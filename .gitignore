@@ -3,7 +3,8 @@ __pycache__
 .bak
 experiments
 scripts/logs
+figures
+data
 data/
 .ipynb_checkpoints/
 waveletflux.egg-info/
-figures
