@@ -2,3 +2,6 @@ __pycache__
 .tmp
 experiments
 scripts/logs
+data/
+.ipynb_checkpoints/
+waveletflux.egg-info/
