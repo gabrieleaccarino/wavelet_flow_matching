@@ -1,0 +1,2 @@
+from waveletflux.modules.datamodules import WellDataModuleLightning
+from waveletflux.modules.augmentations import compose_augmentation

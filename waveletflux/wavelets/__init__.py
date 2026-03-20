@@ -1,0 +1,1 @@
+from waveletflux.wavelets.DWT2D import WaveletDecomposer2D
