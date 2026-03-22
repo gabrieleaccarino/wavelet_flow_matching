@@ -13,11 +13,11 @@
 
 [train]
     epochs            = 1000
-    warmup_epochs     = 50
+    warmup_epochs     = 20
     batch_size        = 16
     n_steps_input     = 4
     n_steps_output    = 1
-    max_rollout_steps = 20
+    max_rollout_steps = 1
     train_shuffle     = true
     val_shuffle       = false
     test_shuffle      = false
@@ -38,14 +38,14 @@
 [velocity_net]
     cls = 'WaveletFlowUNet'
     [velocity_net.params]
-    # conditioning / context
-    num_cond            = 2
-    context_in_channels = 4   # physical fields
-    num_context_frames  = 3   # number of previous frames to condition on
-    # architecture
-    base_ch  = 64
-    n_res    = 2
-    cond_dim = 128
+        # conditioning / context
+        num_cond            = 2
+        context_in_channels = 4   # physical fields
+        num_context_frames  = 3   # number of previous frames to condition on
+        # architecture
+        base_ch  = 64
+        n_res    = 2
+        cond_dim = 128
 
 [flow_matching]
     cls        = 'OT_CFM'

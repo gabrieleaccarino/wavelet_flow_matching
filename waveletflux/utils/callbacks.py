@@ -270,4 +270,4 @@ class PortableModelCheckpoint(ModelCheckpoint):
             },
             out_path,
         )
-        print(f"[rank0] portable checkpoint → {out_path}", flush=True)
+        #print(f"[rank0] portable checkpoint → {out_path}", flush=True)

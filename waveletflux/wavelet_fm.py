@@ -1,7 +1,7 @@
 from torch.optim.lr_scheduler import LinearLR, CosineAnnealingLR, SequentialLR
 import torch.nn.functional as F
 import pytorch_lightning as pl
-from typing import Dict, List
+from typing import Any, Dict, List
 from einops import rearrange
 from torch.optim import *
 import torch
@@ -65,7 +65,7 @@ class WaveletFlowModule(pl.LightningModule):
         velocity_net_cfg : VelocityNetConfig,
         flow_matching_cfg: FlowMatchingConfig,
         optimizer_cfg    : OptimizerConfig,
-        normalizer       
+        normalizer       : Any
     ):
         super().__init__()
 
