@@ -23,6 +23,7 @@
     test_shuffle      = false
     rollout_shuffle   = false
     target_dtype      = 'torch.float32'
+    augmentations     = ['log_scalars']
 
 [wavelet]
     cls         = 'WaveletDecomposer2D'

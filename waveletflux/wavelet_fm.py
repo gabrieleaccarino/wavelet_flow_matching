@@ -129,9 +129,10 @@ class WaveletFlowModule(pl.LightningModule):
             "flow_matching_cfg": flow_matching_cfg.to_dict(),
             "optimizer_cfg":     optimizer_cfg.to_dict(),
             # Normalizer internals — reconstruct on load
-            "normalizer_stats":           normalizer.stats,
-            "normalizer_fields":          list(normalizer.core_field_names),
-            "normalizer_constant_fields": list(normalizer.core_constant_field_names),
+            "normalizer_means":                     normalizer.means,
+            "normalizer_stds":                      normalizer.stds,
+            "normalizer_core_field_names":          normalizer.core_field_names,
+            "normalizer_core_constant_field_names": normalizer.core_constant_field_names,
         })
 
     # ─────────────────────────────────────────────────────────────────────────
@@ -422,16 +423,19 @@ class WaveletFlowModule(pl.LightningModule):
         ckpt = torch.load(path, map_location=map_location)
         hp   = ckpt["hyper_parameters"]
 
+        means = {'mean' : hp["normalizer_means"]}
+        stds  = {'std'  : hp["normalizer_stds"]}
+
         normalizer = ZScoreNormalization(
-            hp["normalizer_stats"],
-            core_field_names          = hp["normalizer_fields"],
-            core_constant_field_names = hp["normalizer_constant_fields"],
+            stats                     = means | stds,
+            core_field_names          = hp["normalizer_core_field_names"],
+            core_constant_field_names = hp["normalizer_core_constant_field_names"],
         )
 
         model = cls(
             in_channels       = hp["in_channels"],
             field_names       = hp["field_names"],
-            data_shape        = tuple(hp["data_shape"]),
+            data_shape        = hp["data_shape"],
             n_steps_output    = hp["n_steps_output"],
             scale_weights     = hp["scale_weights"],
             wavelet_cfg       = WaveletConfig.from_dict(hp["wavelet_cfg"]),

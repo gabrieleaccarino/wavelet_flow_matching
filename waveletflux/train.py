@@ -1,4 +1,14 @@
+import sys
+import os
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from waveletflux.utils.configs import WaveletConfig, VelocityNetConfig, FlowMatchingConfig, OptimizerConfig
+from waveletflux.modules.datamodules import WellDataModuleLightning
+from waveletflux.modules.augmentations import compose_augmentation
 from the_well.data.normalization import ZScoreNormalization
+from waveletflux.utils.experiment import ExperimentManager
+from waveletflux.wavelet_fm import WaveletFlowModule
 from the_well.data import WellDataModule
 import pytorch_lightning as pl
 import argparse
@@ -8,15 +18,6 @@ import torch
 import munch
 import toml
 import yaml
-import sys
-import os
-
-from waveletflux.utils.configs import WaveletConfig, VelocityNetConfig, FlowMatchingConfig, OptimizerConfig
-from waveletflux.modules.datamodules import WellDataModuleLightning
-from waveletflux.utils.callbacks import PortableCheckpointCallback
-from waveletflux.modules.augmentations import compose_augmentation
-from waveletflux.utils.experiment import ExperimentManager
-from waveletflux.wavelet_fm import WaveletFlowModule
 
 def get_rank():
     return int(os.environ.get("RANK", "0"))
@@ -81,7 +82,7 @@ base_data_module = WellDataModule(
     batch_size         = train_cfg.batch_size,
     use_normalization  = False,
     normalization_type = None,
-    transformations    = compose_augmentation(*train_cfg.augmentations),
+    transform          = compose_augmentation(*train_cfg.augmentations),
     data_workers       = config.lightning.datamodules.data_workers,
     world_size         = 1,   # Lightning manages distribution
     rank               = 0,
@@ -98,7 +99,7 @@ data_module = WellDataModuleLightning(
 
 field_names          = base_data_module.train_dataset.core_field_names
 constant_field_names = base_data_module.train_dataset.core_constant_field_names
-data_shape           = base_data_module.train_dataset.data_shape
+data_shape           = base_data_module.train_dataset.metadata.spatial_resolution
 
 with fsspec.open(config.path.stats_path, mode='r') as f:
     stats = yaml.safe_load(f)
