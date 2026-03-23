@@ -12,9 +12,9 @@
     seed = 4739
 
 [train]
-    epochs            = 500
+    epochs            = 200
     warmup_epochs     = 20
-    batch_size        = 64 #16
+    batch_size        = 32
     n_steps_input     = 4
     n_steps_output    = 1
     max_rollout_steps = 1
@@ -78,19 +78,21 @@
 
 [lightning]
     [lightning.datamodules]
-        data_workers = 32 # 8
+        data_workers = 16
 
     [lightning.trainer]
-        accelerator       = 'gpu'
-        strategy          = 'ddp'
-        precision         = 'bf16-mixed' #'32-true'
-        matmul_precision  = 'high'
-        gradient_clip_val = 1.0
-        log_every_n_steps = 1
+        accelerator         = 'gpu'
+        strategy            = 'ddp'
+        precision           = 'bf16-mixed' #'32-true'
+        matmul_precision    = 'high'
+        gradient_clip_val   = 1.0
+        log_every_n_steps   = 1
+        limit_train_batches = 0.10
+        limit_val_batches   = 0.15
 
 [loggers]
     loggers            = ['csv']
-    log_every_n_epochs = 10
+    log_every_n_epochs = 5
 
 [callbacks]
     callbacks = ['model_checkpoint_cb', 'emergency_cb', 'performance_cb']

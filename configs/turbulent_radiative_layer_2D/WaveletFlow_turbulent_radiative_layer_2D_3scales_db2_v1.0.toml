@@ -14,7 +14,7 @@
 [train]
     epochs            = 500
     warmup_epochs     = 20
-    batch_size        = 16
+    batch_size        = 32 #16
     n_steps_input     = 4
     n_steps_output    = 1
     max_rollout_steps = 1
@@ -43,7 +43,8 @@
         context_in_channels = 4   # physical fields
         num_context_frames  = 3   # number of previous frames to condition on
         # architecture
-        base_ch  = 128
+        n_levels = 3              # number of wavelet scales (must >= wavelet.params.n_scales)
+        base_ch  = 64
         n_res    = 3
         cond_dim = 256
 
@@ -76,15 +77,17 @@
 
 [lightning]
     [lightning.datamodules]
-        data_workers = 8
+        data_workers = 16
 
     [lightning.trainer]
-        accelerator       = 'gpu'
-        strategy          = 'ddp'
-        precision         = 'bf16-mixed' #'32-true'
-        matmul_precision  = 'high'
-        gradient_clip_val = 1.0
-        log_every_n_steps = 1
+        accelerator         = 'gpu'
+        strategy            = 'ddp'
+        precision           = 'bf16-mixed' #'32-true'
+        matmul_precision    = 'high'
+        gradient_clip_val   = 1.0
+        log_every_n_steps   = 1
+        limit_train_batches = 1.0
+        limit_val_batches   = 1.0
 
 [loggers]
     loggers            = ['csv']
