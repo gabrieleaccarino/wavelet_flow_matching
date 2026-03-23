@@ -1,7 +1,7 @@
 from torch.optim.lr_scheduler import LinearLR, CosineAnnealingLR, SequentialLR
+from typing import Any, Dict, List
 import torch.nn.functional as F
 import pytorch_lightning as pl
-from typing import Any, Dict, List
 from einops import rearrange
 from torch.optim import *
 import torch
@@ -15,7 +15,6 @@ from waveletflux.utils.configs import (
     OptimizerConfig,
 )
 
-
 # ─────────────────────────────────────────────────────────────────────────────
 # Loss
 # ─────────────────────────────────────────────────────────────────────────────
@@ -24,7 +23,7 @@ def _normed_mse(pred: torch.Tensor, target: torch.Tensor) -> torch.Tensor:
     """
     Variance-normalised MSE.
 
-    var shape (B, C, 1, 1): per-element per-channel spatial variance.
+    var shape (B, C, 1, 1): per-channel spatial variance.
     Normalises across subbands with very different energy levels (LL vs HH).
     """
     var = target.var(dim=(2, 3), keepdim=True).detach().clamp(min=1e-4)
@@ -41,17 +40,32 @@ class WaveletFlowModule(pl.LightningModule):
 
     Parameters
     ----------
-    in_channels     : number of physical fields (C)
-    field_names     : field names, used for logging and plotting
-    data_shape      : (H, W) of the spatial domain
-    n_steps_output  : number of predicted time steps (T)
-    scale_weights   : per-scale loss weights, length must equal wavelet_cfg.n_scales
-    wavelet_cfg     : WaveletConfig
-    velocity_net_cfg: VelocityNetConfig  — swap for any other NetConfig to
-                      plug in a different architecture
+    in_channels      : number of physical fields (C)
+    field_names      : field names, used for logging and plotting
+    data_shape       : (H, W) of the spatial domain
+    n_steps_output   : number of predicted time steps (T)
+    scale_weights    : per-scale loss weights; length must equal n_scales
+    wavelet_cfg      : WaveletConfig
+    velocity_net_cfg : VelocityNetConfig — must include n_levels
     flow_matching_cfg: FlowMatchingConfig
-    optimizer_cfg   : OptimizerConfig
-    normalizer      : noralizer instance, e.g., The Well's ZScoreNormalization
+    optimizer_cfg    : OptimizerConfig
+    normalizer       : normalizer instance, e.g. The Well's ZScoreNormalization
+
+    Decoupled-depth notes
+    ---------------------
+    n_scales  (from wavelet_cfg) — wavelet decomposition depth; controls
+              injection points and the number of velocity outputs.
+    n_levels  (from velocity_net_cfg) — UNet depth (down/upsamplings).
+              Must satisfy n_levels >= n_scales.  Use the same n_levels for
+              all configurations (wavelet and data-space) to keep the
+              network capacity consistent.
+
+    T-dimension fix
+    ---------------
+    x0 (the current frame, T=1) is tiled to (B, C, T, H, W) before being
+    passed through _to_coeff_dict so that curr[i] and x_tau[i] always have
+    the same channel count C*T*n_coeff_i.  The wavelet probe also uses T
+    to produce the correct spatial shapes.
     """
 
     def __init__(
@@ -65,7 +79,7 @@ class WaveletFlowModule(pl.LightningModule):
         velocity_net_cfg : VelocityNetConfig,
         flow_matching_cfg: FlowMatchingConfig,
         optimizer_cfg    : OptimizerConfig,
-        normalizer       : Any
+        normalizer       : Any,
     ):
         super().__init__()
 
@@ -86,6 +100,7 @@ class WaveletFlowModule(pl.LightningModule):
             if self.use_wavelet else None
         )
 
+        # Probe must run AFTER n_steps_output and n_scales are set.
         self.scale_shapes = self._probe_wavelet_shapes()
 
         assert len(scale_weights) == self.n_scales, (
@@ -102,7 +117,9 @@ class WaveletFlowModule(pl.LightningModule):
         self.net = WaveletFlowUNet(
             scale_shapes     = self.scale_shapes,
             in_channels      = self.in_channels,
+            n_steps_output   = self.n_steps_output,   # T-fix: needed for wav_ch
             n_scales         = self.n_scales,
+            n_levels         = vn.n_levels,            # decoupled UNet depth
             context_channels = vn.context_in_channels,
             n_context_frames = vn.num_context_frames,
             cond_dim         = vn.cond_dim,
@@ -112,20 +129,19 @@ class WaveletFlowModule(pl.LightningModule):
         )
 
         self.experiment_manager = None
-        #self.save_hyperparameters(ignore=['normalizer'])
 
-        # Store normalizer stats in hparams so they're embedded in the checkpoint.
-        # The normalizer object itself is not serializable, so we exclude it and
-        # reconstruct it in from_checkpoint() from these plain-dict stats.
+        # Store normalizer stats in hparams so they are embedded in the
+        # checkpoint.  The normalizer object is not serialisable, so we
+        # exclude it and reconstruct it in from_checkpoint() from these
+        # plain-dict stats.
         self.save_hyperparameters({
             "in_channels":       in_channels,
             "field_names":       field_names,
             "data_shape":        data_shape,
             "n_steps_output":    n_steps_output,
             "scale_weights":     scale_weights,
-            # Config dataclasses → plain dicts (add .to_dict() to each Config class)
             "wavelet_cfg":       wavelet_cfg.to_dict(),
-            "velocity_net_cfg":  velocity_net_cfg.to_dict(),
+            "velocity_net_cfg":  velocity_net_cfg.to_dict(),   # includes n_levels
             "flow_matching_cfg": flow_matching_cfg.to_dict(),
             "optimizer_cfg":     optimizer_cfg.to_dict(),
             # Normalizer internals — reconstruct on load
@@ -141,17 +157,29 @@ class WaveletFlowModule(pl.LightningModule):
 
     @torch.no_grad()
     def _probe_wavelet_shapes(self) -> Dict[int, dict]:
+        """
+        Run a dummy tensor through the wavelet decomposer to determine the
+        spatial shape and coefficient count at each scale.
+
+        The dummy uses T = n_steps_output (not T=1) so that the probe is
+        semantically correct even when n_steps_output > 1.  H_s, W_s, and
+        n_coeff do not depend on T, but using the real T avoids any surprise
+        if the decomposer has T-dependent paths.
+        """
         H, W  = self.data_shape
-        dummy = torch.zeros(1, self.in_channels, 1, H, W)
+        dummy = torch.zeros(1, self.in_channels, self.n_steps_output, H, W)
+
         if self.use_wavelet:
             was = self.wavelet_decomposer.training
             self.wavelet_decomposer.eval()
             coeffs = self.wavelet_decomposer.forward_transform(dummy)
             self.wavelet_decomposer.train(was)
+            # coeffs[i] shape: (B, C, T, n_coeff, H_s, W_s)
             return {
                 i: {'H': c.shape[-2], 'W': c.shape[-1], 'n_coeff': c.shape[3]}
                 for i, c in coeffs.items()
             }
+        # Data-space: single scale, full resolution, n_coeff=1
         return {0: {'H': H, 'W': W, 'n_coeff': 1}}
 
     # ─────────────────────────────────────────────────────────────────────────
@@ -167,6 +195,17 @@ class WaveletFlowModule(pl.LightningModule):
                 for i, v in raw.items()
             }
         return {0: rearrange(x, 'B C T H W -> B (C T) H W')}
+
+    def _to_coeff_dict_x0(self, x0: torch.Tensor) -> Dict[int, torch.Tensor]:
+        """
+        Convert the current frame x0 (B, C, 1, H, W) to coefficient dict,
+        tiling to T = n_steps_output along the temporal axis first.
+
+        This ensures curr[i] and x_tau[i] always have the same channel count
+        C*T*n_coeff_i, which is required by the stem convolutions.
+        """
+        x0_tiled = x0.expand(-1, -1, self.n_steps_output, -1, -1)
+        return self._to_coeff_dict(x0_tiled)
 
     def _from_coeff_dict(self, coeff: Dict[int, torch.Tensor]) -> torch.Tensor:
         """
@@ -201,6 +240,7 @@ class WaveletFlowModule(pl.LightningModule):
         Normalise inputs, split into current frame x0, targets x1,
         past context xp, and scalar conditions.
         Returns (x0, x1, cond, B).
+        x0 is (B, C, 1, H, W) — the most recent input frame.
         """
         device = self.device
         inp = self.normalizer.normalize_flattened(
@@ -208,9 +248,9 @@ class WaveletFlowModule(pl.LightningModule):
         out = self.normalizer.normalize_flattened(
             batch["output_fields"].to(device), mode='variable')
 
-        x0  = rearrange(inp[:, -1:], 'B 1 H W C -> B C 1 H W')   # most recent input frame
-        x1  = rearrange(out,         'B T H W C -> B C T H W')   # targets
-        xp  = rearrange(inp[:, :-1], 'B T H W C -> B C T H W')   # past context frames
+        x0 = rearrange(inp[:, -1:], 'B 1 H W C -> B C 1 H W')   # T=1
+        x1 = rearrange(out,         'B T H W C -> B C T H W')   # T=n_steps_output
+        xp = rearrange(inp[:, :-1], 'B T H W C -> B C T H W')   # past context
 
         cond = {
             'const'      : batch['constant_scalars'].to(device),
@@ -228,15 +268,19 @@ class WaveletFlowModule(pl.LightningModule):
 
         For each scale i:
           ε ~ N(0, I)
-          x_tau[i] = t·x1[i] + (1-t)·ε          (OT-CFM interpolant)
-          v_target[i] = x1[i] - ε                (OT-CFM velocity)
+          x_tau[i] = t·x1[i] + (1−t)·ε          (OT-CFM interpolant)
+          v_target[i] = x1[i] − ε                (OT-CFM velocity)
           loss[i] = normed_mse(vel[i], v_target[i])
 
         Total loss = Σ_i  (w_i / Σw) · loss[i]
+
+        x0 is tiled to T=n_steps_output via _to_coeff_dict_x0 so that
+        curr[i] and x_tau[i] have matching channel dimensions.
         """
         x0, x1, cond, B = self._prepare_batch(batch)
 
-        c0 = self._to_coeff_dict(x0)
+        # T-fix: tile x0 to T so curr[i] matches x_tau[i] channel-wise
+        c0 = self._to_coeff_dict_x0(x0)
         c1 = self._to_coeff_dict(x1)
 
         t     = torch.rand(B, device=self.device).clamp(1e-5, 1.0 - 1e-5)
@@ -289,22 +333,25 @@ class WaveletFlowModule(pl.LightningModule):
         """
         Euler integration of the learned vector field.
 
-        x_tau[i] initialised to pure Gaussian noise at t=0.
-        After num_sampling_steps Euler steps x_tau[i] ≈ sample from p(x1_coeffs).
+        x_tau[i] is initialised to pure Gaussian noise at t=0.
+        After num_sampling_steps Euler steps x_tau[i] ≈ sample from p(x1).
         IDWT reconstructs the spatial field.
+
+        x0 is tiled to T=n_steps_output via _to_coeff_dict_x0.
         """
         fm    = self.flow_matching_cfg
         n_ens = n_ensemble or fm.n_ensemble
         dt    = 1.0 / fm.num_sampling_steps
 
         x0, x1, cond, B = self._prepare_batch(batch)
-        c0 = self._to_coeff_dict(x0)
+
+        # T-fix: tile x0 to T
+        c0 = self._to_coeff_dict_x0(x0)
         c1 = self._to_coeff_dict(x1)
 
-        members: List[Dict[int, torch.Tensor]] = [] # each entry: (B, T, H, W, C)
+        members: List[Dict[int, torch.Tensor]] = []
 
         for _ in range(n_ens):
-            # Each member starts from an independent noise sample
             x_tau = {i: torch.randn_like(c1[i]) for i in range(self.n_scales)}
 
             for step in range(fm.num_sampling_steps):
@@ -324,7 +371,6 @@ class WaveletFlowModule(pl.LightningModule):
 
             members.append(self._from_coeff_dict(x_tau))    # (B, T, H, W, C)
 
-        # Stack along a new ensemble dimension
         yhat = torch.stack(members, dim=1)  # (B, E, T, H, W, C)
         y    = self._from_coeff_dict(c1)    # (B, T, H, W, C)
         return yhat, y
@@ -360,11 +406,11 @@ class WaveletFlowModule(pl.LightningModule):
     # ─────────────────────────────────────────────────────────────────────────
 
     def on_train_epoch_end(self, ensemble_reduce: str = 'random'):
-        # TODO: parameterize ensemble_reduce
         """
         Parameters
         ----------
-        ensemble_reduce : how to collapse the E dimension of yhat before plotting.
+        ensemble_reduce : how to collapse the E dimension of yhat before
+            plotting.
             'random' — pick one member at random (default)
             'mean'   — average across all members in physical space
         """
@@ -376,25 +422,26 @@ class WaveletFlowModule(pl.LightningModule):
         )
         if not should_save:
             return
- 
+
         batch, batch_idx = self._get_random_validation_sample()
         yhat, y = self.sample(batch, batch_idx)   # yhat: (B, E, T, H, W, C)
- 
+
         E = yhat.shape[1]
         if ensemble_reduce == 'mean':
-            yhat_reduced = yhat.mean(dim=1)                              # (B, T, H, W, C)
+            yhat_reduced = yhat.mean(dim=1)
         else:
             e = torch.randint(0, E, (1,)).item()
-            yhat_reduced = yhat[:, e]                                    # (B, T, H, W, C)
- 
+            yhat_reduced = yhat[:, e]
+
         self.experiment_manager.dump_sample_plots(
-            yhat = rearrange(yhat_reduced, 'B T H W C -> B C T H W'),
-            y    = rearrange(y, 'B T H W C -> B C T H W'),
-            field_names=self.field_names,
-            fig_name=f"epoch_{self.current_epoch}_val_batch_{batch_idx}.png",
-            cmap='RdBu_r', dpi=300,
+            yhat        = rearrange(yhat_reduced, 'B T H W C -> B C T H W'),
+            y           = rearrange(y,            'B T H W C -> B C T H W'),
+            field_names = self.field_names,
+            fig_name    = f"epoch_{self.current_epoch}_val_batch_{batch_idx}.png",
+            cmap        = 'RdBu_r',
+            dpi         = 300,
         )
- 
+
     def _get_random_validation_sample(self):
         loader = self.trainer.val_dataloaders
         idx    = torch.randint(0, len(loader), (1,)).item()
@@ -404,15 +451,22 @@ class WaveletFlowModule(pl.LightningModule):
         B = batch["output_fields"].shape[0]
         s = torch.randint(0, B, (1,)).item()
         return {k: v[s:s + 1] for k, v in batch.items()}, idx
-    
+
+    # ─────────────────────────────────────────────────────────────────────────
+    # Portable checkpoint
+    # ─────────────────────────────────────────────────────────────────────────
+
     @classmethod
     def from_checkpoint(cls, path: str, map_location="cpu") -> "WaveletFlowModule":
         """
         Load a fully self-contained checkpoint.
         No TOML config, no distributed setup — just the .ckpt file.
 
+        VelocityNetConfig.from_dict must handle the 'n_levels' key that is
+        now included in the saved velocity_net_cfg dict.
+
         Usage:
-            model = WaveletFlowModule.from_checkpoint("portable_epoch0010.ckpt")
+            model = WaveletFlowModule.from_checkpoint("run.ckpt")
             model.eval()
         """
         from the_well.data.normalization import ZScoreNormalization
@@ -423,8 +477,8 @@ class WaveletFlowModule(pl.LightningModule):
         ckpt = torch.load(path, map_location=map_location)
         hp   = ckpt["hyper_parameters"]
 
-        means = {'mean' : hp["normalizer_means"]}
-        stds  = {'std'  : hp["normalizer_stds"]}
+        means = {'mean': hp["normalizer_means"]}
+        stds  = {'std' : hp["normalizer_stds"]}
 
         normalizer = ZScoreNormalization(
             stats                     = means | stds,
@@ -435,7 +489,7 @@ class WaveletFlowModule(pl.LightningModule):
         model = cls(
             in_channels       = hp["in_channels"],
             field_names       = hp["field_names"],
-            data_shape        = hp["data_shape"],
+            data_shape        = tuple(hp["data_shape"]),
             n_steps_output    = hp["n_steps_output"],
             scale_weights     = hp["scale_weights"],
             wavelet_cfg       = WaveletConfig.from_dict(hp["wavelet_cfg"]),
