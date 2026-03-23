@@ -43,6 +43,7 @@
         context_in_channels = 4   # physical fields
         num_context_frames  = 3   # number of previous frames to condition on
         # architecture
+        n_levels = 3              # number of wavelet scales (must >= wavelet.params.n_scales)
         base_ch  = 64
         n_res    = 2
         cond_dim = 128

@@ -165,6 +165,8 @@ trainer = pl.Trainer(
     gradient_clip_val    = gradient_clip_val,
     log_every_n_steps    = lt_train.log_every_n_steps,
     num_sanity_val_steps = 0,
+    limit_train_batches  = lt_train.limit_train_batches,
+    limit_val_batches    = lt_train.limit_val_batches,
 )
 
 if is_rank0:
