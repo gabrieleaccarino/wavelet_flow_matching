@@ -5,6 +5,7 @@ import pytorch_lightning as pl
 from einops import rearrange
 from torch.optim import *
 import torch
+import math
 
 from waveletflux.wavelets.DWT2D import WaveletDecomposer2D
 from waveletflux.models.wavelet_unet import WaveletFlowUNet
@@ -145,8 +146,15 @@ class WaveletFlowModule(pl.LightningModule):
             "flow_matching_cfg": flow_matching_cfg.to_dict(),
             "optimizer_cfg":     optimizer_cfg.to_dict(),
             # Normalizer internals — reconstruct on load
-            "normalizer_means":                     normalizer.means,
-            "normalizer_stds":                      normalizer.stds,
+            #"normalizer_stats":                     normalizer.stats,
+            #"normalizer_means":                     normalizer.means,
+            #"normalizer_stds":                      normalizer.stds,
+            "normalizer_stats": {
+                "mean":       {k: v.tolist() for k, v in normalizer.means.items()},
+                "std":        {k: v.tolist() for k, v in normalizer.stds.items()},
+                "mean_delta": {k: v.tolist() for k, v in normalizer.means_delta.items()},
+                "std_delta":  {k: v.tolist() for k, v in normalizer.stds_delta.items()},
+            },
             "normalizer_core_field_names":          normalizer.core_field_names,
             "normalizer_core_constant_field_names": normalizer.core_constant_field_names,
         })
@@ -375,6 +383,214 @@ class WaveletFlowModule(pl.LightningModule):
         y    = self._from_coeff_dict(c1)    # (B, T, H, W, C)
         return yhat, y
 
+
+    # ─────────────────────────────────────────────────────────────────────────
+    # Autoregressive rollout
+    # ─────────────────────────────────────────────────────────────────────────
+ 
+    @torch.no_grad()
+    def rollout(
+        self,
+        seed          : torch.Tensor,
+        scalar_conds  : torch.Tensor,
+        rollout_steps : int,
+        n_steps_input : int | None = None,
+        n_ensemble    : int | None = None,
+        normalized_input: bool = False,
+        verbose       : bool = False,
+    ) -> torch.Tensor:
+        """
+        Autoregressive rollout from an initial seed window.
+ 
+        At each iteration the model predicts ``n_steps_output`` frames; the
+        sliding context window is advanced by that many frames and the next
+        call uses the freshly predicted frames as conditioning.  The loop
+        runs for ``ceil(rollout_steps / n_steps_output)`` model calls and the
+        output is trimmed to exactly ``rollout_steps`` frames.
+ 
+        The entire ensemble is evaluated in a single batched forward pass
+        (batch dimension = B × N_ENSEMBLE) rather than a sequential member
+        loop, keeping GPU utilisation high.
+ 
+        Parameters
+        ----------
+        seed : Tensor, shape (B, Ti, H, W, C)
+            Seed frames in *physical* space (or already z-score normalised if
+            ``normalized_input=True``).  ``Ti`` must be >= 1.  If ``Ti``
+            exceeds ``n_steps_input``, the last ``n_steps_input`` frames are
+            used as the initial window.
+        scalar_conds : Tensor, shape (B, num_cond)
+            Scalar conditioning variables (e.g. PDE parameters / Reynolds
+            number).  Replicated across ensemble members automatically.
+        rollout_steps : int
+            Total number of output time steps to produce.
+        n_steps_input : int or None
+            Sliding-window width Ti used for conditioning.  Defaults to
+            ``seed.shape[1]`` (use the full seed).  Must match the value used
+            during training.
+        n_ensemble : int or None
+            Ensemble size E.  Defaults to ``flow_matching_cfg.n_ensemble``.
+        normalized_input : bool
+            If ``True``, ``seed`` is treated as already z-score normalised and
+            the normaliser is *not* applied.
+        verbose : bool
+            If ``True``, print a progress line for each model call.
+ 
+        Returns
+        -------
+        preds : Tensor, shape (B, E, rollout_steps, H, W, C)
+            Ensemble predictions in *physical* (denormalised) space, on CPU.
+ 
+        Notes
+        -----
+        * The method runs entirely under ``torch.no_grad()`` and moves the
+          output to CPU incrementally to avoid OOM on long rollouts.
+        * When ``n_steps_output > 1`` the model simultaneously predicts
+          multiple frames, so the number of network evaluations per rollout
+          step is ``ceil(rollout_steps / n_steps_output)``.
+        """
+        fm     = self.flow_matching_cfg
+        n_ens  = n_ensemble if n_ensemble is not None else fm.n_ensemble
+        T_out  = self.n_steps_output      # frames predicted per call
+        dt     = 1.0 / fm.num_sampling_steps
+        device = self.device
+        dtype  = next(self.parameters()).dtype
+ 
+        # ── Input validation ──────────────────────────────────────────────────
+        if seed.ndim != 5:
+            raise ValueError(
+                f"seed must be (B, Ti, H, W, C), got shape {tuple(seed.shape)}"
+            )
+        B, Ti_seed, H, W, C = seed.shape
+ 
+        Ti = n_steps_input if n_steps_input is not None else Ti_seed
+        if Ti_seed < Ti:
+            raise ValueError(
+                f"seed has only {Ti_seed} frames but n_steps_input={Ti} was requested."
+            )
+        if Ti < 1:
+            raise ValueError("n_steps_input must be >= 1.")
+ 
+        # ── 1. Normalise & trim seed window ───────────────────────────────────
+        seed = seed.to(device=device, dtype=dtype)
+ 
+        if not normalized_input:
+            seed_norm = self.normalizer.normalize_flattened(seed, mode='variable')
+        else:
+            seed_norm = seed
+ 
+        seed_norm = seed_norm[:, -Ti:]   # (B, Ti, H, W, C) — keep last Ti frames
+ 
+        # ── 2. Expand seed & scalar conds across ensemble members ─────────────
+        # Layout: rows 0..E-1 → batch element 0, rows E..2E-1 → batch element 1, …
+        # seed_norm : (B, Ti, H, W, C) → (B, 1, Ti, H, W, C) → (B, E, Ti, H, W, C)
+        windows = (
+            seed_norm
+            .unsqueeze(1)
+            .expand(-1, n_ens, -1, -1, -1, -1)
+            .reshape(B * n_ens, Ti, H, W, C)
+            .clone()                              # (B*E, Ti, H, W, C)
+        )
+ 
+        scalar_conds = scalar_conds.to(device=device, dtype=dtype)
+        scalar_exp   = (
+            scalar_conds
+            .unsqueeze(1)
+            .expand(-1, n_ens, -1)
+            .reshape(B * n_ens, -1)              # (B*E, num_cond)
+        )
+ 
+        BxE = B * n_ens
+ 
+        # ── 3. Allocate output buffer on CPU (avoid OOM on long rollouts) ─────
+        preds_phys = torch.zeros(
+            BxE, rollout_steps, H, W, C,
+            device='cpu', dtype=dtype,
+        )
+ 
+        # ── 4. Autoregressive loop ─────────────────────────────────────────────
+        step_out   = 0
+        call_count = 0
+        n_calls    = math.ceil(rollout_steps / T_out)
+ 
+        while step_out < rollout_steps:
+            call_count += 1
+            if verbose:
+                print(
+                    f"  rollout call {call_count:>4d}/{n_calls} "
+                    f"(frames {step_out+1}–{min(step_out+T_out, rollout_steps)}"
+                    f"/{rollout_steps})",
+                    end='\r',
+                )
+ 
+            # ── Conditioning ──────────────────────────────────────────────────
+            # curr: last frame of each member's window, shape (B*E, C, 1, H, W)
+            # past: all preceding frames,              shape (B*E, C, Ti-1, H, W)
+            curr_norm = rearrange(windows[:, -1:], 'B 1 H W Cv -> B Cv 1 H W')
+            past_norm = rearrange(windows[:, :-1], 'B T H W Cv -> B Cv T H W')
+ 
+            # c0[i]: (B*E, C·T_out·n_coeff_i, H_s, W_s)  (tiled to T_out internally)
+            c0 = self._to_coeff_dict_x0(curr_norm)
+ 
+            # ── Initialise noise in wavelet coefficient space ──────────────────
+            # Each scale has its own spatial resolution and coefficient count.
+            x_tau = {
+                i: torch.randn(
+                    BxE,
+                    self.in_channels * T_out * self.scale_shapes[i]['n_coeff'],
+                    self.scale_shapes[i]['H'],
+                    self.scale_shapes[i]['W'],
+                    device=device,
+                    dtype=dtype,
+                )
+                for i in range(self.n_scales)
+            }
+ 
+            # ── Euler integration ──────────────────────────────────────────────
+            for s in range(fm.num_sampling_steps):
+                t_batch = torch.full(
+                    (BxE,),
+                    s / fm.num_sampling_steps,
+                    device=device,
+                    dtype=dtype,
+                )
+                vel = self.net(
+                    curr        = c0,
+                    x_tau       = x_tau,
+                    t           = t_batch,
+                    scalar_conds= scalar_exp,
+                    context     = past_norm,
+                )
+                for i in range(self.n_scales):
+                    x_tau[i] = x_tau[i] + dt * vel[i]
+ 
+            # ── Decode: (B*E, T_out, H, W, C) in physical space ───────────────
+            pred_phys = self._from_coeff_dict(x_tau)   # (B*E, T_out, H, W, C)
+ 
+            # ── Store (clip to remaining budget) ──────────────────────────────
+            frames_to_store = min(T_out, rollout_steps - step_out)
+            preds_phys[:, step_out : step_out + frames_to_store] = (
+                pred_phys[:, :frames_to_store].cpu()
+            )
+            step_out += frames_to_store
+ 
+            # ── Slide the context window forward by T_out frames ───────────────
+            # Normalise the *full* T_out prediction before appending so that
+            # the window always contains z-score normalised values.
+            pred_norm = self.normalizer.normalize_flattened(
+                pred_phys, mode='variable'
+            )                                                        # (B*E, T_out, H, W, C)
+ 
+            # Concatenate new frames and keep only the last Ti frames.
+            windows = torch.cat([windows, pred_norm], dim=1)[:, -Ti:]
+ 
+        if verbose:
+            print()   # newline after \r progress
+ 
+        # ── 5. Reshape to (B, E, rollout_steps, H, W, C) ──────────────────────
+        return preds_phys.view(B, n_ens, rollout_steps, H, W, C)
+ 
+
     # ─────────────────────────────────────────────────────────────────────────
     # Optimiser + scheduler
     # ─────────────────────────────────────────────────────────────────────────
@@ -456,19 +672,53 @@ class WaveletFlowModule(pl.LightningModule):
     # Portable checkpoint
     # ─────────────────────────────────────────────────────────────────────────
 
+    #@classmethod
+    #def from_checkpoint(cls, path: str, map_location="cpu") -> "WaveletFlowModule":
+    #    """
+    #    Load a fully self-contained checkpoint.
+    #    No TOML config, no distributed setup — just the .ckpt file.
+
+    #    VelocityNetConfig.from_dict must handle the 'n_levels' key that is
+    #    now included in the saved velocity_net_cfg dict.
+
+    #    Usage:
+    #        model = WaveletFlowModule.from_checkpoint("run.ckpt")
+    #        model.eval()
+    #    """
+    #    from the_well.data.normalization import ZScoreNormalization
+    #    from waveletflux.utils.configs import (
+    #        WaveletConfig, VelocityNetConfig, FlowMatchingConfig, OptimizerConfig,
+    #    )
+
+    #    ckpt = torch.load(path, map_location=map_location)
+    #    hp   = ckpt["hyper_parameters"]
+
+    #    means = {'mean': hp["normalizer_means"]}
+    #    stds  = {'std' : hp["normalizer_stds"]}
+
+    #    normalizer = ZScoreNormalization(
+    #        stats                     = means | stds,
+    #        core_field_names          = hp["normalizer_core_field_names"],
+    #        core_constant_field_names = hp["normalizer_core_constant_field_names"],
+    #    )
+
+    #    model = cls(
+    #        in_channels       = hp["in_channels"],
+    #        field_names       = hp["field_names"],
+    #        data_shape        = tuple(hp["data_shape"]),
+    #        n_steps_output    = hp["n_steps_output"],
+    #        scale_weights     = hp["scale_weights"],
+    #        wavelet_cfg       = WaveletConfig.from_dict(hp["wavelet_cfg"]),
+    #        velocity_net_cfg  = VelocityNetConfig.from_dict(hp["velocity_net_cfg"]),
+    #        flow_matching_cfg = FlowMatchingConfig.from_dict(hp["flow_matching_cfg"]),
+    #        optimizer_cfg     = OptimizerConfig.from_dict(hp["optimizer_cfg"]),
+    #        normalizer        = normalizer,
+    #    )
+    #    model.load_state_dict(ckpt["state_dict"])
+    #    return model
+    
     @classmethod
-    def from_checkpoint(cls, path: str, map_location="cpu") -> "WaveletFlowModule":
-        """
-        Load a fully self-contained checkpoint.
-        No TOML config, no distributed setup — just the .ckpt file.
-
-        VelocityNetConfig.from_dict must handle the 'n_levels' key that is
-        now included in the saved velocity_net_cfg dict.
-
-        Usage:
-            model = WaveletFlowModule.from_checkpoint("run.ckpt")
-            model.eval()
-        """
+    def from_checkpoint(cls, path: str, map_location="cpu", stats: dict = None) -> "WaveletFlowModule":
         from the_well.data.normalization import ZScoreNormalization
         from waveletflux.utils.configs import (
             WaveletConfig, VelocityNetConfig, FlowMatchingConfig, OptimizerConfig,
@@ -477,11 +727,26 @@ class WaveletFlowModule(pl.LightningModule):
         ckpt = torch.load(path, map_location=map_location)
         hp   = ckpt["hyper_parameters"]
 
-        means = {'mean': hp["normalizer_means"]}
-        stds  = {'std' : hp["normalizer_stds"]}
+        # ── Normalizer stats: external override > new format > old partial format ──
+        if stats is not None:
+            normalizer_stats = stats
+        elif hp.get("normalizer_stats") is not None:
+            normalizer_stats = hp["normalizer_stats"]
+        elif "normalizer_means" in hp and "normalizer_stds" in hp:
+            zeros = {k: 0.0 for k in hp["normalizer_means"]}
+            normalizer_stats = {
+            "mean":       hp["normalizer_means"],
+            "std":        hp["normalizer_stds"],
+            "mean_delta": zeros,
+            "std_delta":  zeros,
+            }
+        else:
+            raise KeyError(
+                f"Cannot find normalizer stats in checkpoint. Keys: {list(hp.keys())}"
+            )
 
         normalizer = ZScoreNormalization(
-            stats                     = means | stds,
+            stats                     = normalizer_stats,
             core_field_names          = hp["normalizer_core_field_names"],
             core_constant_field_names = hp["normalizer_core_constant_field_names"],
         )
@@ -500,3 +765,4 @@ class WaveletFlowModule(pl.LightningModule):
         )
         model.load_state_dict(ckpt["state_dict"])
         return model
+    

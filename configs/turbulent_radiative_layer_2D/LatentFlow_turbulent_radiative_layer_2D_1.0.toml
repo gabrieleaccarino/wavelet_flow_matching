@@ -1,0 +1,97 @@
+[main]
+    exp_name = 'LatentFlow_turbulent_radiative_layer_2D_v1.0'
+
+[path]
+    project_path      = '/glade/work/gaccarino/waveletflux'
+    well_base_path    = '/glade/work/gaccarino/data/datasets'
+    well_dataset_name = 'turbulent_radiative_layer_2D'
+    stats_path        = '/glade/work/gaccarino/data/datasets/turbulent_radiative_layer_2D/stats.yaml'
+    experiments_path  = '/glade/work/gaccarino/waveletflux/experiments/turbulent_radiative_layer_2D'
+
+[random]
+    seed = 2837
+
+[train]
+    epochs            = 200
+    warmup_epochs     = 20
+    batch_size        = 16
+    n_steps_input     = 4
+    n_steps_output    = 1
+    max_rollout_steps = 1
+    train_shuffle     = true
+    val_shuffle       = false
+    test_shuffle      = false
+    rollout_shuffle   = false
+    target_dtype      = 'torch.float32'
+
+# ── VAE  (replaces [wavelet]) ──────────────────────────────────────────────────
+# The SD-VAE compresses (B*G, 3, H, W) → (B*G, 4, H/8, W/8).
+# For C=4 fields: G=2 groups → latent (B, 8, H/8, W/8).
+# For C=3 fields (planetswe): G=1 group → latent (B, 4, H/8, W/8).
+[vae]
+    model_id      = "stabilityai/sd-vae-ft-mse"
+    freeze        = true
+    latent_scale  = 1.0
+    use_mode      = true
+
+# ── Velocity network ──────────────────────────────────────────────────────────
+[velocity_net]
+    cls = 'WaveletFlowUNet'
+    [velocity_net.params]
+        # context_in_channels MUST equal C (the number of physical fields).
+        # Past context is passed in physical space, never VAE-encoded.
+        #   rayleigh_benard / turbulence_radiative_layer_2D : C = 4  → set 4
+        #   planetswe                                       : C = 3  → set 3
+        # conditioning / context
+        num_cond            = 2
+        context_in_channels = 4    # ← change to 3 for planetswe
+        num_context_frames  = 3
+        # architecture
+        n_levels = 3
+        base_ch  = 64
+        n_res    = 2
+        cond_dim = 128
+
+[flow_matching]
+    cls        = 'OT_CFM'
+    n_ensemble = 1
+
+[flow_matching.params]
+    sigma = 0.0
+
+[loss]
+    scale_weights = [1.0]    # single latent scale — always exactly one entry
+
+[sampling]
+    solver             = 'euler'
+    num_sampling_steps = 20
+
+[optimizer]
+    cls = 'AdamW'
+    [optimizer.params]
+        lr           = 3e-4
+        weight_decay = 1e-2
+        betas        = [0.9, 0.999]
+
+[scheduler]
+    cls = 'CosineAnnealingLR'
+    [scheduler.params]
+        eta_min = 1e-7
+
+[lightning]
+    [lightning.datamodules]
+        data_workers = 8
+    [lightning.trainer]
+        accelerator       = 'gpu'
+        strategy          = 'ddp'
+        precision         = '32-true'
+        matmul_precision  = 'high'
+        gradient_clip_val = 1.0
+        log_every_n_steps = 1
+
+[loggers]
+    loggers            = ['csv']
+    log_every_n_epochs = 10
+
+[callbacks]
+    callbacks = ['model_checkpoint_cb', 'emergency_cb', 'performance_cb']
