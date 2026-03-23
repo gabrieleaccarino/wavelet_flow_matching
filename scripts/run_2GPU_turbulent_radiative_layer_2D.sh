@@ -1,7 +1,7 @@
 #!/bin/bash -l
-#PBS -N LatentFlow_turbulent_radiative_layer_2D_v0.0
-#PBS -o /glade/work/gaccarino/waveletflux/scripts/logs/LatentFlow_turbulent_radiative_layer_2D_v0.0.out
-#PBS -e /glade/work/gaccarino/waveletflux/scripts/logs/LatentFlow_turbulent_radiative_layer_2D_v0.0.err
+#PBS -N WaveletFlow_turbulent_radiative_layer_2D_3scales_db2_v1.0
+#PBS -o /glade/work/gaccarino/waveletflux/scripts/logs/WaveletFlow_turbulent_radiative_layer_2D_3scales_db2_v1.0.out
+#PBS -e /glade/work/gaccarino/waveletflux/scripts/logs/WaveletFlow_turbulent_radiative_layer_2D_3scales_db2_v1.0.err
 
 # === Project / Queue ===
 #PBS -A UCLB0062
@@ -30,6 +30,6 @@ conda activate mlenv
 # === Run ===
 REPO=/glade/work/gaccarino/waveletflux
 torchrun --nproc_per_node=2 \
-    ${REPO}/waveletflux/train_latent_fm.py \
-    -c ${REPO}/configs/turbulent_radiative_layer_2D/LatentFlow_turbulent_radiative_layer_2D_v0.0.toml \
+    ${REPO}/waveletflux/train.py \
+    -c ${REPO}/configs/turbulent_radiative_layer_2D/WaveletFlow_turbulent_radiative_layer_2D_3scales_db2_v1.0.toml \
     -n 1 -d 2
