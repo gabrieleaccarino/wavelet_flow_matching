@@ -60,6 +60,7 @@ class VelocityNetConfig:
     # Architecture knobs
     base_ch  : int = 32
     n_res    : int = 1
+    n_levels : int = 3
     cond_dim : int = 128
     # Conditioning / context
     num_cond            : int = 0
@@ -72,6 +73,7 @@ class VelocityNetConfig:
         return cls(
             base_ch             = int(getattr(p, 'base_ch',             32)),
             n_res               = int(getattr(p, 'n_res',               1)),
+            n_levels            = int(getattr(p, 'n_levels',            3)),  # must >= wavelet.params.n_scales
             cond_dim            = int(getattr(p, 'cond_dim',            128)),
             num_cond            = int(getattr(p, 'num_cond',            0)),
             context_in_channels = int(getattr(p, 'context_in_channels', 4)),
