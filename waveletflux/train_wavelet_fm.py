@@ -1,14 +1,5 @@
-import sys
-import os
-
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-
-from waveletflux.utils.configs import WaveletConfig, VelocityNetConfig, FlowMatchingConfig, OptimizerConfig
-from waveletflux.modules.datamodules import WellDataModuleLightning
-from waveletflux.modules.augmentations import compose_augmentation
+from waveletflux.utils.augmentations import compose_augmentation
 from the_well.data.normalization import ZScoreNormalization
-from waveletflux.utils.experiment import ExperimentManager
-from waveletflux.wavelet_fm import WaveletFlowModule
 from the_well.data import WellDataModule
 import pytorch_lightning as pl
 import argparse
@@ -18,6 +9,15 @@ import torch
 import munch
 import toml
 import yaml
+import sys
+import os
+
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from waveletflux.utils.configs import WaveletConfig, VelocityNetConfig, FlowMatchingConfig, OptimizerConfig
+from waveletflux.utils.well_data import WellDataModuleLightning
+from waveletflux.modules.wavelet_fm import WaveletFlowModule
+from waveletflux.utils.experiment import ExperimentManager
 
 def get_rank():
     return int(os.environ.get("RANK", "0"))

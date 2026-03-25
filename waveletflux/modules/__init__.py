@@ -1,3 +1,4 @@
-from waveletflux.modules.datamodules import WellDataModuleLightning
-from waveletflux.modules.augmentations import compose_augmentation
-from waveletflux.modules.data import get_well_dataset, get_well_inputs
+from waveletflux.utils.well_data import WellDataModuleLightning
+from waveletflux.utils.augmentations import compose_augmentation
+from waveletflux.utils.well_data import get_well_dataset, get_well_inputs
+from waveletflux.modules.neural_ops import NeuralOperatorModule

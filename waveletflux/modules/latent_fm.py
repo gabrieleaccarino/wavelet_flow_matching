@@ -48,15 +48,14 @@ physical space to ContextEncoder, never encoded to the latent space.
 
 from __future__ import annotations
 
-import math
+from torch.optim.lr_scheduler import LinearLR, CosineAnnealingLR, SequentialLR
 from typing import Any, Dict, List, Optional, Tuple
-
-import torch
+from diffusers import AutoencoderKL
 import torch.nn.functional as F
 import pytorch_lightning as pl
-from torch.optim.lr_scheduler import LinearLR, CosineAnnealingLR, SequentialLR
-from diffusers import AutoencoderKL
 from einops import rearrange
+import torch
+import math
 
 from waveletflux.models.wavelet_unet import WaveletFlowUNet
 from waveletflux.utils.configs import (
@@ -64,7 +63,7 @@ from waveletflux.utils.configs import (
     FlowMatchingConfig,
     OptimizerConfig,
 )
-from waveletflux.utils.latent_configs import LatentVAEConfig
+from waveletflux.utils.configs import LatentVAEConfig
 
 
 # ─────────────────────────────────────────────────────────────────────────────
