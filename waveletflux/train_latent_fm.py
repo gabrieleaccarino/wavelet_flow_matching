@@ -39,8 +39,8 @@ from waveletflux.utils.configs import (
     OptimizerConfig,
 )
 from waveletflux.utils.latent_configs import LatentVAEConfig                  # ← CHANGED (1a)
-from waveletflux.latent_fm import LatentFlowModule                            # ← CHANGED (1b)
-from waveletflux.modules.datamodules import WellDataModuleLightning
+from waveletflux.modules.latent_fm import LatentFlowModule                            # ← CHANGED (1b)
+from waveletflux.utils.well_data import WellDataModuleLightning
 from waveletflux.utils.experiment import ExperimentManager
 
 
