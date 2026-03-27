@@ -1,6 +1,9 @@
 [main]
     exp_name   = 'WaveletFlow_turbulent_radiative_layer_2D_1scales_db2_v1.0'
 
+[resume]
+    ckpt = ''
+
 [path]
     project_path      = '/glade/work/gaccarino/waveletflux'
     well_base_path    = '/glade/work/gaccarino/data/datasets'
