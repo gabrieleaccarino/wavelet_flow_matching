@@ -7,6 +7,7 @@ import matplotlib.animation as ani
 import matplotlib.pyplot as plt
 import numpy as np
 import seaborn as sb
+import pandas as pd
 import torch
 
 from IPython.display import Video
@@ -377,3 +378,136 @@ def draw_movie(
         return Video(file, embed=embed, width=1280)
     else:
         return file
+
+
+def plot_psd_seaborn(
+    psd_df:      pd.DataFrame,
+    field_names: list[str],
+    *,
+    # ── aggregation ────────────────────────────────────────────────────────────
+    agg_over:    list[str] = ("traj", "ens", "step"),  # dims collapsed to mean
+    # ── style ──────────────────────────────────────────────────────────────────
+    gt_label:    str = "Ground-truth",
+    palette:     str | list | None = "tab10",
+    gt_color:    str = "black",
+    gt_lw:       float = 2.0,
+    model_lw:    float = 1.5,
+    ci:          int | str | None = 95,   # seaborn errorband; None = no band
+    figsize:     tuple[float, float] = (4.0, 3.5),
+    log_base:    int = 2,
+) -> plt.Figure:
+    """
+    Draw one log-log PSD panel per field.
+ 
+    The function aggregates `psd_df` over `agg_over` dimensions (default:
+    mean across trajectories, ensemble members, and lead-time steps).  The
+    error band (95 % CI by default) shows variability that remains after
+    averaging — e.g. across trajectories if you only average over ens/step.
+ 
+    Parameters
+    ----------
+    psd_df      : DataFrame from build_psd_df
+    field_names : ordered list of field labels to panel
+    agg_over    : columns whose variance is collapsed by seaborn's estimator
+    gt_label    : value of the "model" column that identifies ground truth
+    palette     : seaborn / matplotlib palette for non-GT models
+    ci          : confidence-interval width passed to sns.lineplot (int or
+                  "sd"); set to None to suppress error bands
+    figsize     : per-panel size; total width = figsize[0] * n_fields
+    log_base    : base for both axes (2 = octave spacing, 10 = decade spacing)
+ 
+    Returns
+    -------
+    matplotlib Figure
+    """
+    n_fields = len(field_names)
+    fig, axs = plt.subplots(
+        1, n_fields,
+        figsize=(figsize[0] * n_fields, figsize[1]),
+        squeeze=False,
+        sharey=False,
+    )
+ 
+    # Separate models so GT always gets a fixed black line
+    all_models = [m for m in psd_df["model"].unique() if m != gt_label]
+ 
+    if isinstance(palette, str):
+        colors = sb.color_palette(palette, n_colors=len(all_models))
+    else:
+        colors = palette or sb.color_palette("tab10", n_colors=len(all_models))
+ 
+    model_palette = dict(zip(all_models, colors))
+ 
+    for col_idx, field in enumerate(field_names):
+        ax = axs[0, col_idx]
+ 
+        df_field = psd_df[psd_df["field"] == field].copy()
+ 
+        # ── non-GT models ──────────────────────────────────────────────────
+        df_models = df_field[df_field["model"] != gt_label]
+ 
+        if not df_models.empty:
+            sb.lineplot(
+                data=df_models,
+                x="wavelength",
+                y="psd",
+                hue="model",
+                palette=model_palette,
+                estimator="mean",
+                errorbar=("ci", ci) if ci is not None else None,
+                linewidth=model_lw,
+                ax=ax,
+            )
+ 
+        # ── Ground truth (always on top in black) ─────────────────────────
+        df_gt = df_field[df_field["model"] == gt_label]
+ 
+        if not df_gt.empty:
+            sb.lineplot(
+                data=df_gt,
+                x="wavelength",
+                y="psd",
+                color=gt_color,
+                dashes=(4, 2),
+                estimator="mean",
+                errorbar=None,          # GT is deterministic → no CI band
+                linewidth=gt_lw,
+                label=gt_label,
+                ax=ax,
+            )
+ 
+        # ── log-log scale & cosmetics ──────────────────────────────────────
+        ax.set_xscale("log", base=log_base)
+        ax.set_yscale("log", base=log_base)
+        ax.invert_xaxis()               # large wavelengths on the left
+ 
+        # Tick at every power of log_base that appears in the data
+        wl_min = df_field["wavelength"].replace([np.inf], np.nan).dropna().min()
+        wl_max = df_field["wavelength"].replace([np.inf], np.nan).dropna().max()
+        exp_min = math.floor(math.log(wl_min, log_base))
+        exp_max = math.ceil(math.log(wl_max, log_base))
+        ticks = [log_base ** e for e in range(exp_min, exp_max + 1)]
+        ax.set_xticks(ticks)
+        ax.xaxis.set_major_formatter(
+            plt.FuncFormatter(lambda v, _: rf"$2^{{{int(round(math.log(v, log_base)))}}}$"
+                              if v > 0 else ""))
+ 
+        ax.set_title(field)
+        ax.set_xlabel(f"wavelength")
+        #ax.set_xlabel(f"wavelength  [px / cycle]")
+ 
+        if col_idx == 0:
+            ax.set_ylabel("power spectrum density")
+        else:
+            ax.set_ylabel("")
+ 
+        # Keep a single, clean legend on each panel
+        handles, labels = ax.get_legend_handles_labels()
+        if handles:
+            ax.legend(handles, labels, fontsize=8, framealpha=0.7)
+        else:
+            ax.legend().set_visible(False)
+ 
+    fig.align_labels()
+    fig.tight_layout()
+    return fig

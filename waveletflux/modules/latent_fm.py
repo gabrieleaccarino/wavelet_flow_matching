@@ -54,6 +54,7 @@ from diffusers import AutoencoderKL
 import torch.nn.functional as F
 import pytorch_lightning as pl
 from einops import rearrange
+from torch.optim import *
 import torch
 import math
 
@@ -117,7 +118,7 @@ class LatentFlowModule(pl.LightningModule):
         self.vae_cfg           = vae_cfg
 
         # ── Frozen VAE ────────────────────────────────────────────────────────
-        self.vae = AutoencoderKL.from_pretrained(vae_cfg.model_id)
+        self.vae = AutoencoderKL.from_pretrained(vae_cfg.model_id, subfolder='vae')
         if vae_cfg.freeze:
             self.vae.requires_grad_(False)
             self.vae.eval()
@@ -134,9 +135,10 @@ class LatentFlowModule(pl.LightningModule):
 
         # latent_channels per frame = G * lat_ch_per_group
         # n_coeff in scale_shapes[0] already includes T, so divide it back out
-        self.latent_channels = (
-            self.scale_shapes[0]['n_coeff'] // self.n_steps_output
-        )
+        #self.latent_channels = (
+        #    self.scale_shapes[0]['n_coeff'] // self.n_steps_output
+        #)
+        self.latent_channels = self.n_groups * self._lat_ch_per_group
 
         assert len(scale_weights) == 1, (
             f"LatentFlowModule uses a single latent scale; "
@@ -191,23 +193,39 @@ class LatentFlowModule(pl.LightningModule):
 
     @torch.no_grad()
     def _probe_latent_shape(self) -> Dict[int, dict]:
-        """
-        Run a dummy tensor through the VAE encoder to determine latent dims.
-
-        Returns {0: {'H': H_lat, 'W': W_lat, 'n_coeff': G*lat_ch*T}} so
-        that WaveletFlowUNet receives the same scale_shapes structure as
-        in wavelet_fm, and wav_ch[0] = latent_channels * T correctly.
-        """
         H, W   = self.data_shape
         device = next(self.vae.parameters()).device
         dummy  = torch.zeros(self.n_groups, 3, H, W, device=device)
         lat    = self.vae.encode(dummy).latent_dist.mode()
         _, lat_ch_per_group, H_lat, W_lat = lat.shape
 
-        # n_coeff = G * lat_ch_per_group * T  →  wav_ch[0] = latent_ch * T
-        n_coeff = self.n_groups * lat_ch_per_group * self.n_steps_output
+        # Save so __init__ can compute latent_channels directly
+        self._lat_ch_per_group = lat_ch_per_group
 
-        return {0: {'H': H_lat, 'W': W_lat, 'n_coeff': n_coeff}}
+        # n_coeff = 1: there is only one "sub-band" in latent space.
+        # G and lat_ch are already in `in_channels = latent_channels`.
+        # T is already in wav_ch via n_steps_output. No double-counting.
+        return {0: {'H': H_lat, 'W': W_lat, 'n_coeff': 1}}
+
+    #@torch.no_grad()
+    #def _probe_latent_shape(self) -> Dict[int, dict]:
+    #    """
+    #    Run a dummy tensor through the VAE encoder to determine latent dims.
+#
+    #    Returns {0: {'H': H_lat, 'W': W_lat, 'n_coeff': G*lat_ch*T}} so
+    #    that WaveletFlowUNet receives the same scale_shapes structure as
+    #    in wavelet_fm, and wav_ch[0] = latent_channels * T correctly.
+    #    """
+    #    H, W   = self.data_shape
+    #    device = next(self.vae.parameters()).device
+    #    dummy  = torch.zeros(self.n_groups, 3, H, W, device=device)
+    #    lat    = self.vae.encode(dummy).latent_dist.mode()
+    #    _, lat_ch_per_group, H_lat, W_lat = lat.shape
+#
+    #    # n_coeff = G * lat_ch_per_group * T  →  wav_ch[0] = latent_ch * T
+    #    n_coeff = self.n_groups * lat_ch_per_group * self.n_steps_output
+#
+    #    return {0: {'H': H_lat, 'W': W_lat, 'n_coeff': n_coeff}}
 
     # ─────────────────────────────────────────────────────────────────────────
     # VAE encode / decode  (internal building blocks)
