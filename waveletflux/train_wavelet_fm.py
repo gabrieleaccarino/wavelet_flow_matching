@@ -1,4 +1,3 @@
-from waveletflux.utils.augmentations import compose_augmentation
 from the_well.data.normalization import ZScoreNormalization
 from the_well.data import WellDataModule
 import pytorch_lightning as pl
@@ -15,6 +14,7 @@ import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from waveletflux.utils.configs import WaveletConfig, VelocityNetConfig, FlowMatchingConfig, OptimizerConfig
+from waveletflux.utils.augmentations import compose_augmentation
 from waveletflux.utils.well_data import WellDataModuleLightning
 from waveletflux.modules.wavelet_fm import WaveletFlowModule
 from waveletflux.utils.experiment import ExperimentManager
@@ -97,11 +97,7 @@ data_module = WellDataModuleLightning(
     target_dtype    = eval(train_cfg.target_dtype),
 )
 
-
-#field_names          = base_data_module.train_dataset.core_field_names
-#constant_field_names = base_data_module.train_dataset.core_constant_field_names
-#data_shape           = base_data_module.train_dataset.metadata.spatial_resolution
-
+# Load normalization stats (computed from training data) and create normalizer instance
 with fsspec.open(config.path.stats_path, mode='r') as f:
     stats = yaml.safe_load(f)
 
@@ -114,6 +110,7 @@ normalizer = ZScoreNormalization(
 data_shape  = base_data_module.train_dataset.metadata.spatial_resolution
 meta_fields = base_data_module.train_dataset.metadata.field_names
 field_names = [item for sublist in meta_fields.values() for item in sublist]
+
 # ─────────────────────────────────────────────────────────────────────────────
 # Model
 # ─────────────────────────────────────────────────────────────────────────────
@@ -138,7 +135,7 @@ model = WaveletFlowModule(
 model.experiment_manager = ExperimentManager(
     base_dir           = config.path.experiments_path,
     experiment_name    = config.main.exp_name,
-    overwrite          = False,
+    overwrite          = False, # config.resume.ckpt is not None
     loggers            = config.loggers.loggers,
     callbacks          = config.callbacks.callbacks,
     log_every_n_epochs = config.loggers.log_every_n_epochs,
@@ -200,7 +197,11 @@ if is_rank0:
 # Train
 # ─────────────────────────────────────────────────────────────────────────────
 
-trainer.fit(model, datamodule=data_module)
+# resume checkpoint if specified
+if not config.resume.ckpt:
+    trainer.fit(model, datamodule=data_module)
+else:   
+    trainer.fit(model, datamodule=data_module, ckpt_path=config.resume.ckpt)
 
 if is_rank0:
     end_time = datetime.datetime.now()

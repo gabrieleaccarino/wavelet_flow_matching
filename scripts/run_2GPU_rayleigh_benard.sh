@@ -30,6 +30,6 @@ conda activate mlenv
 # === Run ===
 REPO=/glade/work/gaccarino/waveletflux
 torchrun --nproc_per_node=2 \
-    ${REPO}/waveletflux/train.py \
+    ${REPO}/waveletflux/train_wavelet_fm.py \
     -c ${REPO}/configs/rayleigh_benard/WaveletFlow_rayleigh_benard_3scales_db2_v1.0.toml \
     -n 1 -d 2
