@@ -1,9 +1,7 @@
-import matplotlib.pyplot as plt
 import pandas as pd
 import torch
 
-from waveletflux.utils.fourier import isotropic_power_spectrum, isotropic_cross_correlation
-
+from waveletflux.utils.fourier import isotropic_power_spectrum, isotropic_cross_correlation, isotropic_binning
 
 # ══════════════════════════════════════════════════════════════════════════════
 # Core metric computation
@@ -163,7 +161,9 @@ def build_stats_df(
     return pd.DataFrame(records)
 """
 
-
+# ══════════════════════════════════════════════════════════════════════════════
+# Build the statistics DataFrame
+# ══════════════════════════════════════════════════════════════════════════════
 
 def build_stats_df(
     truth:        torch.Tensor,             # (N_TRAJ, STEPS, H, W, C)
@@ -241,3 +241,156 @@ def build_stats_df(
                     })
 
     return pd.DataFrame(records)
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# Build the DataFrame for power spectral density (PSD) curves
+# ══════════════════════════════════════════════════════════════════════════════
+
+def build_psd_df(
+    truth:        torch.Tensor,             # (N_TRAJ, STEPS, H, W, C)
+    predictions:  dict[str, torch.Tensor],  # name -> (N_TRAJ, N_ENS, STEPS, H, W, C)
+                                            #      or (N_TRAJ,        STEPS, H, W, C)
+    field_names:  list[str],
+    Ti:           int = 0,                  # context frames to skip (same as build_stats_df)
+    lead_times:   list[int] | None = None,  # 0-indexed rollout steps; None = all
+    stride:       int = 1,
+    traj_indices: list[int] | None = None,
+    spatial:      int = 2,
+    min_bin_count: int = 3,                 # drop frequency bins with fewer contributing
+                                            # pixels than this — suppresses Nyquist noise
+) -> pd.DataFrame:
+    """
+    Compute the isotropic power spectrum for every combination of:
+        (model, trajectory, ensemble-member, field, lead-time, wavenumber)
+ 
+    The returned DataFrame is in **long format** — one row per wavenumber bin —
+    so that seaborn can aggregate freely (mean over traj / ens / step, CI bands, …).
+ 
+    Columns
+    -------
+    model, traj, ens, field, step, time   – identifiers
+    k                                     – spatial frequency  (cycles / pixel)
+    wavelength                            – 1 / k              (pixels / cycle)
+    psd                                   – power spectral density
+ 
+    Notes
+    -----
+    * "GT" is added automatically as a model with a single ensemble member (ens=0).
+    * For deterministic baselines (5-D pred tensor) ens is always 0.
+    * Frequency bins with fewer than `min_bin_count` contributing pixels are
+      dropped.  These are the isotropic corners of the 2-D spectrum (near Nyquist)
+      where the radial average is based on only 1–2 pixels and produces noisy,
+      model-dependent spikes at low wavelengths.  Default = 3 is conservative;
+      increase to 8–16 for cleaner plots on small grids.
+    * All PSD arrays are stored as Python lists (not numpy views) before being
+      passed to pandas, which prevents silent k↔psd misalignment when explode()
+      is called on object-dtype columns.
+    """
+    N_TRAJ, STEPS = truth.shape[:2]
+ 
+    if traj_indices is None:
+        traj_indices = list(range(N_TRAJ))
+ 
+    # ── derive max usable rollout steps (mirrors build_stats_df) ─────────────
+    pred_steps = []
+    for pred in predictions.values():
+        s = pred.shape[2] if pred.ndim == 6 else pred.shape[1]
+        pred_steps.append(s)
+ 
+    max_steps = min(STEPS - Ti, *pred_steps)
+ 
+    if lead_times is None:
+        lead_times = list(range(max_steps))
+    else:
+        oob = [t for t in lead_times if t >= max_steps]
+        if oob:
+            raise ValueError(
+                f"lead_times {oob} exceed available steps ({max_steps}). "
+                f"truth has {STEPS} steps, Ti={Ti}, "
+                f"shortest pred has {min(pred_steps)} steps."
+            )
+ 
+    # ── pre-compute low-count bin mask once (shared grid shape for all tensors) ─
+    # isotropic_binning is @cached so this is free after the first real call
+    _sample_shape = tuple(int(x) for x in truth.shape[2:2 + spatial])  # (H, W)
+    _edges, _counts, _ = isotropic_binning(_sample_shape, device=torch.device("cpu"))
+    # Drop bins with too few contributing pixels — these are the noisy Nyquist
+    # corner bins that cause the high-frequency spike on some models.
+    _valid = (_counts[1:] >= min_bin_count).numpy()     # (B,) bool
+ 
+    # ── helper: collect PSD rows for one (traj, field, step) slice ───────────
+    def _rows_from_tensor(
+        v: torch.Tensor,        # (N_ENS, H, W)  already sliced
+        model_name: str,
+        traj_idx: int,
+        field_name: str,
+        step: int,
+    ) -> list[dict]:
+        v = torch.as_tensor(v, dtype=torch.float32)
+        p_v, k = isotropic_power_spectrum(v, spatial=spatial)  # (N_ENS, B), (B,)
+ 
+        # ── owned copies, not views ─────────────────────────────────────────
+        # p_v[ens_idx] would be a numpy *view* of p_np; storing views from
+        # different loop iterations in a DataFrame then calling explode() can
+        # silently mis-align k↔psd because pandas may evaluate the views lazily.
+        # Converting to Python lists sidesteps this entirely.
+        k_np  = k.numpy(force=True)[_valid]           # (B',) owned copy via bool-index
+        wl_np = (1.0 / k_np)                          # (B',) all k > 0 after mask
+        p_np  = p_v.numpy(force=True)[:, _valid]      # (N_ENS, B') owned copy
+ 
+        n_ens = p_np.shape[0]
+        k_list  = k_np.tolist()    # Python list — pandas explode is unambiguous
+        wl_list = wl_np.tolist()   #   for any pandas version
+ 
+        rows = []
+        for ens_idx in range(n_ens):
+            rows.append({
+                "model":      model_name,
+                "traj":       traj_idx,
+                "ens":        ens_idx,
+                "field":      field_name,
+                "step":       step,
+                "time":       step * stride,
+                "k":          k_list,
+                "wavelength": wl_list,
+                "psd":        p_np[ens_idx].tolist(),   # .tolist() → independent copy
+            })
+        return rows
+ 
+    # ── accumulate records (arrays, not scalars → explode once at the end) ───
+    records = []
+ 
+    # Ground truth (model="Ground-truth", ens=0)
+    for traj_idx in traj_indices:
+        for field_idx, field_name in enumerate(field_names):
+            for step in lead_times:
+                u = truth[traj_idx, Ti + step, :, :, field_idx]
+                u_batch = u.unsqueeze(0)                   # (1, H, W) – fake ens dim
+                records.extend(
+                    _rows_from_tensor(u_batch, "Ground-truth", traj_idx, field_name, step)
+                )
+ 
+    # Predictions
+    for model_name, pred in predictions.items():
+        is_ensemble = pred.ndim == 6
+ 
+        for traj_idx in traj_indices:
+            for field_idx, field_name in enumerate(field_names):
+                for step in lead_times:
+                    if is_ensemble:
+                        v = pred[traj_idx, :, step, :, :, field_idx]    # (N_ENS, H, W)
+                    else:
+                        v = pred[traj_idx, step, :, :, field_idx].unsqueeze(0)
+                    records.extend(
+                        _rows_from_tensor(v, model_name, traj_idx, field_name, step)
+                    )
+ 
+    # ── build DataFrame: each row holds arrays → explode to long format ───────
+    df = pd.DataFrame(records)
+    df = df.explode(["k", "wavelength", "psd"]).reset_index(drop=True)
+    df["k"]          = df["k"].astype(float)
+    df["wavelength"] = df["wavelength"].astype(float)
+    df["psd"]        = df["psd"].astype(float)
+ 
+    return df
