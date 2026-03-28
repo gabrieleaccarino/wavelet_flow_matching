@@ -380,7 +380,8 @@ class WaveletFlowModule(pl.LightningModule):
             members.append(self._from_coeff_dict(x_tau))    # (B, T, H, W, C)
 
         yhat = torch.stack(members, dim=1)  # (B, E, T, H, W, C)
-        y    = self._from_coeff_dict(c1)    # (B, T, H, W, C)
+        #y    = self._from_coeff_dict(c1)    # (B, T, H, W, C)
+        y = self.normalizer.denormalize_flattened(rearrange(x1, 'B C T H W -> B T H W C'), mode='variable')
         return yhat, y
 
 
