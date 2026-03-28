@@ -19,7 +19,6 @@ The three-line diff is marked with  # ← CHANGED  comments.
 from the_well.data.normalization import ZScoreNormalization
 from the_well.data import WellDataModule
 import pytorch_lightning as pl
-from einops import rearrange
 import argparse
 import fsspec
 import munch
@@ -52,7 +51,7 @@ print(f"[RANK {RANK}] starting train.py", flush=True)
 # CLI
 # ─────────────────────────────────────────────────────────────────────────────
 
-parser = argparse.ArgumentParser(prog='WaveletFlow', description='Multi-Scale Wavelet Flow Matching')
+parser = argparse.ArgumentParser(prog='LatentFlow', description='Latent Flow Matching')
 parser.add_argument('-c', '--config',    type=str, required=True, help='TOML config file')
 parser.add_argument('-n', '--num_nodes', type=int, required=True, help='Number of cluster nodes')
 parser.add_argument('-d', '--devices',  type=int, required=True, help='GPUs per node')
@@ -87,7 +86,6 @@ optimizer_cfg     = OptimizerConfig.from_config(config.optimizer, config.schedul
 # ─────────────────────────────────────────────────────────────────────────────
 
 train_cfg = config.train
-
 
 base_data_module = WellDataModule(
     well_base_path     = config.path.well_base_path,

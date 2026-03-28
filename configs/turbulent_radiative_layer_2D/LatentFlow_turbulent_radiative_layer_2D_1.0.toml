@@ -15,9 +15,9 @@
     seed = 2837
 
 [train]
-    epochs            = 200
-    warmup_epochs     = 20
-    batch_size        = 16
+    epochs            = 500
+    warmup_epochs     = 50
+    batch_size        = 32
     n_steps_input     = 4
     n_steps_output    = 1
     max_rollout_steps = 1
@@ -37,7 +37,7 @@
     #model_id      = "'adamo1139/stable-diffusion-3.5-large-turbo-ungated'"
     freeze        = true
     latent_scale  = 1.0
-    use_mode      = true
+    use_mode      = false # true avoids encoder stochasticity
 
 # ── Velocity network ──────────────────────────────────────────────────────────
 [velocity_net]
@@ -54,8 +54,8 @@
         # architecture
         n_levels = 3
         base_ch  = 64
-        n_res    = 2
-        cond_dim = 128
+        n_res    = 6
+        cond_dim = 256
 
 [flow_matching]
     cls        = 'OT_CFM'
@@ -88,8 +88,8 @@
         data_workers = 8
     [lightning.trainer]
         accelerator         = 'gpu'
-        strategy            = 'auto' #'ddp'
-        precision           = '32-true'
+        strategy            = 'ddp'
+        precision           = 'bf16-mixed'
         matmul_precision    = 'high'
         gradient_clip_val   = 1.0
         log_every_n_steps   = 1
@@ -98,7 +98,7 @@
 
 [loggers]
     loggers            = ['csv']
-    log_every_n_epochs = 10
+    log_every_n_epochs = 5
 
 [callbacks]
     callbacks = ['model_checkpoint_cb', 'emergency_cb', 'performance_cb']
