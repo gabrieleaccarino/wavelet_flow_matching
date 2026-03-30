@@ -22,18 +22,20 @@ import torch
 import sys
 import os
 
-# Silence tltorch / neuralop deprecation warnings
-warnings.filterwarnings("ignore", category=UserWarning, module="tltorch")
-warnings.filterwarnings("ignore", category=UserWarning, module="neuralop")
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from waveletflux.modules.neural_ops import NeuralOperatorModule
 from waveletflux.utils.well_data import WellDataModule
+
+# Silence tltorch / neuralop deprecation warnings
+warnings.filterwarnings("ignore", category=UserWarning, module="tltorch")
+warnings.filterwarnings("ignore", category=UserWarning, module="neuralop")
 
 # ── CLI ───────────────────────────────────────────────────────────────────────
 
 def parse_args():
     parser = argparse.ArgumentParser(
-        prog="train_fno.py",
+        prog="train_neural_ops.py",
         description="FNO / TFNO baseline — PyTorch Lightning + DeepSpeed",
     )
 
@@ -88,7 +90,7 @@ def main():
     is_main = (rank == 0)
 
     if is_main:
-        print(f"[RANK {rank}] starting train_fno.py", flush=True)
+        print(f"[RANK {rank}] starting train_neural_ops.py", flush=True)
 
     # Defaults
     lr = args.lr if args.lr is not None else (5e-3 if args.model == "fno" else 1e-3)
@@ -106,6 +108,7 @@ def main():
 
     # ── Seed (mirrors pl.seed_everything in train.py) ─────────────────────────
     pl.seed_everything(42)
+    torch.set_float32_matmul_precision('high')
 
     # ── DataModule ────────────────────────────────────────────────────────────
     data_module = WellDataModule(
@@ -182,8 +185,6 @@ def main():
     save_last=True,
     every_n_epochs=1,           # check every epoch, save when val_loss improves
 )
-
-
 
 
     lr_monitor = pl.callbacks.LearningRateMonitor(logging_interval="epoch")
