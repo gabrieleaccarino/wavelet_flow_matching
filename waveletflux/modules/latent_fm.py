@@ -63,8 +63,8 @@ from waveletflux.utils.configs import (
     VelocityNetConfig,
     FlowMatchingConfig,
     OptimizerConfig,
+    LatentVAEConfig
 )
-from waveletflux.utils.configs import LatentVAEConfig
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -182,11 +182,20 @@ class LatentFlowModule(pl.LightningModule):
             "velocity_net_cfg":  vn.to_dict(),
             "flow_matching_cfg": flow_matching_cfg.to_dict(),
             "optimizer_cfg":     optimizer_cfg.to_dict(),
-            "normalizer_means":                     normalizer.means,
-            "normalizer_stds":                      normalizer.stds,
+            #"normalizer_means":                     normalizer.means,
+            "normalizer_stats": {
+                "mean":       {k: v.tolist() for k, v in normalizer.means.items()},
+                "std":        {k: v.tolist() for k, v in normalizer.stds.items()},
+                "mean_delta": {k: v.tolist() for k, v in normalizer.means_delta.items()},
+                "std_delta":  {k: v.tolist() for k, v in normalizer.stds_delta.items()},
+            },
             "normalizer_core_field_names":          normalizer.core_field_names,
             "normalizer_core_constant_field_names": normalizer.core_constant_field_names,
         })
+            #"normalizer_stds":                      normalizer.stds,
+            #"normalizer_core_field_names":          normalizer.core_field_names,
+            #"normalizer_core_constant_field_names": normalizer.core_constant_field_names,
+        #})
 
     # ─────────────────────────────────────────────────────────────────────────
     # Shape probe  (mirrors _probe_wavelet_shapes)
@@ -540,25 +549,72 @@ class LatentFlowModule(pl.LightningModule):
     # Portable checkpoint  (mirrors wavelet_fm.from_checkpoint)
     # ─────────────────────────────────────────────────────────────────────────
 
+    #@classmethod
+    #def from_checkpoint(cls, path: str, map_location="cpu") -> "LatentFlowModule":
+    #    """
+    #    Load a fully self-contained checkpoint.
+    #    No TOML config, no distributed setup — just the .ckpt file.
+    #    """
+    #    from the_well.data.normalization import ZScoreNormalization
+    #    from waveletflux.utils.configs import (
+    #        VelocityNetConfig, FlowMatchingConfig, OptimizerConfig,
+    #    )
+
+    #    ckpt = torch.load(path, map_location=map_location)
+    #    hp   = ckpt["hyper_parameters"]
+
+    #    normalizer = ZScoreNormalization(
+    #        stats={
+    #            'mean': hp["normalizer_means"],
+    #            'std' : hp["normalizer_stds"],
+    #        },
+    #        core_field_names          = hp["normalizer_core_field_names"],
+    #        core_constant_field_names = hp["normalizer_core_constant_field_names"],
+    #    )
+
+    #    model = cls(
+    #        in_channels       = hp["in_channels"],
+    #        field_names       = hp["field_names"],
+    #        data_shape        = tuple(hp["data_shape"]),
+    #        n_steps_output    = hp["n_steps_output"],
+    #        scale_weights     = hp["scale_weights"],
+    #        vae_cfg           = LatentVAEConfig.from_dict(hp["vae_cfg"]),
+    #        velocity_net_cfg  = VelocityNetConfig.from_dict(hp["velocity_net_cfg"]),
+    #        flow_matching_cfg = FlowMatchingConfig.from_dict(hp["flow_matching_cfg"]),
+    #        optimizer_cfg     = OptimizerConfig.from_dict(hp["optimizer_cfg"]),
+    #        normalizer        = normalizer,
+    #    )
+    #    model.load_state_dict(ckpt["state_dict"])
+    #    return model
+
     @classmethod
-    def from_checkpoint(cls, path: str, map_location="cpu") -> "LatentFlowModule":
-        """
-        Load a fully self-contained checkpoint.
-        No TOML config, no distributed setup — just the .ckpt file.
-        """
+    def from_checkpoint(cls, path: str, map_location="cpu", stats: dict = None) -> "LatentFlowModule":
         from the_well.data.normalization import ZScoreNormalization
-        from waveletflux.utils.configs import (
-            VelocityNetConfig, FlowMatchingConfig, OptimizerConfig,
-        )
+        from waveletflux.utils.configs import VelocityNetConfig, FlowMatchingConfig, OptimizerConfig, LatentVAEConfig
 
         ckpt = torch.load(path, map_location=map_location)
         hp   = ckpt["hyper_parameters"]
 
+        # ── Normalizer stats: external override > new format > old partial format ──
+        if stats is not None:
+            normalizer_stats = stats
+        elif hp.get("normalizer_stats") is not None:
+            normalizer_stats = hp["normalizer_stats"]
+        elif "normalizer_means" in hp and "normalizer_stds" in hp:
+            zeros = {k: 0.0 for k in hp["normalizer_means"]}
+            normalizer_stats = {
+            "mean":       hp["normalizer_means"],
+            "std":        hp["normalizer_stds"],
+            "mean_delta": zeros,
+            "std_delta":  zeros,
+            }
+        else:
+            raise KeyError(
+                f"Cannot find normalizer stats in checkpoint. Keys: {list(hp.keys())}"
+            )
+
         normalizer = ZScoreNormalization(
-            stats={
-                'mean': hp["normalizer_means"],
-                'std' : hp["normalizer_stds"],
-            },
+            stats                     = normalizer_stats,
             core_field_names          = hp["normalizer_core_field_names"],
             core_constant_field_names = hp["normalizer_core_constant_field_names"],
         )
@@ -579,6 +635,191 @@ class LatentFlowModule(pl.LightningModule):
         return model
 
 
+    #@torch.no_grad()
+    #def rollout(
+    #    self,
+    #    seed            : torch.Tensor,
+    #    scalar_conds    : torch.Tensor,
+    #    rollout_steps   : int,
+    #    n_steps_input   : int | None = None,
+    #    n_ensemble      : int | None = None,
+    #    normalized_input: bool = False,
+    #    verbose         : bool = False,
+    #) -> torch.Tensor:
+    #    """
+    #    Autoregressive rollout in the VAE latent space.
+#
+    #    Mirrors WaveletFlowModule.rollout exactly.  The three latent-specific
+    #    differences are marked with # LATENT: comments:
+#
+    #    1.  c0 is computed via _to_latent(x0_tiled) instead of
+    #        _to_coeff_dict_x0, to stay consistent with _compute_loss.
+    #    2.  x_tau is a single-scale dict {0: tensor} whose channel count is
+    #        latent_channels * T_out (not in_channels * T_out * n_coeff_i).
+    #    3.  Decode via _from_latent(x_tau, scales=None) — no per-sample
+    #        scale is available at inference; the fixed input_scale in
+    #        _encode_frame / _decode_frame absorbs the rescaling.
+#
+    #    Parameters
+    #    ----------
+    #    seed : (B, Ti, H, W, C)
+    #        Seed frames in physical space (or already z-score normalised if
+    #        ``normalized_input=True``).  Ti must be >= 1.
+    #    scalar_conds : (B, num_cond)
+    #        Scalar conditioning variables, e.g. PDE parameters / Re number.
+    #    rollout_steps : int
+    #        Total output frames to produce.
+    #    n_steps_input : int or None
+    #        Sliding-window width.  Defaults to seed.shape[1].
+    #    n_ensemble : int or None
+    #        Ensemble size E.  Defaults to flow_matching_cfg.n_ensemble.
+    #    normalized_input : bool
+    #        If True, skip normalisation (seed already in z-score space).
+    #    verbose : bool
+    #        Print per-call progress.
+#
+    #    Returns
+    #    -------
+    #    Tensor of shape (B, E, rollout_steps, H, W, C)  — physical space, CPU.
+    #    """
+    #    fm     = self.flow_matching_cfg
+    #    n_ens  = n_ensemble if n_ensemble is not None else fm.n_ensemble
+    #    T_out  = self.n_steps_output
+    #    dt     = 1.0 / fm.num_sampling_steps
+    #    device = self.device
+    #    dtype  = next(self.parameters()).dtype
+#
+    #    # ── Input validation ──────────────────────────────────────────────────
+    #    if seed.ndim != 5:
+    #        raise ValueError(
+    #            f"seed must be (B, Ti, H, W, C), got {tuple(seed.shape)}"
+    #        )
+    #    B, Ti_seed, H, W, C = seed.shape
+#
+    #    Ti = n_steps_input if n_steps_input is not None else Ti_seed
+    #    if Ti_seed < Ti:
+    #        raise ValueError(
+    #            f"seed has only {Ti_seed} frames but n_steps_input={Ti} requested."
+    #        )
+    #    if Ti < 1:
+    #        raise ValueError("n_steps_input must be >= 1.")
+#
+    #    # ── 1. Normalise & trim seed window ───────────────────────────────────
+    #    seed = seed.to(device=device, dtype=dtype)
+#
+    #    seed_norm = (
+    #        seed if normalized_input
+    #        else self.normalizer.normalize_flattened(seed, mode='variable')
+    #    )
+    #    seed_norm = seed_norm[:, -Ti:]          # (B, Ti, H, W, C)
+#
+    #    # ── 2. Expand seed & scalar conds over ensemble members ───────────────
+    #    windows = (
+    #        seed_norm
+    #        .unsqueeze(1)
+    #        .expand(-1, n_ens, -1, -1, -1, -1)
+    #        .reshape(B * n_ens, Ti, H, W, C)
+    #        .clone()                            # (B*E, Ti, H, W, C)
+    #    )
+#
+    #    scalar_conds = scalar_conds.to(device=device, dtype=dtype)
+    #    scalar_exp   = (
+    #        scalar_conds
+    #        .unsqueeze(1)
+    #        .expand(-1, n_ens, -1)
+    #        .reshape(B * n_ens, -1)             # (B*E, num_cond)
+    #    )
+#
+    #    BxE = B * n_ens
+#
+    #    # ── 3. Allocate output buffer on CPU ──────────────────────────────────
+    #    preds_phys = torch.zeros(
+    #        BxE, rollout_steps, H, W, C,
+    #        device='cpu', dtype=dtype,
+    #    )
+#
+    #    # ── LATENT: latent spatial dimensions from the probed shape ──────────
+    #    H_lat  = self.scale_shapes[0]['H']
+    #    W_lat  = self.scale_shapes[0]['W']
+    #    # Channel count that _to_latent packs into the channel axis:
+    #    #   latent_channels (= G * lat_ch_per_group) per frame × T_out frames
+    #    lat_ch_total = self.latent_channels * T_out
+#
+    #    # ── 4. Autoregressive loop ─────────────────────────────────────────────
+    #    step_out   = 0
+    #    call_count = 0
+    #    n_calls    = math.ceil(rollout_steps / T_out)
+#
+    #    while step_out < rollout_steps:
+    #        call_count += 1
+    #        if verbose:
+    #            print(
+    #                f"  rollout call {call_count:>4d}/{n_calls} "
+    #                f"(frames {step_out+1}–{min(step_out+T_out, rollout_steps)}"
+    #                f"/{rollout_steps})",
+    #                end='\r',
+    #            )
+#
+    #        # ── Conditioning ──────────────────────────────────────────────────
+    #        # curr:  (B*E, C, 1, H, W)     — last frame in z-score space
+    #        # past:  (B*E, C, Ti-1, H, W)  — preceding frames, z-score space
+    #        # (context is always in physical/z-score space, never VAE-encoded)
+    #        curr_norm = rearrange(windows[:, -1:], 'Be 1 H W Cv -> Be Cv 1 H W')
+    #        past_norm = rearrange(windows[:, :-1], 'Be T H W Cv -> Be Cv T H W')
+#
+    #        # LATENT 1: tile current frame to T_out before encoding, matching
+    #        # the _compute_loss convention: x0_tiled = x0.expand(..., T_out, ...)
+    #        x0_tiled = curr_norm.expand(-1, -1, T_out, -1, -1)   # (B*E, C, T_out, H, W)
+    #        #0, _    = self._to_latent(x0_tiled)                 # {0: (B*E, lat_ch*T_out, H_lat, W_lat)}
+    #        # In rollout, capture c0 scales
+    #        c0, c0_scales = self._to_latent(x0_tiled)   # (T_out * B*E * G, 1, 1, 1)
+#
+    #        # LATENT 2: noise lives in the single latent scale, channel count
+    #        # is latent_channels * T_out (not in_channels * T_out * n_coeff).
+    #        x_tau = {
+    #            0: torch.randn(BxE, lat_ch_total, H_lat, W_lat,
+    #                        device=device, dtype=dtype)
+    #        }
+#
+    #        # ── Euler integration ──────────────────────────────────────────────
+    #        for s in range(fm.num_sampling_steps):
+    #            t_batch = torch.full(
+    #                (BxE,), s / fm.num_sampling_steps,
+    #                device=device, dtype=dtype,
+    #            )
+    #            vel = self.net(
+    #                curr         = c0,
+    #                x_tau        = x_tau,
+    #                t            = t_batch,
+    #                scalar_conds = scalar_exp,
+    #                context      = past_norm,
+    #            )
+    #            x_tau[0] = x_tau[0] + dt * vel[0]
+#
+    #        # LATENT 3: decode without per-sample scales — the fixed input_scale
+    #        # in _encode_frame / _decode_frame handles the rescaling symmetrically.
+    #        #pred_phys = self._from_latent(x_tau, scales=None)    # (B*E, T_out, H, W, C)
+    #        pred_phys = self._from_latent(x_tau, c0_scales)    # (B*E, T_out, H, W, C)
+#
+    #        # ── Store (clip to remaining budget) ──────────────────────────────
+    #        frames_to_store = min(T_out, rollout_steps - step_out)
+    #        preds_phys[:, step_out : step_out + frames_to_store] = (
+    #            pred_phys[:, :frames_to_store].cpu()
+    #        )
+    #        step_out += frames_to_store
+#
+    #        # ── Slide context window forward ───────────────────────────────────
+    #        pred_norm = self.normalizer.normalize_flattened(
+    #            pred_phys, mode='variable'
+    #        )                                                       # (B*E, T_out, H, W, C)
+    #        windows = torch.cat([windows, pred_norm], dim=1)[:, -Ti:]
+#
+    #    if verbose:
+    #        print()
+#
+    #    # ── 5. Reshape to (B, E, rollout_steps, H, W, C) ──────────────────────
+    #    return preds_phys.view(B, n_ens, rollout_steps, H, W, C)
+
     @torch.no_grad()
     def rollout(
         self,
@@ -593,22 +834,28 @@ class LatentFlowModule(pl.LightningModule):
         """
         Autoregressive rollout in the VAE latent space.
 
-        Mirrors WaveletFlowModule.rollout exactly.  The three latent-specific
-        differences are marked with # LATENT: comments:
+        Key difference from the original: two parallel sliding windows are
+        maintained to eliminate the decode→renormalize→re-encode cycle for
+        `curr` that caused error accumulation in the original implementation.
 
-        1.  c0 is computed via _to_latent(x0_tiled) instead of
-            _to_coeff_dict_x0, to stay consistent with _compute_loss.
-        2.  x_tau is a single-scale dict {0: tensor} whose channel count is
-            latent_channels * T_out (not in_channels * T_out * n_coeff_i).
-        3.  Decode via _from_latent(x_tau, scales=None) — no per-sample
-            scale is available at inference; the fixed input_scale in
-            _encode_frame / _decode_frame absorbs the rescaling.
+        latent_windows  : (B*E, Ti, latent_channels, H_lat, W_lat)
+            Sliding window in latent space.  `curr` is taken directly from
+            here — no VAE encode inside the loop.
+
+        phys_windows    : (B*E, Ti, H, W, C)
+            Sliding window in normalized physical space.  `past_states`
+            context is always passed in physical space to ContextEncoder,
+            so this window must be maintained in parallel.
+
+        The only remaining decode inside the loop is the one needed to
+        update phys_windows and write preds_phys — unavoidable given that
+        the ContextEncoder operates in physical space.
 
         Parameters
         ----------
         seed : (B, Ti, H, W, C)
             Seed frames in physical space (or already z-score normalised if
-            ``normalized_input=True``).  Ti must be >= 1.
+            normalized_input=True).  Ti must be >= 1.
         scalar_conds : (B, num_cond)
             Scalar conditioning variables, e.g. PDE parameters / Re number.
         rollout_steps : int
@@ -648,48 +895,57 @@ class LatentFlowModule(pl.LightningModule):
         if Ti < 1:
             raise ValueError("n_steps_input must be >= 1.")
 
-        # ── 1. Normalise & trim seed window ───────────────────────────────────
-        seed = seed.to(device=device, dtype=dtype)
+        # ── Latent spatial dims ───────────────────────────────────────────────
+        H_lat        = self.scale_shapes[0]['H']
+        W_lat        = self.scale_shapes[0]['W']
+        lat_ch       = self.latent_channels            # G * lat_ch_per_group
+        lat_ch_total = lat_ch * T_out                  # packed channel dim for net
 
+        # ── 1. Normalise seed ─────────────────────────────────────────────────
+        seed = seed.to(device=device, dtype=dtype)
         seed_norm = (
             seed if normalized_input
             else self.normalizer.normalize_flattened(seed, mode='variable')
         )
-        seed_norm = seed_norm[:, -Ti:]          # (B, Ti, H, W, C)
+        seed_norm = seed_norm[:, -Ti:]                 # (B, Ti, H, W, C)
 
-        # ── 2. Expand seed & scalar conds over ensemble members ───────────────
-        windows = (
+        # ── 2. Expand over ensemble ───────────────────────────────────────────
+        # phys_windows: (B*E, Ti, H, W, C) — normalized physical space
+        phys_windows = (
             seed_norm
             .unsqueeze(1)
             .expand(-1, n_ens, -1, -1, -1, -1)
             .reshape(B * n_ens, Ti, H, W, C)
-            .clone()                            # (B*E, Ti, H, W, C)
+            .clone()
         )
 
         scalar_conds = scalar_conds.to(device=device, dtype=dtype)
-        scalar_exp   = (
+        scalar_exp = (
             scalar_conds
             .unsqueeze(1)
             .expand(-1, n_ens, -1)
-            .reshape(B * n_ens, -1)             # (B*E, num_cond)
+            .reshape(B * n_ens, -1)                   # (B*E, num_cond)
         )
 
         BxE = B * n_ens
 
-        # ── 3. Allocate output buffer on CPU ──────────────────────────────────
+        # ── 3. Encode seed frames once into latent space ──────────────────────
+        # latent_windows: (B*E, Ti, lat_ch, H_lat, W_lat)
+        # This is the only VAE encode call — never repeated inside the loop.
+        seed_bcthw = rearrange(phys_windows, 'Be T H W Cv -> Be Cv T H W')
+        lat_frames = []
+        for t in range(Ti):
+            z_t, _ = self._encode_frame(seed_bcthw[:, :, t])   # (B*E, lat_ch, H_lat, W_lat)
+            lat_frames.append(z_t)
+        latent_windows = torch.stack(lat_frames, dim=1)         # (B*E, Ti, lat_ch, H_lat, W_lat)
+
+        # ── 4. Output buffer on CPU ───────────────────────────────────────────
         preds_phys = torch.zeros(
             BxE, rollout_steps, H, W, C,
             device='cpu', dtype=dtype,
         )
 
-        # ── LATENT: latent spatial dimensions from the probed shape ──────────
-        H_lat  = self.scale_shapes[0]['H']
-        W_lat  = self.scale_shapes[0]['W']
-        # Channel count that _to_latent packs into the channel axis:
-        #   latent_channels (= G * lat_ch_per_group) per frame × T_out frames
-        lat_ch_total = self.latent_channels * T_out
-
-        # ── 4. Autoregressive loop ─────────────────────────────────────────────
+        # ── 5. Autoregressive loop ────────────────────────────────────────────
         step_out   = 0
         call_count = 0
         n_calls    = math.ceil(rollout_steps / T_out)
@@ -704,26 +960,26 @@ class LatentFlowModule(pl.LightningModule):
                     end='\r',
                 )
 
-            # ── Conditioning ──────────────────────────────────────────────────
-            # curr:  (B*E, C, 1, H, W)     — last frame in z-score space
-            # past:  (B*E, C, Ti-1, H, W)  — preceding frames, z-score space
-            # (context is always in physical/z-score space, never VAE-encoded)
-            curr_norm = rearrange(windows[:, -1:], 'Be 1 H W Cv -> Be Cv 1 H W')
-            past_norm = rearrange(windows[:, :-1], 'Be T H W Cv -> Be Cv T H W')
+            # ── Build c0: tile last latent frame T_out times ──────────────────
+            # Mirrors _compute_loss: x0_tiled = x0.expand(-1, -1, T_out, -1, -1)
+            # then _to_latent concatenates T_out identical encoded frames along
+            # the channel axis → (B*E, lat_ch * T_out, H_lat, W_lat).
+            # Here we replicate that directly from the latent window, with zero
+            # VAE encode — the key fix vs the original implementation.
+            curr_lat = latent_windows[:, -1]                    # (B*E, lat_ch, H_lat, W_lat)
+            c0 = {0: curr_lat.repeat(1, T_out, 1, 1)}          # (B*E, lat_ch*T_out, H_lat, W_lat)
 
-            # LATENT 1: tile current frame to T_out before encoding, matching
-            # the _compute_loss convention: x0_tiled = x0.expand(..., T_out, ...)
-            x0_tiled = curr_norm.expand(-1, -1, T_out, -1, -1)   # (B*E, C, T_out, H, W)
-            c0, _    = self._to_latent(x0_tiled)                 # {0: (B*E, lat_ch*T_out, H_lat, W_lat)}
+            # ── Past context: from normalized physical window ─────────────────
+            # The ContextEncoder always operates in physical/z-score space.
+            past_norm = rearrange(
+                phys_windows[:, :-1], 'Be T H W Cv -> Be Cv T H W'
+            )                                                   # (B*E, C, Ti-1, H, W)
 
-            # LATENT 2: noise lives in the single latent scale, channel count
-            # is latent_channels * T_out (not in_channels * T_out * n_coeff).
+            # ── Euler integration ─────────────────────────────────────────────
             x_tau = {
                 0: torch.randn(BxE, lat_ch_total, H_lat, W_lat,
                             device=device, dtype=dtype)
             }
-
-            # ── Euler integration ──────────────────────────────────────────────
             for s in range(fm.num_sampling_steps):
                 t_batch = torch.full(
                     (BxE,), s / fm.num_sampling_steps,
@@ -738,9 +994,11 @@ class LatentFlowModule(pl.LightningModule):
                 )
                 x_tau[0] = x_tau[0] + dt * vel[0]
 
-            # LATENT 3: decode without per-sample scales — the fixed input_scale
-            # in _encode_frame / _decode_frame handles the rescaling symmetrically.
-            pred_phys = self._from_latent(x_tau, scales=None)    # (B*E, T_out, H, W, C)
+            # ── Decode predicted latent → physical ────────────────────────────
+            # scales=None: no per-sample scale available for predicted latents.
+            # This single decode per rollout step is unavoidable — it is needed
+            # both to store predictions and to update phys_windows for context.
+            pred_phys = self._from_latent(x_tau, scales=None)  # (B*E, T_out, H, W, C)
 
             # ── Store (clip to remaining budget) ──────────────────────────────
             frames_to_store = min(T_out, rollout_steps - step_out)
@@ -749,14 +1007,27 @@ class LatentFlowModule(pl.LightningModule):
             )
             step_out += frames_to_store
 
-            # ── Slide context window forward ───────────────────────────────────
+            # ── Slide latent window forward ───────────────────────────────────
+            # Extract per-frame latents from x_tau channel packing and append.
+            # No decode+re-encode: predicted latents go directly into the window.
+            new_lat_frames = x_tau[0].reshape(
+                BxE, T_out, lat_ch, H_lat, W_lat
+            )                                                   # (B*E, T_out, lat_ch, H_lat, W_lat)
+            latent_windows = torch.cat(
+                [latent_windows, new_lat_frames], dim=1
+            )[:, -Ti:]                                          # (B*E, Ti, lat_ch, H_lat, W_lat)
+
+            # ── Slide physical window forward ─────────────────────────────────
+            # Normalize the decoded prediction and append to physical context.
             pred_norm = self.normalizer.normalize_flattened(
                 pred_phys, mode='variable'
-            )                                                       # (B*E, T_out, H, W, C)
-            windows = torch.cat([windows, pred_norm], dim=1)[:, -Ti:]
+            )                                                   # (B*E, T_out, H, W, C)
+            phys_windows = torch.cat(
+                [phys_windows, pred_norm], dim=1
+            )[:, -Ti:]                                          # (B*E, Ti, H, W, C)
 
         if verbose:
             print()
 
-        # ── 5. Reshape to (B, E, rollout_steps, H, W, C) ──────────────────────
+        # ── 6. Reshape to (B, E, rollout_steps, H, W, C) ─────────────────────
         return preds_phys.view(B, n_ens, rollout_steps, H, W, C)
