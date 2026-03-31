@@ -73,6 +73,8 @@ assert len(config.loss.scale_weights) == wavelet_cfg.n_scales, (
 
 train_cfg = config.train
 
+SUBSET_KWS = {"restrict_num_trajectories": 0.05, "restriction_seed": config.random.seed}
+
 base_data_module = WellDataModule(
     well_base_path     = config.path.well_base_path,
     well_dataset_name  = config.path.well_dataset_name,
@@ -86,6 +88,13 @@ base_data_module = WellDataModule(
     data_workers       = config.lightning.datamodules.data_workers,
     world_size         = 1,   # Lightning manages distribution
     rank               = 0,
+    dataset_kws={
+        "train"         : SUBSET_KWS, # restrict training data to speed up iteration
+        "val"           : {},         # use full data    
+        "rollout_val"   : {},         # use full data
+        "test"          : {},         # use full data
+        "rollout_test"  : {},         # use full data
+    }
 )
 
 data_module = WellDataModuleLightning(
