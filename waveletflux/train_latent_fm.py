@@ -34,7 +34,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 # ── project imports ───────────────────────────────────────────────────────────
 from waveletflux.utils.configs import VelocityNetConfig, FlowMatchingConfig, OptimizerConfig, LatentVAEConfig
 from waveletflux.utils.augmentations import compose_augmentation
-from waveletflux.utils.well_data import WellDataModuleLightning
+from waveletflux.waveletflux.utils.well_data import WellDataModuleLightning
 from waveletflux.modules.latent_fm import LatentFlowModule                     
 from waveletflux.utils.experiment import ExperimentManager
 

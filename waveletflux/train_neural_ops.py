@@ -25,7 +25,7 @@ import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from waveletflux.modules.neural_ops import NeuralOperatorModule
-from waveletflux.utils.well_data import WellDataModule
+from waveletflux.waveletflux.utils.well_data import WellDataModule
 
 # Silence tltorch / neuralop deprecation warnings
 warnings.filterwarnings("ignore", category=UserWarning, module="tltorch")
