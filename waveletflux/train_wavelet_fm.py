@@ -15,7 +15,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from waveletflux.utils.configs import WaveletConfig, VelocityNetConfig, FlowMatchingConfig, OptimizerConfig
 from waveletflux.utils.augmentations import compose_augmentation, compose_transformation
-from waveletflux.utils.well_data import WellDataModuleLightning
+from waveletflux.waveletflux.utils.well_data import WellDataModuleLightning
 from waveletflux.modules.wavelet_fm import WaveletFlowModule
 from waveletflux.utils.experiment import ExperimentManager
 
@@ -96,8 +96,6 @@ base_data_module = WellDataModule(
     batch_size         = train_cfg.batch_size,
     use_normalization  = False,
     normalization_type = None,
-    augmentation       = augmentation,    # stochastic, train only
-    transformation     = transformation,  # deterministic, all splits
     data_workers       = config.lightning.datamodules.data_workers,
     world_size         = 1,   # Lightning manages distribution
     rank               = 0,
@@ -117,6 +115,8 @@ data_module = WellDataModuleLightning(
     test_shuffle    = train_cfg.test_shuffle,
     rollout_shuffle = train_cfg.rollout_shuffle,
     target_dtype    = eval(train_cfg.target_dtype),
+    augmentation    = augmentation,    # stochastic, train only
+    transformation  = transformation,  # deterministic, all splits
 )
 
 # Load normalization stats (computed from training data) and create normalizer instance
