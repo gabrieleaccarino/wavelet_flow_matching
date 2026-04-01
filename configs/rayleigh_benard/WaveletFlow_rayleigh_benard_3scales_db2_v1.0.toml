@@ -26,7 +26,8 @@
     test_shuffle      = false
     rollout_shuffle   = false
     target_dtype      = 'torch.float32'
-    augmentations     = ['log_scalars']
+    augmentations     = []                  # stochastic: random_axis_flip, etc. — train only
+    transformations   = ['log_scalars']     # deterministic: applied to ALL splits
 
 [wavelet]
     cls         = 'WaveletDecomposer2D'

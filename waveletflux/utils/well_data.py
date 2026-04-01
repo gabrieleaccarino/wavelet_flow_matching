@@ -1,3 +1,4 @@
+from the_well.data.augmentation import Augmentation, Compose
 from the_well.data.normalization import ZScoreNormalization
 from typing import Dict, Optional, Sequence, Tuple, Any
 from the_well.data import WellDataModule, WellDataset
@@ -8,7 +9,7 @@ import torch
 import yaml
 import os
 
-from waveletflux.utils.augmentations import compose_augmentation
+from waveletflux.utils.augmentations import compose_augmentation, compose_transformation
 
 
 class WellDataModuleLightning(pl.LightningDataModule):
@@ -142,6 +143,8 @@ class WellDataModule(pl.LightningDataModule):
         n_steps_output:  int,
         batch_size:      int,
         num_workers:     int,
+        augmentation:    Optional[Augmentation] = None,   # stochastic, train only
+        transformation:  Optional[Augmentation] = None,   # deterministic, all splits
     ):
         super().__init__()
         self.well_base_path  = well_base_path
@@ -151,16 +154,37 @@ class WellDataModule(pl.LightningDataModule):
         self.n_steps_output  = n_steps_output
         self.batch_size      = batch_size
         self.num_workers     = num_workers
+        self.augmentation    = augmentation
+        self.transformation  = transformation
         self.normalizer      = None  # set in setup()
+
+    def _make_transform(self, split: str) -> Optional[Augmentation]:
+        """
+        Compose the correct transform for a given split.
+
+        - train : transformation + augmentation  (deterministic first, then stochastic)
+        - others: transformation only
+        """
+        ops = []
+        if self.transformation is not None:
+            ops.append(self.transformation)
+        if split == "train" and self.augmentation is not None:
+            ops.append(self.augmentation)
+
+        if not ops:
+            return None
+        return Compose(*ops) if len(ops) > 1 else ops[0]
+
 
     def _make_dataset(self, split: str):
         return WellDataset(
-            well_base_path=self.well_base_path,
-            well_dataset_name=self.well_dataset,
-            well_split_name=split,
-            n_steps_input=self.n_steps_input,
-            n_steps_output=self.n_steps_output,
-            use_normalization=False,
+            well_base_path     = self.well_base_path,
+            well_dataset_name  = self.well_dataset,
+            well_split_name    = split,
+            n_steps_input      = self.n_steps_input,
+            n_steps_output     = self.n_steps_output,
+            use_normalization  = False,
+            transform          = self._make_transform(split),  # split-aware
         )
 
     def setup(self, stage=None):
@@ -176,26 +200,21 @@ class WellDataModule(pl.LightningDataModule):
             self.train_dataset.core_constant_field_names,
         )
 
-    def train_dataloader(self):
-        return torch.utils.data.DataLoader(
-            self.train_dataset,
-            batch_size=self.batch_size,
-            shuffle=True,
-            num_workers=self.num_workers,
-            pin_memory=True,
-            drop_last=True,
+    def _make_loader(self, dataset, shuffle: bool, drop_last: bool) -> DataLoader:
+        return DataLoader(
+            dataset,
+            batch_size  = self.batch_size,
+            shuffle     = shuffle,
+            num_workers = self.num_workers,
+            pin_memory  = True,
+            drop_last   = drop_last,
         )
 
+    def train_dataloader(self):
+        return self._make_loader(self.train_dataset, shuffle=True, drop_last=True)
+
     def val_dataloader(self):
-        return torch.utils.data.DataLoader(
-            self.val_dataset,
-            batch_size=self.batch_size,
-            shuffle=False,
-            num_workers=self.num_workers,
-            pin_memory=True,
-            drop_last=False,
-        )
-    
+        return self._make_loader(self.val_dataset, shuffle=False, drop_last=False)
 
 
 def get_well_dataset(

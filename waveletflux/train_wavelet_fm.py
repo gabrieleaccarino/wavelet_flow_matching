@@ -14,7 +14,7 @@ import os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from waveletflux.utils.configs import WaveletConfig, VelocityNetConfig, FlowMatchingConfig, OptimizerConfig
-from waveletflux.utils.augmentations import compose_augmentation
+from waveletflux.utils.augmentations import compose_augmentation, compose_transformation
 from waveletflux.utils.well_data import WellDataModuleLightning
 from waveletflux.modules.wavelet_fm import WaveletFlowModule
 from waveletflux.utils.experiment import ExperimentManager
@@ -75,6 +75,18 @@ train_cfg = config.train
 
 #SUBSET_KWS = {"restrict_num_trajectories": 0.05, "restriction_seed": config.random.seed}
 
+# Stochastic augmentations — train split only
+augmentation = (
+    compose_augmentation(*train_cfg.augmentations)
+    if train_cfg.augmentations else None
+)
+
+# Deterministic transformations — all splits
+transformation = (
+    compose_transformation(*train_cfg.transformations)
+    if train_cfg.transformations else None
+)
+
 base_data_module = WellDataModule(
     well_base_path     = config.path.well_base_path,
     well_dataset_name  = config.path.well_dataset_name,
@@ -84,7 +96,8 @@ base_data_module = WellDataModule(
     batch_size         = train_cfg.batch_size,
     use_normalization  = False,
     normalization_type = None,
-    transform          = compose_augmentation(*train_cfg.augmentations),
+    augmentation       = augmentation,    # stochastic, train only
+    transformation     = transformation,  # deterministic, all splits
     data_workers       = config.lightning.datamodules.data_workers,
     world_size         = 1,   # Lightning manages distribution
     rank               = 0,
