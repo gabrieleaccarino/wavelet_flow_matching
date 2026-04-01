@@ -30,6 +30,17 @@ def _normed_mse(pred: torch.Tensor, target: torch.Tensor) -> torch.Tensor:
     var = target.var(dim=(2, 3), keepdim=True).detach().clamp(min=1e-4)
     return F.mse_loss(pred / var.sqrt(), target / var.sqrt())
 
+def _vmse(pred: torch.Tensor, target: torch.Tensor) -> torch.Tensor:
+    """
+    Alternative variance-normalised MSE that normalises each sample and channel
+    by its own variance rather than using the batch variance.
+
+    This is more expensive to compute but may be more stable when batch sizes
+    are very small or when there are many zero-variance channels.
+    """
+    l = (pred - target).square().mean(dim=(2, 3)) / (target.var(dim=(2, 3)) + 1e-2)
+    l = l.mean()  # average over B and C
+    return l
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Lightning module
@@ -311,7 +322,8 @@ class WaveletFlowModule(pl.LightningModule):
         total = x0.new_zeros(())
 
         for i in range(self.n_scales):
-            loss_i = _normed_mse(vel[i], targets[i])
+            #loss_i = _normed_mse(vel[i], targets[i])
+            loss_i = _vmse(vel[i], targets[i])
             total  = total + (self.scale_weights[i] / w_sum) * loss_i
             self.log(f"{log_prefix}_loss_s{i}", loss_i,
                      on_epoch=True, on_step=(log_prefix == 'train'),
