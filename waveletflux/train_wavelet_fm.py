@@ -1,5 +1,5 @@
-from the_well.data.normalization import ZScoreNormalization
-from the_well.data import WellDataModule
+#from the_well.data.normalization import ZScoreNormalization
+#from the_well.data import WellDataModule
 import pytorch_lightning as pl
 import argparse
 import datetime
@@ -15,7 +15,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from waveletflux.utils.configs import WaveletConfig, VelocityNetConfig, FlowMatchingConfig, OptimizerConfig
 from waveletflux.utils.augmentations import compose_augmentation, compose_transformation
-from waveletflux.waveletflux.utils.well_data import WellDataModuleLightning
+from waveletflux.utils.well_data import WellDataModuleLightning
 from waveletflux.modules.wavelet_fm import WaveletFlowModule
 from waveletflux.utils.experiment import ExperimentManager
 
@@ -87,50 +87,61 @@ transformation = (
     if train_cfg.transformations else None
 )
 
-base_data_module = WellDataModule(
-    well_base_path     = config.path.well_base_path,
-    well_dataset_name  = config.path.well_dataset_name,
-    n_steps_input      = train_cfg.n_steps_input,
-    n_steps_output     = train_cfg.n_steps_output,
-    max_rollout_steps  = train_cfg.max_rollout_steps,
-    batch_size         = train_cfg.batch_size,
-    use_normalization  = False,
-    normalization_type = None,
-    data_workers       = config.lightning.datamodules.data_workers,
-    world_size         = 1,   # Lightning manages distribution
-    rank               = 0,
-    dataset_kws={
-        "train"         : {},         # use full data
-        "val"           : {},         # use full data    
-        "rollout_val"   : {},         # use full data
-        "test"          : {},         # use full data
-        "rollout_test"  : {},         # use full data
-    }
-)
+#base_data_module = WellDataModule(
+#    well_base_path     = config.path.well_base_path,
+#    well_dataset_name  = config.path.well_dataset_name,
+#    n_steps_input      = train_cfg.n_steps_input,
+#    n_steps_output     = train_cfg.n_steps_output,
+#    max_rollout_steps  = train_cfg.max_rollout_steps,
+#    batch_size         = train_cfg.batch_size,
+#    use_normalization  = False,
+#    normalization_type = None,
+#    data_workers       = config.lightning.datamodules.data_workers,
+#    world_size         = 1,   # Lightning manages distribution
+#    rank               = 0,
+#    dataset_kws={
+#        "train"         : {},         # use full data
+#        "val"           : {},         # use full data    
+#        "rollout_val"   : {},         # use full data
+#        "test"          : {},         # use full data
+#        "rollout_test"  : {},         # use full data
+#    }
+#)
+
+#data_module = WellDataModuleLightning(
+#    base_data_module,
+#    train_shuffle   = train_cfg.train_shuffle,
+#    val_shuffle     = train_cfg.val_shuffle,
+#    test_shuffle    = train_cfg.test_shuffle,
+#    rollout_shuffle = train_cfg.rollout_shuffle,
+#    target_dtype    = eval(train_cfg.target_dtype),
+#    augmentation    = augmentation,    # stochastic, train only
+#    transformation  = transformation,  # deterministic, all splits
+#)
 
 data_module = WellDataModuleLightning(
-    base_data_module,
-    train_shuffle   = train_cfg.train_shuffle,
-    val_shuffle     = train_cfg.val_shuffle,
-    test_shuffle    = train_cfg.test_shuffle,
-    rollout_shuffle = train_cfg.rollout_shuffle,
-    target_dtype    = eval(train_cfg.target_dtype),
-    augmentation    = augmentation,    # stochastic, train only
-    transformation  = transformation,  # deterministic, all splits
+    well_base_path    = config.path.well_base_path,
+    well_dataset      = config.path.well_dataset_name,
+    stats_path        = config.path.stats_path,
+    n_steps_input     = config.train.n_steps_input,
+    n_steps_output    = config.train.n_steps_output,
+    max_rollout_steps = config.train.max_rollout_steps,
+    batch_size        = config.train.batch_size,
+    num_workers       = config.lightning.datamodules.data_workers,
+    train_shuffle     = train_cfg.train_shuffle,
+    val_shuffle       = train_cfg.val_shuffle,
+    test_shuffle      = train_cfg.test_shuffle,
+    # rollout_val/test_shuffle not in TOML, default to False
+    target_dtype      = eval(train_cfg.target_dtype),
+    augmentation      = augmentation,
+    transformation    = transformation,
 )
 
-# Load normalization stats (computed from training data) and create normalizer instance
-with fsspec.open(config.path.stats_path, mode='r') as f:
-    stats = yaml.safe_load(f)
+data_module.setup()
 
-normalizer = ZScoreNormalization(
-    stats,
-    core_field_names          = base_data_module.train_dataset.core_field_names,
-    core_constant_field_names = base_data_module.train_dataset.core_constant_field_names,
-)
-
-data_shape  = base_data_module.train_dataset.metadata.spatial_resolution
-meta_fields = base_data_module.train_dataset.metadata.field_names
+normalizer  = data_module.normalizer
+data_shape  = data_module.train_dataset.metadata.spatial_resolution
+meta_fields = data_module.train_dataset.metadata.field_names
 field_names = [item for sublist in meta_fields.values() for item in sublist]
 
 # ─────────────────────────────────────────────────────────────────────────────

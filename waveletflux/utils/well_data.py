@@ -1,162 +1,153 @@
 from the_well.data.augmentation import Augmentation, Compose
 from the_well.data.normalization import ZScoreNormalization
 from typing import Dict, Optional, Sequence, Tuple, Any
-from the_well.data import WellDataModule, WellDataset
 from torch.utils.data import DataLoader
+from the_well.data import WellDataset
 import pytorch_lightning as pl
 import fsspec
 import torch
 import yaml
 import os
 
-from waveletflux.utils.augmentations import compose_augmentation, compose_transformation
+from waveletflux.utils.augmentations import compose_augmentation
+
+def _build_transform(*transforms):
+    """Compose only non-None transforms."""
+    ops = [t for t in transforms if t is not None]
+    if not ops:
+        return None
+    return Compose(*ops) if len(ops) > 1 else ops[0]
 
 
 class WellDataModuleLightning(pl.LightningDataModule):
-    """
-    Lightning wrapper around the library's WellDataModule.
-
-    Responsibilities:
-      - Inject distributed sampler params before setup
-      - Apply deterministic `transformation` to ALL dataset splits
-      - Apply stochastic `augmentation`  to TRAIN split only
-      - Cast batch tensors to `target_dtype`
-
-    The library's WellDataModule is responsible for:
-      - Dataset construction, rollout splits, dataset_kws, etc.
-    """
 
     def __init__(
         self,
-        well_dm:         WellDataModule,
-        train_shuffle:   bool            = True,
-        val_shuffle:     bool            = False,
-        test_shuffle:    bool            = False,
-        rollout_shuffle: bool            = False,
-        target_dtype:    torch.dtype     = torch.float32,
-        augmentation:    Optional[Augmentation] = None,   # stochastic, train only
-        transformation:  Optional[Augmentation] = None,   # deterministic, all splits
+        well_base_path        : str,
+        well_dataset          : str,
+        stats_path            : str,
+        n_steps_input         : int,
+        n_steps_output        : int,
+        max_rollout_steps     : int,
+        batch_size            : int,
+        num_workers           : int,
+        train_shuffle         : bool                   = True,
+        val_shuffle           : bool                   = False,
+        test_shuffle          : bool                   = False,
+        rollout_val_shuffle   : bool                   = False,
+        rollout_test_shuffle  : bool                   = False,
+        target_dtype          : torch.dtype            = torch.float32,
+        augmentation          : Optional[Augmentation] = None,
+        transformation        : Optional[Augmentation] = None,
     ):
         super().__init__()
-        self.well_dm         = well_dm
-        self.train_shuffle   = train_shuffle
-        self.val_shuffle     = val_shuffle
-        self.test_shuffle    = test_shuffle
-        self.rollout_shuffle = rollout_shuffle
-        self.target_dtype    = target_dtype
-        self.augmentation    = augmentation
-        self.transformation  = transformation
+        self.well_base_path       = well_base_path
+        self.well_dataset         = well_dataset
+        self.stats_path           = stats_path
+        self.n_steps_input        = n_steps_input
+        self.n_steps_output       = n_steps_output
+        self.max_rollout_steps    = max_rollout_steps
+        self.batch_size           = batch_size
+        self.num_workers          = num_workers
+        self.train_shuffle        = train_shuffle
+        self.val_shuffle          = val_shuffle
+        self.test_shuffle         = test_shuffle
+        self.rollout_val_shuffle  = rollout_val_shuffle
+        self.rollout_test_shuffle = rollout_test_shuffle
+        self.target_dtype         = target_dtype
+        self.augmentation         = augmentation
+        self.transformation       = transformation
 
-    # ------------------------------------------------------------------
-    # Transform helpers
-    # ------------------------------------------------------------------
+        self.train_dataset        = None
+        self.val_dataset          = None
+        self.test_dataset         = None
+        self.rollout_val_dataset  = None
+        self.rollout_test_dataset = None
+        self.normalizer           = None
 
-    def _make_transform(self, split: str) -> Optional[Augmentation]:
-        """
-        Compose the correct transform per split:
-          - train : transformation → augmentation  (det. first, stoch. second)
-          - others: transformation only
-        """
-        ops = []
-        if self.transformation is not None:
-            ops.append(self.transformation)
-        if split == "train" and self.augmentation is not None:
-            ops.append(self.augmentation)
+    def _make_dataset(self, split: str, is_train: bool = False, is_rollout: bool = False) -> WellDataset:
+        transform = _build_transform(
+            self.transformation,
+            self.augmentation if is_train else None,
+        )
+        # Rollout datasets need to predict max_rollout_steps ahead
+        # Standard datasets predict n_steps_output ahead
+        n_steps_output = self.max_rollout_steps if is_rollout else self.n_steps_output
 
-        if not ops:
-            return None
-        return Compose(*ops) if len(ops) > 1 else ops[0]
-
-    def _apply_transforms(self):
-        """
-        Patch transforms onto every dataset split AFTER the library has
-        constructed them in setup(). Maps split name → dataset attribute.
-        """
-        split_to_attr = {
-            "train"        : "train_dataset",
-            "val"          : "val_dataset",
-            "test"         : "test_dataset",
-            "rollout_val"  : "rollout_val_dataset",
-            "rollout_test" : "rollout_test_dataset",
-        }
-        for split, attr in split_to_attr.items():
-            ds = getattr(self.well_dm, attr, None)
-            if ds is None:
-                continue
-            transform = self._make_transform(split)
-            if transform is not None:
-                ds.transform = transform
-
-    # ------------------------------------------------------------------
-    # Lightning hooks
-    # ------------------------------------------------------------------
+        return WellDataset(
+            well_base_path    = self.well_base_path,
+            well_dataset_name = self.well_dataset,
+            well_split_name   = split,
+            n_steps_input     = self.n_steps_input,
+            n_steps_output    = n_steps_output,
+            use_normalization = False,
+            transform         = transform,
+        )
 
     def setup(self, stage: Optional[str] = None):
-        # 1. Inject distributed params before the library builds datasets
-        if hasattr(self, "trainer") and self.trainer is not None:
-            if torch.distributed.is_initialized():
-                self.well_dm.world_size = self.trainer.world_size
-                self.well_dm.rank       = self.trainer.global_rank
-            else:
-                self.well_dm.world_size = 1
-                self.well_dm.rank       = 0
+        if self.train_dataset is not None:
+            return  # already set up — prevents double rebuild when Lightning
+                    # calls setup() after manual data_module.setup() in train.py
+                    
+        self.train_dataset        = self._make_dataset("train", is_train=True)
+        self.val_dataset          = self._make_dataset("valid")
+        self.test_dataset         = self._make_dataset("test")
+        self.rollout_val_dataset  = self._make_dataset("valid", is_rollout=True)
+        self.rollout_test_dataset = self._make_dataset("test",  is_rollout=True)
 
-        # 2. Let the library build all dataset splits
-        if callable(getattr(self.well_dm, "setup", None)):
-            self.well_dm.setup(stage)
+        with fsspec.open(self.stats_path, mode="r") as f:
+            stats = yaml.safe_load(f)
 
-        # 3. Patch transforms onto every split (the only place we touch them)
-        self._apply_transforms()
-
-    # ------------------------------------------------------------------
-    # Dtype conversion
-    # ------------------------------------------------------------------
-
-    def _convert_dtype(self, batch: Any) -> Any:
-        if isinstance(batch, dict):
-            return {k: v.to(dtype=self.target_dtype) if isinstance(v, torch.Tensor) else v
-                    for k, v in batch.items()}
-        if isinstance(batch, (list, tuple)):
-            converted = [v.to(dtype=self.target_dtype) if isinstance(v, torch.Tensor) else v
-                         for v in batch]
-            return type(batch)(converted)
-        if isinstance(batch, torch.Tensor):
-            return batch.to(dtype=self.target_dtype)
-        return batch
-
-    def _wrap_collate(self, original_collate_fn):
-        def collate_wrapper(batch):
-            result = original_collate_fn(batch) if original_collate_fn else batch
-            return self._convert_dtype(result)
-        return collate_wrapper
-
-    def _make_loader(self, original_dl: DataLoader, shuffle: bool) -> DataLoader:
-        return DataLoader(
-            dataset     = original_dl.dataset,
-            batch_size  = original_dl.batch_size,
-            num_workers = original_dl.num_workers,
-            shuffle     = shuffle,
-            pin_memory  = original_dl.pin_memory,
-            drop_last   = original_dl.drop_last,
-            collate_fn  = self._wrap_collate(original_dl.collate_fn),
-            sampler     = None,   # Lightning injects DistributedSampler
+        self.normalizer = ZScoreNormalization(
+            stats,
+            self.train_dataset.core_field_names,
+            self.train_dataset.core_constant_field_names,
         )
 
     # ------------------------------------------------------------------
-    # Dataloaders
+    # Dtype casting + dataloaders (unchanged from working version)
     # ------------------------------------------------------------------
 
+    def _cast(self, batch: Any) -> Any:
+        if isinstance(batch, dict):
+            return {k: v.to(self.target_dtype) if isinstance(v, torch.Tensor) else v
+                    for k, v in batch.items()}
+        if isinstance(batch, (list, tuple)):
+            return type(batch)(
+                v.to(self.target_dtype) if isinstance(v, torch.Tensor) else v
+                for v in batch
+            )
+        if isinstance(batch, torch.Tensor):
+            return batch.to(self.target_dtype)
+        return batch
+
+    def _make_loader(self, dataset: WellDataset, shuffle: bool, drop_last: bool) -> DataLoader:
+        return DataLoader(
+            dataset,
+            batch_size  = self.batch_size,
+            num_workers = self.num_workers,
+            shuffle     = shuffle,
+            pin_memory  = True,
+            drop_last   = drop_last,
+            collate_fn  = lambda batch: self._cast(
+                torch.utils.data.dataloader.default_collate(batch)
+            ),
+        )
+
     def train_dataloader(self):
-        return self._make_loader(self.well_dm.train_dataloader(), self.train_shuffle)
+        return self._make_loader(self.train_dataset,        self.train_shuffle,        drop_last=True)
 
     def val_dataloader(self):
-        return self._make_loader(self.well_dm.val_dataloader(), self.val_shuffle)
+        return self._make_loader(self.val_dataset,          self.val_shuffle,          drop_last=False)
 
     def test_dataloader(self):
-        return self._make_loader(self.well_dm.test_dataloader(), self.test_shuffle)
+        return self._make_loader(self.test_dataset,         self.test_shuffle,         drop_last=False)
 
-    def rollout_dataloader(self):
-        return self._make_loader(self.well_dm.rollout_val_dataloader(), self.rollout_shuffle)
+    def rollout_val_dataloader(self):
+        return self._make_loader(self.rollout_val_dataset,  self.rollout_val_shuffle,  drop_last=False)
+
+    def rollout_test_dataloader(self):
+        return self._make_loader(self.rollout_test_dataset, self.rollout_test_shuffle, drop_last=False)
     
 
 def get_well_dataset(
