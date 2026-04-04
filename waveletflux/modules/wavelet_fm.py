@@ -505,13 +505,16 @@ class WaveletFlowModule(pl.LightningModule):
             .clone()                              # (B*E, Ti, H, W, C)
         )
  
-        scalar_conds = scalar_conds.to(device=device, dtype=dtype)
-        scalar_exp   = (
-            scalar_conds
-            .unsqueeze(1)
-            .expand(-1, n_ens, -1)
-            .reshape(B * n_ens, -1)              # (B*E, num_cond)
-        )
+        if scalar_conds is not None:
+            scalar_conds = scalar_conds.to(device=device, dtype=dtype)
+            scalar_exp   = (
+                scalar_conds
+                .unsqueeze(1)
+                .expand(-1, n_ens, -1)
+                .reshape(B * n_ens, -1)              # (B*E, num_cond)
+            )
+        else:
+            scalar_exp = None
  
         BxE = B * n_ens
  
