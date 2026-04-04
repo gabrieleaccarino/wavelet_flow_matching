@@ -272,7 +272,7 @@ class WaveletFlowModule(pl.LightningModule):
         xp = rearrange(inp[:, :-1], 'B T H W C -> B C T H W')   # past context
 
         cond = {
-            'const'      : batch['constant_scalars'].to(device),
+            'const'      : batch['constant_scalars'].to(device) if 'constant_scalars' in batch.keys() else None,
             'past_states': xp,
         }
         return x0, x1, cond, x0.shape[0]
