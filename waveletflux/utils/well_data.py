@@ -9,7 +9,7 @@ import torch
 import yaml
 import os
 
-from waveletflux.utils.augmentations import compose_augmentation
+from waveletflux.utils.augmentations import compose_augmentation, compose_transformation
 
 def _build_transform(*transforms):
     """Compose only non-None transforms."""
@@ -158,6 +158,7 @@ def get_well_dataset(
     include_filters: Sequence[str] = (),
     exclude_filters: Sequence[str] = (),
     augment: Sequence[str] = (),
+    transform: Sequence[str] = (),
     **kwargs,
 ) -> WellDataset:
     r"""Instantiates a dataset from the Well.
@@ -196,6 +197,11 @@ def get_well_dataset(
     else:
         augmentation = None
 
+    if transform:
+        transformation = compose_transformation(*transform)
+    else:
+        transformation = None
+
     if steps < 0:
         dataset = WellDataset(
             path=path,
@@ -211,7 +217,7 @@ def get_well_dataset(
         include_filters=include_filters,
         exclude_filters=exclude_filters,
         use_normalization=False,
-        transform=augmentation,
+        transform=_build_transform(augmentation, transformation),
         **kwargs,
     )
 
@@ -228,9 +234,12 @@ def get_well_inputs(
     """
 
     if "input_fields" in item:
-        scalars = item["constant_scalars"]
-        scalars = scalars.to(device=device, non_blocking=True)
-
+        if "constant_scalars" in item:
+            scalars = item["constant_scalars"]
+            scalars = scalars.to(device=device, non_blocking=True)
+        else:
+            scalars = None
+            
         #bcs = item["boundary_conditions"]
         #bcs = bcs.to(device=device, non_blocking=True)
         #bcs = bcs.flatten(start_dim=scalars.ndim - 1)  # ... H W -> ... (H W)
