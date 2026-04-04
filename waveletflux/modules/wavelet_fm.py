@@ -271,8 +271,22 @@ class WaveletFlowModule(pl.LightningModule):
         x1 = rearrange(out,         'B T H W C -> B C T H W')   # T=n_steps_output
         xp = rearrange(inp[:, :-1], 'B T H W C -> B C T H W')   # past context
 
+        # ── Scalar conditions ──────────────────────────────────────────────────
+        scalars = batch['constant_scalars'].to(device) \
+                if 'constant_scalars' in batch else None
+
+        # Extract per-trajectory mean dt from the time grid — shape (B, 1)
+        dt_cond = None
+        if 'input_time_grid' in batch.keys():
+            time_grid = batch['input_time_grid'].to(device)   # (B, T)
+            dt_cond   = (time_grid[:, 1] - time_grid[:, 0]).unsqueeze(-1)
+
+        # Concatenate whatever conditions are available
+        cond_parts = [c for c in (scalars, dt_cond) if c is not None]
+        const = torch.cat(cond_parts, dim=-1) if cond_parts else None
+
         cond = {
-            'const'      : batch['constant_scalars'].to(device) if 'constant_scalars' in batch.keys() else None,
+            'const'      : const,
             'past_states': xp,
         }
         return x0, x1, cond, x0.shape[0]
