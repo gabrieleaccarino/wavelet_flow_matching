@@ -2,7 +2,7 @@
     exp_name   = 'WaveletFlow_planetswe_3scales_db2_v1.0'
 
 [resume]
-    ckpt = ''
+    ckpt = '/glade/work/gaccarino/waveletflux/experiments/planetswe/WaveletFlow_planetswe_3scales_db2_v1.0/artifacts/checkpoints/WaveletFlow_planetswe_3scales_db2_v1.0_20260408_101928-epoch=49-val_loss=0.0103.ckpt'
 
 [path]
     project_path      = '/glade/work/gaccarino/waveletflux'
