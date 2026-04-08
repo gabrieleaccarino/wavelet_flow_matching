@@ -1,6 +1,9 @@
 [main]
     exp_name   = 'WaveletFlow_turbulent_radiative_layer_2D_3scales_db2_v1.0'
 
+[resume]
+    ckpt = ''
+
 [path]
     project_path      = '/glade/work/gaccarino/waveletflux'
     well_base_path    = '/glade/work/gaccarino/data/datasets'
@@ -9,12 +12,12 @@
     experiments_path  = '/glade/work/gaccarino/waveletflux/experiments/turbulent_radiative_layer_2D'
 
 [random]
-    seed = 5783
+    seed = 3462
 
 [train]
-    epochs            = 500
+    epochs            = 200
     warmup_epochs     = 20
-    batch_size        = 32 #16
+    batch_size        = 32
     n_steps_input     = 4
     n_steps_output    = 1
     max_rollout_steps = 1
@@ -23,7 +26,8 @@
     test_shuffle      = false
     rollout_shuffle   = false
     target_dtype      = 'torch.float32'
-    augmentations     = []
+    augmentations     = []      # stochastic: random_axis_flip, etc. — train only
+    transformations   = []      # deterministic: applied to ALL splits
 
 [wavelet]
     cls         = 'WaveletDecomposer2D'
@@ -72,8 +76,9 @@
 
 [scheduler]
     cls = 'CosineAnnealingLR'
-    [scheduler.params]
-        eta_min = 1e-7
+
+[scheduler.params]
+    eta_min = 1e-7
 
 [lightning]
     [lightning.datamodules]

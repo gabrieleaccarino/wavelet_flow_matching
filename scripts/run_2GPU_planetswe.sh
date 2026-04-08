@@ -1,7 +1,7 @@
 #!/bin/bash -l
-#PBS -N WaveletFlow_planetswe_3scales_db2_v1.0
-#PBS -o /glade/work/gaccarino/waveletflux/scripts/logs/WaveletFlow_planetswe_3scales_db2_v1.0.out
-#PBS -e /glade/work/gaccarino/waveletflux/scripts/logs/WaveletFlow_planetswe_3scales_db2_v1.0.err
+#PBS -N WaveletFlow_planetswe_3scales_db2_v1.1
+#PBS -o /glade/work/gaccarino/waveletflux/scripts/logs/WaveletFlow_planetswe_3scales_db2_v1.1.out
+#PBS -e /glade/work/gaccarino/waveletflux/scripts/logs/WaveletFlow_planetswe_3scales_db2_v1.1.err
 
 # === Project / Queue ===
 #PBS -A UCLB0062
@@ -31,5 +31,5 @@ conda activate mlenv
 REPO=/glade/work/gaccarino/waveletflux
 torchrun --nproc_per_node=2 \
     ${REPO}/waveletflux/train_wavelet_fm.py \
-    -c ${REPO}/configs/planetswe/WaveletFlow_planetswe_3scales_db2_v1.0.toml \
+    -c ${REPO}/configs/planetswe/WaveletFlow_planetswe_3scales_db2_v1.1.toml \
     -n 1 -d 2

@@ -1,19 +1,18 @@
 #!/usr/bin/env python
-r"""FNO / TFNO baseline training script — PyTorch Lightning + DeepSpeed.
+r"""FNO / TFNO baseline training script — PyTorch Lightning + DDP.
 
-Mirrors the structure of train.py (same PBS script, same torchrun launcher).
-
-Launch (identical to train.py workflow):
-    torchrun --nproc_per_node=4 train_fno.py \
+Launch:
+    torchrun --nproc_per_node=2 train_neural_ops.py \
         --model fno --modes 16 --n_blocks 4 --hidden 128 \
-        --epochs 500 --batch_size 4 --lr 5e-3               \
+        --epochs 500 --batch_size 16 --lr 5e-3               \
         --num_workers 16 --save_every 50                     \
         --n_steps_input 4 --n_steps_output 1                 \
+        --patience 50                                        \
         --well_base_path /glade/work/gaccarino/data/datasets \
         --well_dataset   turbulent_radiative_layer_2D        \
-        --checkpoint_dir /glade/work/gaccarino/multi-scale-wavelet-flow-matching/experiments/fno_v0.1
+        --checkpoint_dir /glade/work/gaccarino/waveletflux/experiments/fno_v0.1
 """
-
+from pytorch_lightning.callbacks import Callback
 import pytorch_lightning as pl
 import argparse
 import datetime
@@ -24,19 +23,103 @@ import os
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+
 from waveletflux.modules.neural_ops import NeuralOperatorModule
-from waveletflux.waveletflux.utils.well_data import WellDataModule
+from waveletflux.utils.well_data import WellDataModuleLightning
 
 # Silence tltorch / neuralop deprecation warnings
 warnings.filterwarnings("ignore", category=UserWarning, module="tltorch")
 warnings.filterwarnings("ignore", category=UserWarning, module="neuralop")
+
+
+# ── Portable checkpoint callback ──────────────────────────────────────────────
+
+class PortableCheckpoint(Callback):
+    """Saves a plain PyTorch state-dict checkpoint whenever val_loss improves.
+
+    The saved file is completely independent of Lightning / DeepSpeed and can
+    be loaded with:
+        ckpt = torch.load("best.pt")
+        model = NeuralOperatorModule(**ckpt["hparams"])
+        model.load_state_dict(ckpt["model_state_dict"])
+    """
+
+    def __init__(self, dirpath: str, model_type: str, top_k: int = 3):
+        super().__init__()
+        self.dirpath   = dirpath
+        self.model_type = model_type
+        self.top_k     = top_k
+        self._history: list[tuple[float, str]] = []   # (val_loss, path)
+        self.best_score: float | None = None
+        self.best_path:  str   | None = None
+
+    # ------------------------------------------------------------------
+    def on_validation_epoch_end(self, trainer, pl_module):
+        # Only rank-0 writes files
+        if trainer.global_rank != 0:
+            return
+
+        val_loss = trainer.callback_metrics.get("val_loss")
+        if val_loss is None:
+            return
+        val_loss = float(val_loss)
+
+        if self.best_score is None or val_loss < self.best_score:
+            self.best_score = val_loss
+            epoch = trainer.current_epoch
+
+            filename = (
+                f"{self.model_type}_portable"
+                f"-epoch={epoch:04d}"
+                f"-val_loss={val_loss:.6f}.pt"
+            )
+            path = os.path.join(self.dirpath, filename)
+
+            # Collect hparams so the file is fully self-contained
+            hparams = dict(pl_module.hparams) if hasattr(pl_module, "hparams") else {}
+
+            torch.save(
+                {
+                    "epoch":            epoch,
+                    "val_loss":         val_loss,
+                    "model_state_dict": pl_module.model.state_dict(),
+                    "hparams":          hparams,
+                    "model_type":       self.model_type,
+                },
+                path,
+            )
+            print(
+                f"\n[PortableCheckpoint] saved → {os.path.basename(path)}"
+                f"  (val_loss={val_loss:.6f})",
+                flush=True,
+            )
+
+            self._history.append((val_loss, path))
+            self.best_path = path
+
+            # Prune to top-k (remove worst)
+            self._history.sort(key=lambda x: x[0])
+            while len(self._history) > self.top_k:
+                _, old_path = self._history.pop()   # worst is last after sort
+                if os.path.exists(old_path):
+                    os.remove(old_path)
+
+    # ------------------------------------------------------------------
+    @property
+    def best_model_path(self) -> str | None:
+        return self.best_path
+
+    @property
+    def best_model_score(self) -> float | None:
+        return self.best_score
+
 
 # ── CLI ───────────────────────────────────────────────────────────────────────
 
 def parse_args():
     parser = argparse.ArgumentParser(
         prog="train_neural_ops.py",
-        description="FNO / TFNO baseline — PyTorch Lightning + DeepSpeed",
+        description="FNO / TFNO baseline — PyTorch Lightning + DDP",
     )
 
     # Model
@@ -56,14 +139,15 @@ def parse_args():
                         help="Learning rate (default: 5e-3 FNO, 1e-3 TFNO)")
     parser.add_argument("--num_workers",    type=int,   default=4)
     parser.add_argument("--save_every",     type=int,   default=50,
-                        help="Save a checkpoint every N epochs")
+                        help="(kept for back-compat; portable ckpt saves on improvement)")
     parser.add_argument("--n_steps_input",  type=int,   default=4)
     parser.add_argument("--n_steps_output", type=int,   default=1)
 
-    # DeepSpeed ZeRO stage (0=disabled, 1=optimizer sharding, 2=+gradient sharding)
-    parser.add_argument("--zero_stage",     type=int,   default=1,
-                        choices=[0, 1, 2],
-                        help="DeepSpeed ZeRO optimization stage")
+    # Early stopping
+    parser.add_argument("--patience",       type=int,   default=50,
+                        help="Early-stopping patience (epochs without val_loss improvement)")
+    parser.add_argument("--min_delta",      type=float, default=1e-6,
+                        help="Minimum absolute improvement to reset patience counter")
 
     # Paths
     parser.add_argument("--well_base_path", type=str,
@@ -85,7 +169,6 @@ def parse_args():
 def main():
     args = parse_args()
 
-    # Detect rank the same way as train.py
     rank    = int(os.environ.get("RANK", "0"))
     is_main = (rank == 0)
 
@@ -106,22 +189,22 @@ def main():
 
     os.makedirs(args.checkpoint_dir, exist_ok=True)
 
-    # ── Seed (mirrors pl.seed_everything in train.py) ─────────────────────────
+    # ── Reproducibility ───────────────────────────────────────────────────────
     pl.seed_everything(42)
-    torch.set_float32_matmul_precision('high')
+    torch.set_float32_matmul_precision("high")
 
     # ── DataModule ────────────────────────────────────────────────────────────
-    data_module = WellDataModule(
+    data_module = WellDataModuleLightning(
         well_base_path=args.well_base_path,
         well_dataset=args.well_dataset,
         stats_path=args.stats_path,
         n_steps_input=args.n_steps_input,
         n_steps_output=args.n_steps_output,
+        max_rollout_steps=args.n_steps_output,
         batch_size=args.batch_size,
         num_workers=args.num_workers,
     )
 
-    # Setup early to read F (number of fields)
     data_module.setup()
     F = data_module.train_dataset.metadata.n_fields
 
@@ -133,8 +216,8 @@ def main():
         print(f"  Hidden         : {args.hidden}")
         print(f"  LR             : {lr}")
         print(f"  Epochs         : {args.epochs}")
+        print(f"  Patience       : {args.patience}")
         print(f"  Batch/GPU      : {args.batch_size}")
-        print(f"  ZeRO stage     : {args.zero_stage}")
         print(f"  Fields (F)     : {F}")
         print(f"  In  channels   : {args.n_steps_input  * F}")
         print(f"  Out channels   : {args.n_steps_output * F}")
@@ -157,56 +240,59 @@ def main():
         n_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
         print(f"  Parameters     : {n_params:,}\n")
 
-    # ── DeepSpeed strategy ────────────────────────────────────────────────────
-    # Lightning's DeepSpeedStrategy wraps DDP with ZeRO — does NOT use
-    # DataParallel's setattr/replicate, so tltorch ComplexFactorList is safe.
-    strategy = pl.strategies.DeepSpeedStrategy(
-        stage=args.zero_stage,
-        # Optional: enable mixed precision via DeepSpeed
-        # precision_plugin=pl.plugins.DeepSpeedPrecisionPlugin(precision="bf16-mixed"),
+    # ── Callbacks ─────────────────────────────────────────────────────────────
+    # 1) Lightning checkpoint — keeps full training state for resuming
+    lightning_ckpt = pl.callbacks.ModelCheckpoint(
+        dirpath=args.checkpoint_dir,
+        filename=f"{args.model}-lightning" + "-{epoch:04d}-{val_loss:.6f}",
+        monitor="val_loss",
+        mode="min",
+        save_top_k=3,
+        save_last=True,
+        every_n_epochs=1,
     )
 
-    # ── Callbacks ─────────────────────────────────────────────────────────────
-    #checkpoint_callback = pl.callbacks.ModelCheckpoint(
-    #    dirpath=args.checkpoint_dir,
-    #    filename=f"{args.model}" + "-{epoch:04d}-{val_loss:.4f}",
-    #    monitor="val_loss",
-    #    mode="min",
-    #    save_top_k=3,
-    #    every_n_epochs=args.save_every,
-    #    save_last=True,
-    #)
-    best_checkpoint = pl.callbacks.ModelCheckpoint(
-    dirpath=args.checkpoint_dir,
-    filename=f"{args.model}" + "-best-{epoch:04d}-{val_loss:.4f}",
-    monitor="val_loss",
-    mode="min",
-    save_top_k=3,
-    save_last=True,
-    every_n_epochs=1,           # check every epoch, save when val_loss improves
-)
+    # 2) Portable checkpoint — plain state-dict, shareable without Lightning
+    portable_ckpt = PortableCheckpoint(
+        dirpath=args.checkpoint_dir,
+        model_type=args.model,
+        top_k=3,
+    )
 
+    # 3) Early stopping
+    early_stop = pl.callbacks.EarlyStopping(
+        monitor="val_loss",
+        mode="min",
+        patience=args.patience,
+        min_delta=args.min_delta,
+        verbose=True,
+    )
 
+    # 4) LR monitor
     lr_monitor = pl.callbacks.LearningRateMonitor(logging_interval="epoch")
 
-    # ── CSV logger (mirrors ExperimentManager CSV logging in train.py) ────────
+    # ── Logger ────────────────────────────────────────────────────────────────
     csv_logger = pl.loggers.CSVLogger(
         save_dir=args.checkpoint_dir,
         name="logs",
     )
 
-    # ── Trainer ───────────────────────────────────────────────────────────────
+    # ── Trainer (DDP) ─────────────────────────────────────────────────────────
+    # DDPStrategy is simpler, more portable, and avoids DeepSpeed file sharding.
+    # find_unused_parameters=False is a safe default when all params are used.
+    strategy = pl.strategies.DDPStrategy(find_unused_parameters=False)
+
     trainer = pl.Trainer(
         accelerator="gpu",
         strategy=strategy,
         devices=torch.cuda.device_count(),
         num_nodes=1,
         max_epochs=args.epochs,
-        precision="32-true",          # change to "bf16-mixed" for mixed precision
-        callbacks=[best_checkpoint, lr_monitor],
+        precision="32-true",
+        callbacks=[lightning_ckpt, portable_ckpt, early_stop, lr_monitor],
         logger=csv_logger,
         log_every_n_steps=1,
-        num_sanity_val_steps=0,       # mirrors train.py
+        num_sanity_val_steps=0,
         enable_progress_bar=is_main,
     )
 
@@ -219,17 +305,17 @@ def main():
 
     if is_main:
         end_time = datetime.datetime.now()
-        print(f"\nTraining complete.")
-        print(f"  Best val loss  : {best_checkpoint.best_model_score:.6f}")
-        print(f"  Best ckpt      : {best_checkpoint.best_model_path}")
+        stopped_early = trainer.early_stopping_callback.stopped_epoch > 0  # type: ignore[union-attr]
+
+        print(f"\nTraining {'stopped early' if stopped_early else 'complete'}.")
+        if stopped_early:
+            print(f"  Stopped at     : epoch {trainer.current_epoch}")
+        print(f"  Best val loss  : {lightning_ckpt.best_model_score:.6f}")
+        print(f"  Best Lightning : {lightning_ckpt.best_model_path}")
+        print(f"  Best portable  : {portable_ckpt.best_model_path}")
         print(f"  Finished       : {end_time.strftime('%Y-%m-%d %H:%M:%S')}")
         print(f"  Total time     : {str(end_time - start_time)}")
-        
-        # Save a single-file checkpoint usable without DeepSpeed
-        trainer.save_checkpoint(
-            os.path.join(args.checkpoint_dir, f"{args.model}_final.ckpt")
-        )
-        
+
     sys.exit(0)
 
 
