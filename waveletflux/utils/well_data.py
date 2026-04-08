@@ -236,16 +236,21 @@ def get_well_inputs(
     if "input_fields" in item:
         if "constant_scalars" in item:
             scalars = item["constant_scalars"]
-            scalars = scalars.to(device=device, non_blocking=True)
+            label = scalars.to(device=device, non_blocking=True)
         else:
-            scalars = None
+            label = None
+
+        #if "input_time_grid" in item:
+        #    time_grid = item["input_time_grid"]          # (T,)
+        #    dt = (time_grid[1] - time_grid[0]).unsqueeze(0)  # (1,)
+        #    label = torch.cat([label, dt], dim=-1) if label is not None else dt
             
         #bcs = item["boundary_conditions"]
         #bcs = bcs.to(device=device, non_blocking=True)
         #bcs = bcs.flatten(start_dim=scalars.ndim - 1)  # ... H W -> ... (H W)
 
         #label = torch.cat((scalars, bcs), dim=-1)
-        label = scalars
+        #label = scalars
 
         x = item["input_fields"]
         x = x.to(device=device, non_blocking=True)
