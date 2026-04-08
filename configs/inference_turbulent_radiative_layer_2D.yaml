@@ -1,0 +1,27 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# configs/trl2d_wavelet.yaml
+# Turbulent Radiative Layer 2D — wavelet-space model
+# ─────────────────────────────────────────────────────────────────────────────
+
+# ── Paths ─────────────────────────────────────────────────────────────────────
+project_root:    "/Users/gabrieleaccarino/Workspace/waveletflux"
+well_base_path:  "/Users/gabrieleaccarino/Workspace/waveletflux/data/datasets"
+well_dataset_name: "turbulent_radiative_layer_2D"
+
+# ── Checkpoint ────────────────────────────────────────────────────────────────
+# Uncomment the checkpoint you want to evaluate
+ckpt_name: "WaveletFlow_turbulent_radiative_layer_2D_data_space_v1.0_portable.ckpt"
+# ckpt_name: "WaveletFlow_turbulent_radiative_layer_2D_3scales_db2_v1.0_20260406_073804-epoch=193-val_loss=0.0190_portable.ckpt"
+# ckpt_name: "WaveletFlow_turbulent_radiative_layer_2D_1scale_db2_v1.0_20260406_074619-epoch=189-val_loss=0.0094_portable.ckpt"
+
+# ── Dataset ───────────────────────────────────────────────────────────────────
+split:     "test"
+steps:     -1           # -1 = use all steps in each trajectory
+transform: ["log_scalars"]
+augment:   []
+
+# ── Model / inference ─────────────────────────────────────────────────────────
+n_steps_input:      4    # Ti — must match the value used during training
+num_sampling_steps: 20   # ODE integration steps per prediction
+n_ensemble:         32   # total ensemble members (split across GPUs)
+verbose:            false

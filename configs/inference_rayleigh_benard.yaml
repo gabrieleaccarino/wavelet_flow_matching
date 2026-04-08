@@ -1,0 +1,21 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# configs/rayleigh_benard_wavelet.yaml
+# Rayleigh-Bénard convection — wavelet-space model
+# ─────────────────────────────────────────────────────────────────────────────
+
+project_root:    "/Users/gabrieleaccarino/Workspace/waveletflux"
+well_base_path:  "/Users/gabrieleaccarino/Workspace/waveletflux/data/datasets"
+well_dataset_name: "rayleigh_benard"
+
+# ckpt_name: "WaveletFlow_rayleigh_benard_3scales_db2_v1.0_20260401_150336-epoch=194-val_loss=0.0207_portable.ckpt"
+ckpt_name: "WaveletFlow_rayleigh_benard_1scale_db2_v1.0_20260406_075915-epoch=193-val_loss=0.0157_portable.ckpt"
+
+split:     "test"
+steps:     -1
+transform: ["log_scalars"]
+augment:   []
+
+n_steps_input:      4
+num_sampling_steps: 20
+n_ensemble:         32
+verbose:            true

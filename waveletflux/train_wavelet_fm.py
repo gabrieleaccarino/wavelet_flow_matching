@@ -1,13 +1,9 @@
-#from the_well.data.normalization import ZScoreNormalization
-#from the_well.data import WellDataModule
 import pytorch_lightning as pl
 import argparse
 import datetime
-import fsspec
 import torch
 import munch
 import toml
-import yaml
 import sys
 import os
 
@@ -73,8 +69,6 @@ assert len(config.loss.scale_weights) == wavelet_cfg.n_scales, (
 
 train_cfg = config.train
 
-#SUBSET_KWS = {"restrict_num_trajectories": 0.05, "restriction_seed": config.random.seed}
-
 # Stochastic augmentations — train split only
 augmentation = (
     compose_augmentation(*train_cfg.augmentations)
@@ -86,38 +80,6 @@ transformation = (
     compose_transformation(*train_cfg.transformations)
     if train_cfg.transformations else None
 )
-
-#base_data_module = WellDataModule(
-#    well_base_path     = config.path.well_base_path,
-#    well_dataset_name  = config.path.well_dataset_name,
-#    n_steps_input      = train_cfg.n_steps_input,
-#    n_steps_output     = train_cfg.n_steps_output,
-#    max_rollout_steps  = train_cfg.max_rollout_steps,
-#    batch_size         = train_cfg.batch_size,
-#    use_normalization  = False,
-#    normalization_type = None,
-#    data_workers       = config.lightning.datamodules.data_workers,
-#    world_size         = 1,   # Lightning manages distribution
-#    rank               = 0,
-#    dataset_kws={
-#        "train"         : {},         # use full data
-#        "val"           : {},         # use full data    
-#        "rollout_val"   : {},         # use full data
-#        "test"          : {},         # use full data
-#        "rollout_test"  : {},         # use full data
-#    }
-#)
-
-#data_module = WellDataModuleLightning(
-#    base_data_module,
-#    train_shuffle   = train_cfg.train_shuffle,
-#    val_shuffle     = train_cfg.val_shuffle,
-#    test_shuffle    = train_cfg.test_shuffle,
-#    rollout_shuffle = train_cfg.rollout_shuffle,
-#    target_dtype    = eval(train_cfg.target_dtype),
-#    augmentation    = augmentation,    # stochastic, train only
-#    transformation  = transformation,  # deterministic, all splits
-#)
 
 data_module = WellDataModuleLightning(
     well_base_path    = config.path.well_base_path,

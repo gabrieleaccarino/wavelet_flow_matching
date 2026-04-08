@@ -81,3 +81,28 @@ class NeuralOperatorModule(pl.LightningModule):
                 "interval":  "epoch",
             },
         }
+    
+    @classmethod
+    def from_pretrained(cls, path: str, device: str = "cpu") -> "NeuralOperatorModule":
+        """Load a portable checkpoint saved by PortableCheckpoint.
+
+        Usage:
+            fno = NeuralOperatorModule.from_pretrained("path/to/fno_portable-....pt")
+        """
+        ckpt = torch.load(path, map_location=device, weights_only=False)
+
+        model = cls(**ckpt["hparams"])
+
+        # PortableCheckpoint saves pl_module.state_dict() → keys already have
+        # the "model." prefix and match NeuralOperatorModule.load_state_dict().
+        # If the file was saved with pl_module.model.state_dict() (old format),
+        # keys will be missing the prefix — patch transparently.
+        state_dict = ckpt["model_state_dict"]
+        sample_key = next(iter(state_dict))
+        if not sample_key.startswith("model."):
+            state_dict = {"model." + k: v for k, v in state_dict.items()}
+
+        model.load_state_dict(state_dict, strict=True)
+        model.to(device)
+        model.eval()
+        return model
