@@ -155,6 +155,68 @@ class OptimizerConfig:
 
 
 # ─────────────────────────────────────────────────────────────────────────────
+# Neural operators / diffusion baselines  (FNO / TFNO / WNO / WDNO)
+# ─────────────────────────────────────────────────────────────────────────────
+
+@dataclass
+class NeuralOperatorConfig:
+    model_type: str = "wno"
+    hidden_channels: int = 64
+    n_layers: int = 4
+    modes: int = 16
+    tucker_rank: float = 0.42
+    level: int = 4
+    n_scales: int = 3
+    n_levels: int = 3
+    n_res: int = 2
+    cond_dim: int = 128
+    diffusion_steps: int = 100
+    sampling_steps: int = 20
+    beta_schedule: str = "cosine"
+    ddim_eta: float = 0.0
+    wavelet: str = "db6"
+    mode: str = "symmetric"
+    padding: int = 0
+    fc_channels: int = 128
+    grid_range: Tuple[float, float] = (1.0, 1.0)
+
+    @classmethod
+    def from_config(cls, cfg) -> "NeuralOperatorConfig":
+        p = cfg.params
+        return cls(
+            model_type=getattr(cfg, "model_type", "wno"),
+            hidden_channels=int(getattr(p, "hidden_channels", getattr(p, "hidden", 64))),
+            n_layers=int(getattr(p, "n_layers", getattr(p, "n_blocks", 4))),
+            modes=int(getattr(p, "modes", 16)),
+            tucker_rank=float(getattr(p, "tucker_rank", 0.42)),
+            level=int(getattr(p, "level", 4)),
+            n_scales=int(getattr(p, "n_scales", 3)),
+            n_levels=int(getattr(p, "n_levels", getattr(p, "n_layers", 3))),
+            n_res=int(getattr(p, "n_res", 2)),
+            cond_dim=int(getattr(p, "cond_dim", 128)),
+            diffusion_steps=int(getattr(p, "diffusion_steps", 100)),
+            sampling_steps=int(getattr(p, "sampling_steps", 20)),
+            beta_schedule=getattr(p, "beta_schedule", "cosine"),
+            ddim_eta=float(getattr(p, "ddim_eta", 0.0)),
+            wavelet=getattr(p, "wavelet", "db6"),
+            mode=getattr(p, "mode", "symmetric"),
+            padding=int(getattr(p, "padding", 0)),
+            fc_channels=int(getattr(p, "fc_channels", 128)),
+            grid_range=tuple(getattr(p, "grid_range", (1.0, 1.0))),
+        )
+
+    @classmethod
+    def from_dict(cls, d: dict) -> "NeuralOperatorConfig":
+        if "grid_range" in d:
+            d = dict(d)
+            d["grid_range"] = tuple(d["grid_range"])
+        return cls(**d)
+
+    def to_dict(self) -> dict:
+        return asdict(self)
+
+
+# ─────────────────────────────────────────────────────────────────────────────
 # LatentVAEConfig
 # ─────────────────────────────────────────────────────────────────────────────
 

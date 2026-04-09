@@ -1,237 +1,172 @@
 #!/usr/bin/env python
-r"""FNO / TFNO baseline training script — PyTorch Lightning + DeepSpeed.
 
-Mirrors the structure of train.py (same PBS script, same torchrun launcher).
-
-Launch (identical to train.py workflow):
-    torchrun --nproc_per_node=4 train_fno.py \
-        --model fno --modes 16 --n_blocks 4 --hidden 128 \
-        --epochs 500 --batch_size 4 --lr 5e-3               \
-        --num_workers 16 --save_every 50                     \
-        --n_steps_input 4 --n_steps_output 1                 \
-        --well_base_path /glade/work/gaccarino/data/datasets \
-        --well_dataset   turbulent_radiative_layer_2D        \
-        --checkpoint_dir /glade/work/gaccarino/multi-scale-wavelet-flow-matching/experiments/fno_v0.1
-"""
-
-import pytorch_lightning as pl
 import argparse
 import datetime
-import warnings
-import torch
-import sys
 import os
+import sys
+
+import munch
+import pytorch_lightning as pl
+import toml
+import torch
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from waveletflux.modules.neural_ops import NeuralOperatorModule
-from waveletflux.waveletflux.utils.well_data import WellDataModule
-
-# Silence tltorch / neuralop deprecation warnings
-warnings.filterwarnings("ignore", category=UserWarning, module="tltorch")
-warnings.filterwarnings("ignore", category=UserWarning, module="neuralop")
-
-# ── CLI ───────────────────────────────────────────────────────────────────────
-
-def parse_args():
-    parser = argparse.ArgumentParser(
-        prog="train_neural_ops.py",
-        description="FNO / TFNO baseline — PyTorch Lightning + DeepSpeed",
-    )
-
-    # Model
-    parser.add_argument("--model",       type=str,   default="fno",
-                        choices=["fno", "tfno"])
-    parser.add_argument("--modes",       type=int,   default=16)
-    parser.add_argument("--n_blocks",    type=int,   default=4)
-    parser.add_argument("--hidden",      type=int,   default=128)
-    parser.add_argument("--tucker_rank", type=float, default=0.42,
-                        help="Tucker rank fraction (TFNO only)")
-
-    # Training
-    parser.add_argument("--epochs",         type=int,   default=500)
-    parser.add_argument("--batch_size",     type=int,   default=4,
-                        help="Per-GPU batch size")
-    parser.add_argument("--lr",             type=float, default=None,
-                        help="Learning rate (default: 5e-3 FNO, 1e-3 TFNO)")
-    parser.add_argument("--num_workers",    type=int,   default=4)
-    parser.add_argument("--save_every",     type=int,   default=50,
-                        help="Save a checkpoint every N epochs")
-    parser.add_argument("--n_steps_input",  type=int,   default=4)
-    parser.add_argument("--n_steps_output", type=int,   default=1)
-
-    # DeepSpeed ZeRO stage (0=disabled, 1=optimizer sharding, 2=+gradient sharding)
-    parser.add_argument("--zero_stage",     type=int,   default=1,
-                        choices=[0, 1, 2],
-                        help="DeepSpeed ZeRO optimization stage")
-
-    # Paths
-    parser.add_argument("--well_base_path", type=str,
-                        default="/glade/work/gaccarino/data/datasets")
-    parser.add_argument("--well_dataset",   type=str,
-                        default="turbulent_radiative_layer_2D")
-    parser.add_argument("--stats_path",     type=str, default=None)
-    parser.add_argument("--checkpoint_dir", type=str, default=None)
-
-    # torchrun injects LOCAL_RANK via env var
-    parser.add_argument("--local_rank", type=int,
-                        default=int(os.environ.get("LOCAL_RANK", 0)))
-
-    return parser.parse_args()
+from waveletflux.utils.augmentations import compose_augmentation, compose_transformation
+from waveletflux.utils.configs import NeuralOperatorConfig, OptimizerConfig
+from waveletflux.utils.experiment import ExperimentManager
+from waveletflux.utils.well_data import WellDataModuleLightning
 
 
-# ── Main ──────────────────────────────────────────────────────────────────────
+def get_rank():
+    return int(os.environ.get("RANK", "0"))
 
-def main():
-    args = parse_args()
 
-    # Detect rank the same way as train.py
-    rank    = int(os.environ.get("RANK", "0"))
-    is_main = (rank == 0)
+RANK = get_rank()
+is_rank0 = RANK == 0
 
-    if is_main:
-        print(f"[RANK {rank}] starting train_neural_ops.py", flush=True)
 
-    # Defaults
-    lr = args.lr if args.lr is not None else (5e-3 if args.model == "fno" else 1e-3)
+def _infer_scalar_cond_dim(dataset) -> int:
+    sample = dataset[0]
+    scalars = sample.get("constant_scalars")
+    return int(scalars.numel()) if scalars is not None else 0
 
-    if args.checkpoint_dir is None:
-        args.checkpoint_dir = os.path.join(
-            "./experiments", f"{args.model}_{args.well_dataset}"
-        )
-    if args.stats_path is None:
-        args.stats_path = os.path.join(
-            args.well_base_path, args.well_dataset, "stats.yaml"
-        )
 
-    os.makedirs(args.checkpoint_dir, exist_ok=True)
+parser = argparse.ArgumentParser(
+    prog="train_neural_ops.py",
+    description="Train neural-operator and diffusion baselines (FNO / TFNO / WNO / WDNO)",
+)
+parser.add_argument("-c", "--config", type=str, required=True, help="TOML config file")
+parser.add_argument("-n", "--num_nodes", type=int, required=True, help="Number of cluster nodes")
+parser.add_argument("-d", "--devices", type=int, required=True, help="GPUs per node")
+args = parser.parse_args()
 
-    # ── Seed (mirrors pl.seed_everything in train.py) ─────────────────────────
-    pl.seed_everything(42)
-    torch.set_float32_matmul_precision('high')
+num_nodes = args.num_nodes
+num_devices_per_node = args.devices
+num_devices = num_nodes * num_devices_per_node
 
-    # ── DataModule ────────────────────────────────────────────────────────────
-    data_module = WellDataModule(
-        well_base_path=args.well_base_path,
-        well_dataset=args.well_dataset,
-        stats_path=args.stats_path,
-        n_steps_input=args.n_steps_input,
-        n_steps_output=args.n_steps_output,
-        batch_size=args.batch_size,
-        num_workers=args.num_workers,
-    )
+config = munch.munchify(toml.load(args.config))
 
-    # Setup early to read F (number of fields)
-    data_module.setup()
-    F = data_module.train_dataset.metadata.n_fields
+pl.seed_everything(config.random.seed)
+lt_train = config.lightning.trainer
+torch.set_float32_matmul_precision(lt_train.matmul_precision)
 
-    if is_main:
-        print(f"\n{'='*60}")
-        print(f"  Model          : {args.model.upper()}")
-        print(f"  Modes          : {args.modes}")
-        print(f"  Blocks         : {args.n_blocks}")
-        print(f"  Hidden         : {args.hidden}")
-        print(f"  LR             : {lr}")
-        print(f"  Epochs         : {args.epochs}")
-        print(f"  Batch/GPU      : {args.batch_size}")
-        print(f"  ZeRO stage     : {args.zero_stage}")
-        print(f"  Fields (F)     : {F}")
-        print(f"  In  channels   : {args.n_steps_input  * F}")
-        print(f"  Out channels   : {args.n_steps_output * F}")
-        print(f"  Checkpoints    : {args.checkpoint_dir}")
-        print(f"{'='*60}\n")
+operator_cfg = NeuralOperatorConfig.from_config(config.neural_operator)
+optimizer_cfg = OptimizerConfig.from_config(config.optimizer, config.scheduler, config.train)
+train_cfg = config.train
 
-    # ── LightningModule ───────────────────────────────────────────────────────
-    model = NeuralOperatorModule(
-        model_type=args.model,
-        modes=args.modes,
-        n_blocks=args.n_blocks,
-        hidden=args.hidden,
-        in_channels=args.n_steps_input  * F,
-        out_channels=args.n_steps_output * F,
-        lr=lr,
-        tucker_rank=args.tucker_rank,
-    )
-
-    if is_main:
-        n_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
-        print(f"  Parameters     : {n_params:,}\n")
-
-    # ── DeepSpeed strategy ────────────────────────────────────────────────────
-    # Lightning's DeepSpeedStrategy wraps DDP with ZeRO — does NOT use
-    # DataParallel's setattr/replicate, so tltorch ComplexFactorList is safe.
-    strategy = pl.strategies.DeepSpeedStrategy(
-        stage=args.zero_stage,
-        # Optional: enable mixed precision via DeepSpeed
-        # precision_plugin=pl.plugins.DeepSpeedPrecisionPlugin(precision="bf16-mixed"),
-    )
-
-    # ── Callbacks ─────────────────────────────────────────────────────────────
-    #checkpoint_callback = pl.callbacks.ModelCheckpoint(
-    #    dirpath=args.checkpoint_dir,
-    #    filename=f"{args.model}" + "-{epoch:04d}-{val_loss:.4f}",
-    #    monitor="val_loss",
-    #    mode="min",
-    #    save_top_k=3,
-    #    every_n_epochs=args.save_every,
-    #    save_last=True,
-    #)
-    best_checkpoint = pl.callbacks.ModelCheckpoint(
-    dirpath=args.checkpoint_dir,
-    filename=f"{args.model}" + "-best-{epoch:04d}-{val_loss:.4f}",
-    monitor="val_loss",
-    mode="min",
-    save_top_k=3,
-    save_last=True,
-    every_n_epochs=1,           # check every epoch, save when val_loss improves
+augmentation = (
+    compose_augmentation(*train_cfg.augmentations)
+    if getattr(train_cfg, "augmentations", None)
+    else None
+)
+transformation = (
+    compose_transformation(*train_cfg.transformations)
+    if getattr(train_cfg, "transformations", None)
+    else None
 )
 
+data_module = WellDataModuleLightning(
+    well_base_path=config.path.well_base_path,
+    well_dataset=config.path.well_dataset_name,
+    stats_path=config.path.stats_path,
+    n_steps_input=train_cfg.n_steps_input,
+    n_steps_output=train_cfg.n_steps_output,
+    max_rollout_steps=train_cfg.max_rollout_steps,
+    batch_size=train_cfg.batch_size,
+    num_workers=config.lightning.datamodules.data_workers,
+    train_shuffle=train_cfg.train_shuffle,
+    val_shuffle=train_cfg.val_shuffle,
+    test_shuffle=train_cfg.test_shuffle,
+    target_dtype=eval(train_cfg.target_dtype),
+    augmentation=augmentation,
+    transformation=transformation,
+)
 
-    lr_monitor = pl.callbacks.LearningRateMonitor(logging_interval="epoch")
+data_module.setup()
 
-    # ── CSV logger (mirrors ExperimentManager CSV logging in train.py) ────────
-    csv_logger = pl.loggers.CSVLogger(
-        save_dir=args.checkpoint_dir,
-        name="logs",
-    )
+normalizer = data_module.normalizer
+data_shape = data_module.train_dataset.metadata.spatial_resolution
+meta_fields = data_module.train_dataset.metadata.field_names
+field_names = [item for sublist in meta_fields.values() for item in sublist]
+scalar_cond_dim = _infer_scalar_cond_dim(data_module.train_dataset)
 
-    # ── Trainer ───────────────────────────────────────────────────────────────
-    trainer = pl.Trainer(
-        accelerator="gpu",
-        strategy=strategy,
-        devices=torch.cuda.device_count(),
-        num_nodes=1,
-        max_epochs=args.epochs,
-        precision="32-true",          # change to "bf16-mixed" for mixed precision
-        callbacks=[best_checkpoint, lr_monitor],
-        logger=csv_logger,
-        log_every_n_steps=1,
-        num_sanity_val_steps=0,       # mirrors train.py
-        enable_progress_bar=is_main,
-    )
+model = NeuralOperatorModule(
+    operator_cfg=operator_cfg,
+    n_fields=len(field_names),
+    field_names=field_names,
+    data_shape=data_shape,
+    n_steps_input=train_cfg.n_steps_input,
+    n_steps_output=train_cfg.n_steps_output,
+    scalar_cond_dim=scalar_cond_dim,
+    optimizer_cfg=optimizer_cfg,
+    normalizer=normalizer,
+)
 
-    # ── Train ─────────────────────────────────────────────────────────────────
-    if is_main:
-        start_time = datetime.datetime.now()
-        print(f"Training started: {start_time.strftime('%Y-%m-%d %H:%M:%S')}\n")
+model.experiment_manager = ExperimentManager(
+    base_dir=config.path.experiments_path,
+    experiment_name=config.main.exp_name,
+    overwrite=False,
+    loggers=config.loggers.loggers,
+    callbacks=config.callbacks.callbacks,
+    log_every_n_epochs=config.loggers.log_every_n_epochs,
+)
 
+callbacks = model.experiment_manager.get_callbacks()
+
+gradient_clip_val = lt_train.gradient_clip_val
+gradient_clip_val = gradient_clip_val if isinstance(gradient_clip_val, float) else None
+
+trainer = pl.Trainer(
+    accelerator=lt_train.accelerator,
+    strategy=lt_train.strategy,
+    devices=num_devices_per_node,
+    num_nodes=num_nodes,
+    precision=lt_train.precision,
+    callbacks=callbacks,
+    max_epochs=train_cfg.epochs,
+    logger=False,
+    gradient_clip_val=gradient_clip_val,
+    log_every_n_steps=lt_train.log_every_n_steps,
+    num_sanity_val_steps=0,
+    limit_train_batches=getattr(lt_train, "limit_train_batches", 1.0),
+    limit_val_batches=getattr(lt_train, "limit_val_batches", 1.0),
+)
+
+if is_rank0:
+    trainer._logger_connector.configure_logger(model.experiment_manager.get_loggers())
+    model.experiment_manager.save_environment_info()
+    model.experiment_manager.copy_config_file(src=args.config)
+
+    em = model.experiment_manager
+    em.append_readme("")
+    em.append_readme("*** Distributed Environment ***\n")
+    em.append_readme(f"> Nodes                : {num_nodes}\n")
+    em.append_readme(f"> Devices/node         : {num_devices_per_node}\n")
+    em.append_readme(f"> Total devices        : {num_devices}\n")
+    em.append_readme(f"> Local batch size     : {train_cfg.batch_size}\n")
+    em.append_readme(f"> Global batch size    : {train_cfg.batch_size * num_devices}\n")
+    em.append_readme(f"> Model                : {operator_cfg.model_type.upper()}\n")
+    em.append_readme(f"> Fields               : {len(field_names)}\n")
+    em.append_readme(f"> Scalar cond dim      : {scalar_cond_dim}\n")
+    em.append_readme(f"> Spatial shape        : {tuple(data_shape)}\n")
+    em.append_readme("")
+
+    start_time = datetime.datetime.now()
+    em.append_readme("*** Training Started ***\n")
+    em.append_readme(f"Started: {start_time}\n")
+
+if not getattr(config, "resume", None) or not config.resume.ckpt:
     trainer.fit(model, datamodule=data_module)
+else:
+    trainer.fit(model, datamodule=data_module, ckpt_path=config.resume.ckpt)
 
-    if is_main:
-        end_time = datetime.datetime.now()
-        print(f"\nTraining complete.")
-        print(f"  Best val loss  : {best_checkpoint.best_model_score:.6f}")
-        print(f"  Best ckpt      : {best_checkpoint.best_model_path}")
-        print(f"  Finished       : {end_time.strftime('%Y-%m-%d %H:%M:%S')}")
-        print(f"  Total time     : {str(end_time - start_time)}")
-        
-        # Save a single-file checkpoint usable without DeepSpeed
-        trainer.save_checkpoint(
-            os.path.join(args.checkpoint_dir, f"{args.model}_final.ckpt")
-        )
-        
-    sys.exit(0)
+if is_rank0:
+    end_time = datetime.datetime.now()
+    em = model.experiment_manager
+    em.append_readme("*** Training Completed ***\n")
+    em.append_readme(f"Finished: {end_time}\n")
+    em.append_readme(f"Total time: {end_time - start_time}\n")
 
-
-if __name__ == "__main__":
-    main()
+sys.exit(0)
