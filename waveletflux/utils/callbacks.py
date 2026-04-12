@@ -8,6 +8,7 @@ import torch
 import time
 import csv
 import os
+import shutil
 
 class EmergencySaveCallback(pl.Callback):
     """
@@ -232,6 +233,7 @@ class PortableModelCheckpoint(ModelCheckpoint):
         portable = base.replace(".ckpt", "") + "_portable.ckpt"
 
         self._write_portable(trainer, filepath, portable)
+        self._maybe_update_best_aliases(filepath, portable)
 
     def _remove_checkpoint(self, trainer, filepath: str):
         # Mirror deletions: when ModelCheckpoint prunes a stale checkpoint,
@@ -261,13 +263,43 @@ class PortableModelCheckpoint(ModelCheckpoint):
             # DDP / single-GPU: Lightning already gives a full state dict on rank 0
             state_dict = pl_module.state_dict()
 
-        torch.save(
-            {
-                "state_dict":       state_dict,
-                "hyper_parameters": dict(pl_module.hparams),
-                "epoch":            trainer.current_epoch,
-                "global_step":      trainer.global_step,
-            },
-            out_path,
-        )
+        payload = {
+            "state_dict":       state_dict,
+            "hyper_parameters": dict(pl_module.hparams),
+            "epoch":            trainer.current_epoch,
+            "global_step":      trainer.global_step,
+        }
+        if hasattr(pl_module, "_export_ema_checkpoint_state"):
+            payload.update(pl_module._export_ema_checkpoint_state())
+
+        torch.save(payload, out_path)
         #print(f"[rank0] portable checkpoint → {out_path}", flush=True)
+
+    def _maybe_update_best_aliases(self, filepath: str, portable_path: str):
+        best_model_path = getattr(self, "best_model_path", "")
+        if not best_model_path:
+            return
+
+        if os.path.abspath(filepath) != os.path.abspath(best_model_path):
+            return
+
+        ckpt_dir = os.path.dirname(filepath.rstrip("/").rstrip("\\"))
+        best_native = os.path.join(ckpt_dir, "best.ckpt")
+        best_portable = os.path.join(ckpt_dir, "best_portable.ckpt")
+
+        self._copy_checkpoint_artifact(filepath, best_native)
+        self._copy_checkpoint_artifact(portable_path, best_portable)
+
+    def _copy_checkpoint_artifact(self, source_path: str, target_path: str):
+        if os.path.abspath(source_path) == os.path.abspath(target_path):
+            return
+
+        if os.path.isdir(target_path):
+            shutil.rmtree(target_path)
+        elif os.path.exists(target_path):
+            os.remove(target_path)
+
+        if os.path.isdir(source_path):
+            shutil.copytree(source_path, target_path)
+        else:
+            shutil.copy2(source_path, target_path)

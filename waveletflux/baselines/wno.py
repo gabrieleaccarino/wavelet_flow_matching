@@ -142,25 +142,27 @@ class WaveConv2d(nn.Module):
                 f"Expected {self.in_channels} channels, got {x.shape[1]}."
             )
 
-        dwt, idwt = self._get_ops(x)
-        yl, yh = dwt(x)
+        # pytorch_wavelets is more stable in fp32 than under bf16 autocast.
+        x_wave = x.to(dtype=torch.float32)
+        with torch.autocast(device_type=x.device.type, enabled=False):
+            dwt, idwt = self._get_ops(x_wave)
+            yl, yh = dwt(x_wave)
 
-        if tuple(yl.shape[-2:]) != self.coeff_size:
-            raise ValueError(
-                "Resolved coarsest wavelet coefficient size does not match the "
-                f"learned kernel shape. Expected {self.coeff_size}, got "
-                f"{tuple(yl.shape[-2:])}."
-            )
+            if tuple(yl.shape[-2:]) != self.coeff_size:
+                raise ValueError(
+                    "Resolved coarsest wavelet coefficient size does not match the "
+                    f"learned kernel shape. Expected {self.coeff_size}, got "
+                    f"{tuple(yl.shape[-2:])}."
+                )
 
-        out_yl = self.mul2d(yl, self.weights1)
-        out_yh = [torch.zeros_like(coeff) for coeff in yh]
+            out_yl = self.mul2d(yl, self.weights1)
+            out_yh = [torch.zeros_like(coeff) for coeff in yh]
 
-        out_yh[-1][:, :, 0, :, :] = self.mul2d(yh[-1][:, :, 0, :, :], self.weights2)
-        out_yh[-1][:, :, 1, :, :] = self.mul2d(yh[-1][:, :, 1, :, :], self.weights3)
-        out_yh[-1][:, :, 2, :, :] = self.mul2d(yh[-1][:, :, 2, :, :], self.weights4)
-
-        out = idwt((out_yl, out_yh))
-        return out[..., : x.shape[-2], : x.shape[-1]]
+            out_yh[-1][:, :, 0, :, :] = self.mul2d(yh[-1][:, :, 0, :, :], self.weights2)
+            out_yh[-1][:, :, 1, :, :] = self.mul2d(yh[-1][:, :, 1, :, :], self.weights3)
+            out_yh[-1][:, :, 2, :, :] = self.mul2d(yh[-1][:, :, 2, :, :], self.weights4)
+            out = idwt((out_yl, out_yh))
+        return out[..., : x.shape[-2], : x.shape[-1]].to(dtype=x.dtype)
 
 
 class WNO2d(nn.Module):

@@ -1,8 +1,10 @@
+from contextlib import contextmanager
 from typing import Any, Optional
 
 import pytorch_lightning as pl
 import torch
 from einops import rearrange
+from torch.utils.data import DataLoader
 from torch.optim.lr_scheduler import CosineAnnealingLR, LinearLR, SequentialLR
 
 from waveletflux.baselines import WDNO2d, WNO2d
@@ -37,6 +39,16 @@ class NeuralOperatorModule(pl.LightningModule):
         self.optimizer_cfg = optimizer_cfg
         self.normalizer = normalizer
         self.experiment_manager = None
+        self.use_ema = self.model_type == "wdno" and operator_cfg.ema_decay > 0.0
+        self.ema_decay = float(operator_cfg.ema_decay)
+        self.ema_update_every = max(int(operator_cfg.ema_update_every), 1)
+        self.ema_start_step = int(operator_cfg.ema_start_step)
+        self.register_buffer("ema_num_updates", torch.zeros((), dtype=torch.long), persistent=True)
+        self._ema_state = None
+        self._ema_backup_state = None
+        self._ema_active = False
+        self.wdno_eval_ensemble_size = 4
+        self.wdno_eval_base_seed = 0
 
         in_channels = n_fields * n_steps_input
         out_channels = n_fields * n_steps_output
@@ -105,6 +117,9 @@ class NeuralOperatorModule(pl.LightningModule):
         else:
             raise ValueError(f"Unknown operator type: {operator_cfg.model_type}")
 
+        if self.use_ema:
+            self._sync_ema_state_from_model()
+
         self.save_hyperparameters(
             {
                 "operator_cfg": operator_cfg.to_dict(),
@@ -132,9 +147,143 @@ class NeuralOperatorModule(pl.LightningModule):
 
     def _get_scalar_conds(self, batch) -> Optional[torch.Tensor]:
         scalars = batch.get("constant_scalars")
-        if scalars is None:
+        scalars = scalars.to(self.device) if scalars is not None else None
+        n_scalars = int(scalars.shape[-1]) if scalars is not None else 0
+
+        time_grid = batch.get("input_time_grid")
+        dt = None
+        if time_grid is not None and time_grid.shape[-1] >= 2:
+            dt = (time_grid[:, 1] - time_grid[:, 0]).unsqueeze(-1).to(self.device)
+
+        if self.scalar_cond_dim == 0:
             return None
-        return scalars.to(self.device)
+
+        parts = []
+        if scalars is not None:
+            parts.append(scalars)
+
+        if dt is not None and self.scalar_cond_dim == n_scalars + 1:
+            parts.append(dt)
+        elif scalars is None and dt is not None and self.scalar_cond_dim == 1:
+            parts.append(dt)
+
+        if not parts:
+            return None
+
+        scalar_conds = torch.cat(parts, dim=-1)
+        if scalar_conds.shape[-1] != self.scalar_cond_dim:
+            raise ValueError(
+                f"Expected {self.scalar_cond_dim} scalar conditions, got "
+                f"{scalar_conds.shape[-1]}. Check checkpoint/config conditioning dims."
+            )
+        return scalar_conds
+
+    def _clone_model_state(self) -> dict[str, torch.Tensor]:
+        return {
+            name: tensor.detach().clone()
+            for name, tensor in self.model.state_dict().items()
+        }
+
+    def _ensure_ema_state_device(self) -> None:
+        if not self.use_ema or self._ema_state is None:
+            return
+        model_state = self.model.state_dict()
+        for name, tensor in model_state.items():
+            ema_tensor = self._ema_state.get(name)
+            if ema_tensor is None or ema_tensor.shape != tensor.shape:
+                self._ema_state[name] = tensor.detach().clone()
+                continue
+            if ema_tensor.device != tensor.device or ema_tensor.dtype != tensor.dtype:
+                self._ema_state[name] = ema_tensor.to(device=tensor.device, dtype=tensor.dtype)
+
+    def _sync_ema_state_from_model(self) -> None:
+        if not self.use_ema:
+            return
+        self._ema_state = self._clone_model_state()
+
+    @torch.no_grad()
+    def _update_ema_state(self) -> None:
+        if not self.use_ema:
+            return
+        self._ensure_ema_state_device()
+
+        model_state = self.model.state_dict()
+        if int(self.ema_num_updates.item()) == 0 or self._ema_state is None:
+            self._sync_ema_state_from_model()
+        else:
+            for name, tensor in model_state.items():
+                ema_tensor = self._ema_state[name]
+                tensor = tensor.detach()
+                if torch.is_floating_point(tensor):
+                    ema_tensor.mul_(self.ema_decay).add_(tensor, alpha=1.0 - self.ema_decay)
+                else:
+                    ema_tensor.copy_(tensor)
+
+        self.ema_num_updates.add_(1)
+
+    def _apply_ema_weights(self) -> bool:
+        if (
+            not self.use_ema
+            or self._ema_active
+            or self._ema_state is None
+            or int(self.ema_num_updates.item()) == 0
+        ):
+            return False
+
+        self._ensure_ema_state_device()
+        self._ema_backup_state = self._clone_model_state()
+        self.model.load_state_dict(self._ema_state, strict=True)
+        self._ema_active = True
+        return True
+
+    def _restore_model_weights(self) -> None:
+        if not self._ema_active or self._ema_backup_state is None:
+            return
+        self.model.load_state_dict(self._ema_backup_state, strict=True)
+        self._ema_backup_state = None
+        self._ema_active = False
+
+    @contextmanager
+    def _ema_scope(self, enabled: bool = True):
+        applied = self._apply_ema_weights() if enabled else False
+        try:
+            yield
+        finally:
+            if applied:
+                self._restore_model_weights()
+
+    def _export_ema_checkpoint_state(self) -> dict:
+        if not self.use_ema or self._ema_state is None:
+            return {}
+        return {
+            "ema_state_dict": {k: v.detach().cpu() for k, v in self._ema_state.items()},
+            "ema_num_updates": self.ema_num_updates.detach().cpu(),
+        }
+
+    def _load_ema_checkpoint_state(self, checkpoint: dict) -> None:
+        if not self.use_ema:
+            return
+
+        ema_state = checkpoint.get("ema_state_dict")
+        if ema_state is None:
+            self._sync_ema_state_from_model()
+            self.ema_num_updates.zero_()
+            return
+
+        self._ema_state = {k: v.detach().clone() for k, v in ema_state.items()}
+        self._ensure_ema_state_device()
+
+        ema_num_updates = checkpoint.get("ema_num_updates")
+        if ema_num_updates is None:
+            self.ema_num_updates.zero_()
+        else:
+            self.ema_num_updates.copy_(
+                torch.as_tensor(
+                    ema_num_updates,
+                    dtype=self.ema_num_updates.dtype,
+                    device=self.ema_num_updates.device,
+                )
+            )
 
     def forward(
         self,
@@ -157,6 +306,64 @@ class NeuralOperatorModule(pl.LightningModule):
         x = rearrange(x, "B Ti H W F -> B (Ti F) H W")
         y = rearrange(y, "B To H W F -> B (To F) H W")
         return x, y, scalar_conds
+
+    @torch.no_grad()
+    def calibrate_wdno_coeff_scales(
+        self,
+        dataset,
+        batch_size: int,
+        num_batches: int = 32,
+    ) -> None:
+        if self.model_type != "wdno":
+            return
+        if num_batches < 1:
+            return
+
+        loader = DataLoader(
+            dataset,
+            batch_size=batch_size,
+            shuffle=False,
+            num_workers=0,
+            collate_fn=lambda batch: torch.utils.data.dataloader.default_collate(batch),
+        )
+
+        coeff_sumsq = {
+            i: torch.zeros_like(getattr(self.model, f"coeff_scale_{i}"))
+            for i in self.model.scale_shapes
+        }
+        coeff_count = 0
+
+        was_training = self.training
+        self.eval()
+        for batch_idx, batch in enumerate(loader):
+            if batch_idx >= num_batches:
+                break
+
+            x, y, scalar_conds = self._prepare_supervised_batch(batch)
+            if hasattr(self.model, "_coeff_dict_from_supervised_tensors"):
+                coeffs = self.model._coeff_dict_from_supervised_tensors(x, y)
+            else:
+                y_fields = rearrange(
+                    y,
+                    "B (To F) H W -> B To H W F",
+                    To=self.n_steps_output,
+                    F=self.n_fields,
+                )
+                coeffs = self.model._coeff_dict_from_fields(y_fields)
+            for i, coeff in coeffs.items():
+                coeff_sumsq[i] += coeff.square().sum(dim=(0, 2, 3), keepdim=True)
+            ref = next(iter(coeffs.values()))
+            coeff_count += ref.shape[0] * ref.shape[2] * ref.shape[3]
+
+        coeff_scales = {
+            i: (coeff_sumsq[i] / max(coeff_count, 1)).sqrt().mul(3.0).clamp(min=1.0)
+            for i in coeff_sumsq
+        }
+        self.model.set_coeff_scales(coeff_scales)
+        if self.use_ema:
+            self._sync_ema_state_from_model()
+        if was_training:
+            self.train()
 
     def _shared_step(self, batch, log_prefix: str) -> torch.Tensor:
         x, y, scalar_conds = self._prepare_supervised_batch(batch)
@@ -183,17 +390,50 @@ class NeuralOperatorModule(pl.LightningModule):
 
     @torch.no_grad()
     def sample(self, batch, batch_idx):
-        x, _, scalar_conds = self._prepare_supervised_batch(batch)
-        yhat_norm = self(x, scalar_conds=scalar_conds)
-        yhat_norm = rearrange(
-            yhat_norm,
-            "B (To F) H W -> B To H W F",
-            To=self.n_steps_output,
-            F=self.n_fields,
-        )
-        yhat = self.normalizer.denormalize_flattened(yhat_norm, mode="variable")
-        y = batch["output_fields"].to(self.device)
-        return yhat, y
+        with self._ema_scope(enabled=self.use_ema):
+            x, _, scalar_conds = self._prepare_supervised_batch(batch)
+            yhat_norm = self(x, scalar_conds=scalar_conds)
+            yhat_norm = rearrange(
+                yhat_norm,
+                "B (To F) H W -> B To H W F",
+                To=self.n_steps_output,
+                F=self.n_fields,
+            )
+            yhat = self.normalizer.denormalize_flattened(yhat_norm, mode="variable")
+            y = batch["output_fields"].to(self.device)
+            return yhat, y
+
+    @torch.no_grad()
+    def _wdno_eval_sample(self, batch, num_samples: Optional[int] = None):
+        if self.model_type != "wdno":
+            raise RuntimeError("_wdno_eval_sample() is only valid for WDNO models.")
+
+        num_samples = int(num_samples or self.wdno_eval_ensemble_size)
+        cpu_rng = torch.random.get_rng_state()
+        cuda_rng = torch.cuda.get_rng_state_all() if torch.cuda.is_available() else None
+
+        preds = []
+        try:
+            for seed_offset in range(num_samples):
+                torch.manual_seed(self.wdno_eval_base_seed + seed_offset)
+                if torch.cuda.is_available():
+                    torch.cuda.manual_seed_all(self.wdno_eval_base_seed + seed_offset)
+                yhat, y = self.sample(batch, batch_idx=0)
+                preds.append(yhat)
+        finally:
+            torch.random.set_rng_state(cpu_rng)
+            if cuda_rng is not None:
+                torch.cuda.set_rng_state_all(cuda_rng)
+
+        yhat_ens = torch.stack(preds, dim=1)
+        return yhat_ens.mean(dim=1), y
+
+    @torch.no_grad()
+    def _wdno_eval_loss(self, batch, num_samples: Optional[int] = None) -> torch.Tensor:
+        yhat, y = self._wdno_eval_sample(batch, num_samples=num_samples)
+        yhat_norm = self.normalizer.normalize_flattened(yhat, mode="variable")
+        y_norm = self.normalizer.normalize_flattened(y, mode="variable")
+        return (yhat_norm - y_norm).square().mean()
 
     @torch.no_grad()
     def rollout(
@@ -204,96 +444,100 @@ class NeuralOperatorModule(pl.LightningModule):
         normalized_input: bool = False,
         verbose: bool = False,
     ) -> torch.Tensor:
-        if self.model_type == "wno":
-            return self.model.rollout(
-                seed=seed,
-                scalar_conds=scalar_conds,
-                rollout_steps=rollout_steps,
-                normalizer=self.normalizer,
-                normalized_input=normalized_input,
-                verbose=verbose,
-            )
-
-        if seed.ndim != 5:
-            raise ValueError(
-                f"Expected seed shape `(B, Ti, H, W, F)`, got {tuple(seed.shape)}."
-            )
-        if rollout_steps < 1:
-            raise ValueError(f"`rollout_steps` must be >= 1, got {rollout_steps}.")
-
-        device = self.device
-        dtype = next(self.parameters()).dtype
-        seed = seed.to(device=device, dtype=dtype)
-
-        if not normalized_input:
-            windows_phys = seed[:, -self.n_steps_input :].clone()
-            windows_norm = None
-        else:
-            windows_norm = seed[:, -self.n_steps_input :].clone()
-            windows_phys = None
-
-        scalar_conds = (
-            scalar_conds.to(device=device, dtype=dtype) if scalar_conds is not None else None
-        )
-
-        batch_size, _, height, width, _ = seed.shape
-        preds = torch.zeros(
-            batch_size,
-            rollout_steps,
-            height,
-            width,
-            self.n_fields,
-            device="cpu",
-            dtype=torch.float32,
-        )
-
-        step_out = 0
-        while step_out < rollout_steps:
-            if windows_phys is not None:
-                window_norm = self.normalizer.normalize_flattened(
-                    windows_phys, mode="variable"
+        with self._ema_scope(enabled=self.use_ema):
+            if self.model_type == "wno":
+                return self.model.rollout(
+                    seed=seed,
+                    scalar_conds=scalar_conds,
+                    rollout_steps=rollout_steps,
+                    normalizer=self.normalizer,
+                    normalized_input=normalized_input,
+                    verbose=verbose,
                 )
+
+            if seed.ndim != 5:
+                raise ValueError(
+                    f"Expected seed shape `(B, Ti, H, W, F)`, got {tuple(seed.shape)}."
+                )
+            if rollout_steps < 1:
+                raise ValueError(f"`rollout_steps` must be >= 1, got {rollout_steps}.")
+
+            device = self.device
+            dtype = next(self.parameters()).dtype
+            seed = seed.to(device=device, dtype=dtype)
+
+            if not normalized_input:
+                windows_phys = seed[:, -self.n_steps_input :].clone()
+                windows_norm = None
             else:
-                window_norm = windows_norm
+                windows_norm = seed[:, -self.n_steps_input :].clone()
+                windows_phys = None
 
-            x_in = rearrange(window_norm, "B Ti H W F -> B (Ti F) H W")
-            yhat = self(x_in, scalar_conds=scalar_conds)
-            yhat_norm = rearrange(
-                yhat,
-                "B (To F) H W -> B To H W F",
-                To=self.n_steps_output,
-                F=self.n_fields,
+            scalar_conds = (
+                scalar_conds.to(device=device, dtype=dtype) if scalar_conds is not None else None
             )
-            yhat_phys = self.normalizer.denormalize_flattened(yhat_norm, mode="variable")
 
-            frames_to_store = min(self.n_steps_output, rollout_steps - step_out)
-            preds[:, step_out : step_out + frames_to_store] = (
-                yhat_phys[:, :frames_to_store].detach().float().cpu()
+            batch_size, _, height, width, _ = seed.shape
+            preds = torch.zeros(
+                batch_size,
+                rollout_steps,
+                height,
+                width,
+                self.n_fields,
+                device="cpu",
+                dtype=torch.float32,
             )
-            step_out += frames_to_store
+
+            step_out = 0
+            while step_out < rollout_steps:
+                if windows_phys is not None:
+                    window_norm = self.normalizer.normalize_flattened(
+                        windows_phys, mode="variable"
+                    )
+                else:
+                    window_norm = windows_norm
+
+                x_in = rearrange(window_norm, "B Ti H W F -> B (Ti F) H W")
+                yhat = self(x_in, scalar_conds=scalar_conds)
+                yhat_norm = rearrange(
+                    yhat,
+                    "B (To F) H W -> B To H W F",
+                    To=self.n_steps_output,
+                    F=self.n_fields,
+                )
+                yhat_phys = self.normalizer.denormalize_flattened(yhat_norm, mode="variable")
+
+                frames_to_store = min(self.n_steps_output, rollout_steps - step_out)
+                preds[:, step_out : step_out + frames_to_store] = (
+                    yhat_phys[:, :frames_to_store].detach().float().cpu()
+                )
+                step_out += frames_to_store
+
+                if verbose:
+                    print(
+                        f"  rollout frames {step_out}/{rollout_steps}",
+                        end="\r",
+                    )
+
+                if windows_phys is not None:
+                    windows_phys = torch.cat([windows_phys, yhat_phys], dim=1)[
+                        :, -self.n_steps_input :
+                    ]
+                else:
+                    windows_norm = torch.cat([windows_norm, yhat_norm], dim=1)[
+                        :, -self.n_steps_input :
+                    ]
 
             if verbose:
-                print(
-                    f"  rollout frames {step_out}/{rollout_steps}",
-                    end="\r",
-                )
-
-            if windows_phys is not None:
-                windows_phys = torch.cat([windows_phys, yhat_phys], dim=1)[
-                    :, -self.n_steps_input :
-                ]
-            else:
-                windows_norm = torch.cat([windows_norm, yhat_norm], dim=1)[
-                    :, -self.n_steps_input :
-                ]
-
-        if verbose:
-            print()
-        return preds
+                print()
+            return preds
 
     def configure_optimizers(self):
         oc = self.optimizer_cfg
-        optimizer = getattr(torch.optim, oc.cls)(self.parameters(), **oc.optimizer_kwargs())
+        optimizer = getattr(torch.optim, oc.cls)(
+            (p for p in self.parameters() if p.requires_grad),
+            **oc.optimizer_kwargs(),
+        )
 
         if not oc.scheduler_cls:
             return optimizer
@@ -332,8 +576,12 @@ class NeuralOperatorModule(pl.LightningModule):
         if not should_save:
             return
 
-        batch, batch_idx = self._get_random_validation_sample()
-        yhat, y = self.sample(batch, batch_idx)
+        if self.model_type == "wdno":
+            batch, batch_idx = self._get_validation_sample()
+            yhat, y = self._wdno_eval_sample(batch)
+        else:
+            batch, batch_idx = self._get_random_validation_sample()
+            yhat, y = self.sample(batch, batch_idx)
         self.experiment_manager.dump_sample_plots(
             yhat=rearrange(yhat, "B T H W C -> B C T H W"),
             y=rearrange(y, "B T H W C -> B C T H W"),
@@ -343,8 +591,57 @@ class NeuralOperatorModule(pl.LightningModule):
             dpi=300,
         )
 
+    def on_before_zero_grad(self, optimizer):
+        if not self.use_ema:
+            return
+
+        step = int(self.global_step)
+        if step < self.ema_start_step:
+            self._sync_ema_state_from_model()
+            return
+
+        if step % self.ema_update_every != 0:
+            return
+
+        self._update_ema_state()
+
+    def on_validation_start(self):
+        self._apply_ema_weights()
+
+    def on_validation_epoch_end(self):
+        if self.model_type != "wdno":
+            return
+        batch, _ = self._get_validation_sample()
+        sample_loss = self._wdno_eval_loss(batch)
+        self.log(
+            "val_sample_loss",
+            sample_loss,
+            on_step=False,
+            on_epoch=True,
+            prog_bar=True,
+            sync_dist=True,
+            batch_size=batch["output_fields"].shape[0],
+        )
+
+    def on_validation_end(self):
+        self._restore_model_weights()
+
+    def on_test_start(self):
+        self._apply_ema_weights()
+
+    def on_test_end(self):
+        self._restore_model_weights()
+
+    def on_save_checkpoint(self, checkpoint):
+        checkpoint.update(self._export_ema_checkpoint_state())
+
+    def on_load_checkpoint(self, checkpoint):
+        self._load_ema_checkpoint_state(checkpoint)
+
     def _get_random_validation_sample(self):
         loader = self.trainer.val_dataloaders
+        if isinstance(loader, list):
+            loader = loader[0]
         idx = torch.randint(0, len(loader), (1,)).item()
         for i, batch in enumerate(loader):
             if i == idx:
@@ -352,6 +649,15 @@ class NeuralOperatorModule(pl.LightningModule):
         batch_size = batch["output_fields"].shape[0]
         sample_idx = torch.randint(0, batch_size, (1,)).item()
         return {k: v[sample_idx : sample_idx + 1] for k, v in batch.items()}, idx
+
+    def _get_validation_sample(self, batch_idx: int = 0, sample_idx: int = 0):
+        loader = self.trainer.val_dataloaders
+        if isinstance(loader, list):
+            loader = loader[0]
+        for i, batch in enumerate(loader):
+            if i == batch_idx:
+                return {k: v[sample_idx : sample_idx + 1] for k, v in batch.items()}, batch_idx
+        raise IndexError(f"Validation batch index {batch_idx} is out of range.")
 
     @classmethod
     def from_checkpoint(
@@ -399,5 +705,19 @@ class NeuralOperatorModule(pl.LightningModule):
             optimizer_cfg=OptimizerConfig.from_dict(hp["optimizer_cfg"]),
             normalizer=normalizer,
         )
-        model.load_state_dict(ckpt["state_dict"])
+        missing_keys, unexpected_keys = model.load_state_dict(ckpt["state_dict"], strict=False)
+        allowed_missing = {"ema_num_updates"}
+        if model.model_type == "wdno":
+            allowed_missing.update(
+                f"model.coeff_scale_{i}" for i in model.model.scale_shapes
+            )
+
+        unexpected = [key for key in unexpected_keys if key not in allowed_missing]
+        missing = [key for key in missing_keys if key not in allowed_missing]
+        if missing or unexpected:
+            raise RuntimeError(
+                "Checkpoint state_dict is incompatible. "
+                f"Missing keys: {missing}. Unexpected keys: {unexpected}."
+            )
+        model._load_ema_checkpoint_state(ckpt)
         return model

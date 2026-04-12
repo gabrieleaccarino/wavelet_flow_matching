@@ -213,15 +213,17 @@ class ExperimentManager:
     def get_emergency_callback(self):
         return EmergencySaveCallback()
     
-    def get_model_checkpoint_callback(self, ckpt_dir: str):
+    def get_model_checkpoint_callback(self, ckpt_dir: str, monitor: str = "val_loss"):
         #return ModelCheckpoint(
         return PortableModelCheckpoint(
             dirpath = ckpt_dir,
-            monitor = "val_loss",
+            monitor = monitor,
             mode = "min",
-            save_top_k = 3,
-            save_last = True,
-            filename = f"{self.run_name}" + "-{epoch}-{val_loss:.4f}",
+            save_top_k = 1,
+            save_last = False,
+            filename = "best",
+            auto_insert_metric_name = False,
+            enable_version_counter = False,
             )
     
     #def get_portable_checkpoint_callback(self, ckpt_dir: str, every_n_epochs: int = 5):
@@ -230,14 +232,19 @@ class ExperimentManager:
     #        every_n_epochs = every_n_epochs,
     #    )
 
-    def get_callbacks(self):
+    def get_callbacks(self, checkpoint_monitor: str = "val_loss"):
         """
         Returns ModelCheckpoint callback configured for the experiment.
         """
         callbacks = []
        
         if 'model_checkpoint_cb' in self.callbacks:
-            callbacks.append(self.get_model_checkpoint_callback(self.dirs["checkpoints"]))
+            callbacks.append(
+                self.get_model_checkpoint_callback(
+                    self.dirs["checkpoints"],
+                    monitor=checkpoint_monitor,
+                )
+            )
             #model_ckpt = self.get_model_checkpoint_callback(self.dirs["checkpoints"])
             #callbacks.append(model_ckpt)
 

@@ -174,6 +174,9 @@ class NeuralOperatorConfig:
     sampling_steps: int = 20
     beta_schedule: str = "cosine"
     ddim_eta: float = 0.0
+    ema_decay: float = 0.995
+    ema_update_every: int = 1
+    ema_start_step: int = 0
     wavelet: str = "db6"
     mode: str = "symmetric"
     padding: int = 0
@@ -198,6 +201,9 @@ class NeuralOperatorConfig:
             sampling_steps=int(getattr(p, "sampling_steps", 20)),
             beta_schedule=getattr(p, "beta_schedule", "cosine"),
             ddim_eta=float(getattr(p, "ddim_eta", 0.0)),
+            ema_decay=float(getattr(p, "ema_decay", 0.995)),
+            ema_update_every=int(getattr(p, "ema_update_every", 1)),
+            ema_start_step=int(getattr(p, "ema_start_step", 0)),
             wavelet=getattr(p, "wavelet", "db6"),
             mode=getattr(p, "mode", "symmetric"),
             padding=int(getattr(p, "padding", 0)),

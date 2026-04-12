@@ -30,7 +30,11 @@ is_rank0 = RANK == 0
 def _infer_scalar_cond_dim(dataset) -> int:
     sample = dataset[0]
     scalars = sample.get("constant_scalars")
-    return int(scalars.numel()) if scalars is not None else 0
+    dim = int(scalars.numel()) if scalars is not None else 0
+    time_grid = sample.get("input_time_grid")
+    if time_grid is not None and time_grid.numel() >= 2:
+        dim += 1
+    return dim
 
 
 parser = argparse.ArgumentParser(
@@ -104,6 +108,13 @@ model = NeuralOperatorModule(
     normalizer=normalizer,
 )
 
+if operator_cfg.model_type.lower() == "wdno":
+    model.calibrate_wdno_coeff_scales(
+        dataset=data_module.train_dataset,
+        batch_size=train_cfg.batch_size,
+        num_batches=8,
+    )
+
 model.experiment_manager = ExperimentManager(
     base_dir=config.path.experiments_path,
     experiment_name=config.main.exp_name,
@@ -113,7 +124,8 @@ model.experiment_manager = ExperimentManager(
     log_every_n_epochs=config.loggers.log_every_n_epochs,
 )
 
-callbacks = model.experiment_manager.get_callbacks()
+checkpoint_monitor = "val_sample_loss" if operator_cfg.model_type.lower() == "wdno" else "val_loss"
+callbacks = model.experiment_manager.get_callbacks(checkpoint_monitor=checkpoint_monitor)
 
 gradient_clip_val = lt_train.gradient_clip_val
 gradient_clip_val = gradient_clip_val if isinstance(gradient_clip_val, float) else None
