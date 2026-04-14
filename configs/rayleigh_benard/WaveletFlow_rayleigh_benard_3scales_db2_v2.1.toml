@@ -1,5 +1,8 @@
 [main]
-    exp_name   = 'WaveletFlow_rayleigh_benard_3scales_db2_v0.0'
+    exp_name   = 'WaveletFlow_rayleigh_benard_3scales_db2_v2.1'
+
+[resume]
+    ckpt = ''
 
 [path]
     project_path      = '/glade/work/gaccarino/waveletflux'
@@ -9,12 +12,12 @@
     experiments_path  = '/glade/work/gaccarino/waveletflux/experiments/rayleigh_benard'
 
 [random]
-    seed = 4739
+    seed = 9823
 
 [train]
-    epochs            = 1000
+    epochs            = 200
     warmup_epochs     = 20
-    batch_size        = 16
+    batch_size        = 32
     n_steps_input     = 4
     n_steps_output    = 1
     max_rollout_steps = 1
@@ -23,7 +26,8 @@
     test_shuffle      = false
     rollout_shuffle   = false
     target_dtype      = 'torch.float32'
-    augmentations     = ['log_scalars']
+    augmentations     = []                  # stochastic: random_axis_flip, etc. — train only
+    transformations   = ['log_scalars']     # deterministic: applied to ALL splits
 
 [wavelet]
     cls         = 'WaveletDecomposer2D'
@@ -45,8 +49,8 @@
         # architecture
         n_levels = 3              # number of wavelet scales (must >= wavelet.params.n_scales)
         base_ch  = 64
-        n_res    = 2
-        cond_dim = 128
+        n_res    = 3
+        cond_dim = 256
 
 [flow_matching]
     cls        = 'OT_CFM'
@@ -57,7 +61,7 @@
 
 [loss]
     # must have exactly wavelet.params.n_scales entries
-    scale_weights = [1.0, 1.0, 1.0]
+    scale_weights = [1.0, 1.0, 2.0]
 
 [sampling]
     solver             = 'euler'
@@ -78,19 +82,21 @@
 
 [lightning]
     [lightning.datamodules]
-        data_workers = 8
+        data_workers = 16
 
     [lightning.trainer]
-        accelerator       = 'gpu'
-        strategy          = 'ddp'
-        precision         = '32-true'
-        matmul_precision  = 'high'
-        gradient_clip_val = 1.0
-        log_every_n_steps = 1
+        accelerator         = 'gpu'
+        strategy            = 'ddp'
+        precision           = 'bf16-mixed' #'32-true'
+        matmul_precision    = 'high'
+        gradient_clip_val   = 1.0
+        log_every_n_steps   = 1
+        limit_train_batches = 1.0
+        limit_val_batches   = 1.0
 
 [loggers]
     loggers            = ['csv']
-    log_every_n_epochs = 10
+    log_every_n_epochs = 5
 
 [callbacks]
     callbacks = ['model_checkpoint_cb', 'emergency_cb', 'performance_cb']

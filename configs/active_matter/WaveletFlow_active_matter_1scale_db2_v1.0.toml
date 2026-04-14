@@ -1,5 +1,5 @@
 [main]
-    exp_name = 'WaveletFlow_turbulent_radiative_layer_2D_3scales_db2_v3.0'
+    exp_name   = 'WaveletFlow_active_matter_1scale_db2_v1.0'
 
 [resume]
     ckpt = ''
@@ -7,17 +7,17 @@
 [path]
     project_path      = '/glade/work/gaccarino/waveletflux'
     well_base_path    = '/glade/work/gaccarino/data/datasets'
-    well_dataset_name = 'turbulent_radiative_layer_2D'
-    stats_path        = '/glade/work/gaccarino/data/datasets/turbulent_radiative_layer_2D/stats.yaml'
-    experiments_path  = '/glade/work/gaccarino/waveletflux/experiments/turbulent_radiative_layer_2D'
+    well_dataset_name = 'active_matter'
+    stats_path        = '/glade/work/gaccarino/data/datasets/active_matter/stats.yaml'
+    experiments_path  = '/glade/work/gaccarino/waveletflux/experiments/active_matter'
 
 [random]
-    seed = 3919
+    seed = 4893
 
 [train]
-    epochs            = 500
-    warmup_epochs     = 50
-    batch_size        = 32 #16
+    epochs            = 200
+    warmup_epochs     = 20
+    batch_size        = 32
     n_steps_input     = 4
     n_steps_output    = 1
     max_rollout_steps = 1
@@ -26,7 +26,8 @@
     test_shuffle      = false
     rollout_shuffle   = false
     target_dtype      = 'torch.float32'
-    augmentations     = []
+    augmentations     = []                  # stochastic: random_axis_flip, etc. — train only
+    transformations   = ['log_scalars']     # deterministic: applied to ALL splits
 
 [wavelet]
     cls         = 'WaveletDecomposer2D'
@@ -36,19 +37,19 @@
 [wavelet.params]
     wavelet  = 'db2'
     mode     = 'periodic'
-    n_scales = 3
+    n_scales = 1
 
 [velocity_net]
     cls = 'WaveletFlowUNet'
     [velocity_net.params]
         # conditioning / context
-        num_cond            = 1
-        context_in_channels = 4   # physical fields
+        num_cond            = 3
+        context_in_channels = 11  # physical fields
         num_context_frames  = 3   # number of previous frames to condition on
         # architecture
         n_levels = 3              # number of wavelet scales (must >= wavelet.params.n_scales)
         base_ch  = 64
-        n_res    = 6
+        n_res    = 3
         cond_dim = 256
 
 [flow_matching]
@@ -60,7 +61,7 @@
 
 [loss]
     # must have exactly wavelet.params.n_scales entries
-    scale_weights = [1.0, 1.0, 1.0]
+    scale_weights = [1.0]
 
 [sampling]
     solver             = 'euler'
@@ -75,8 +76,9 @@
 
 [scheduler]
     cls = 'CosineAnnealingLR'
-    [scheduler.params]
-        eta_min = 1e-7
+
+[scheduler.params]
+    eta_min = 1e-7
 
 [lightning]
     [lightning.datamodules]

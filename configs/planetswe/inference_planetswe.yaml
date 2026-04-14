@@ -1,0 +1,23 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# configs/planetswe/inference_planetswe.yaml
+# ─────────────────────────────────────────────────────────────────────────────
+
+# ── Paths ─────────────────────────────────────────────────────────────────────
+project_root:    "/glade/work/gaccarino/waveletflux"
+well_base_path:  "/glade/work/gaccarino/data/datasets"
+well_dataset_name: "planetswe"
+
+# ── Checkpoint ────────────────────────────────────────────────────────────────
+ckpt_name: "WaveletFlow_planetswe_3scales_db2_v1.0_20260408_123556-epoch=197-val_loss=0.0029_portable.ckpt"
+            
+# ── Dataset ───────────────────────────────────────────────────────────────────
+split:     "test"
+steps:     -1           # -1 = use all steps in each trajectory
+transform: []
+augment:   []
+
+# ── Model / inference ─────────────────────────────────────────────────────────
+n_steps_input:      4    # Ti — must match the value used during training
+num_sampling_steps: 20   # ODE integration steps per prediction
+n_ensemble:         8   # total ensemble members (split across GPUs)
+verbose:            true

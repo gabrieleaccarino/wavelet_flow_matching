@@ -1,0 +1,27 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# configs/rayleigh_benard_wavelet.yaml
+# Rayleigh-Bénard convection — wavelet-space model
+# ─────────────────────────────────────────────────────────────────────────────
+
+project_root:    "/glade/work/gaccarino/waveletflux"
+well_base_path:  "/glade/work/gaccarino/data/datasets"
+well_dataset_name: "rayleigh_benard"
+
+#ckpt_name: FM_data_space_rayleigh_benard_v2.0_20260411_172753-epoch=188-val_loss=0.0096_portable.ckpt
+#ckpt_name: "WaveletFlow_rayleigh_benard_3scales_db2_v1.0_20260401_150336-epoch=194-val_loss=0.0207_portable.ckpt"
+#ckpt_name: "WaveletFlow_rayleigh_benard_1scale_db2_v1.0_20260406_075915-epoch=193-val_loss=0.0157_portable.ckpt"
+#ckpt_name: "WaveletFlow_rayleigh_benard_3scales_db2_v2.0_20260413_171522-epoch=178-val_loss=0.0201_portable.ckpt"
+ckpt_name: "WaveletFlow_rayleigh_benard_3scales_db2_v2.1_20260413_181933-epoch=197-val_loss=0.0208_portable.ckpt"
+
+split:     "test"
+steps:     -1
+transform: ["log_scalars"]
+augment:   []
+
+n_steps_input: 4
+num_sampling_steps: 20
+n_ensemble: 8
+ode_method: "heun"         # "euler", "heun", or "midpoint"
+clamp_sigma: 5.0           # soft clamp on normalized predictions (0 = off)
+num_sampling_steps: 50     # increase from default if using euler
+verbose: true

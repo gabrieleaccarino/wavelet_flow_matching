@@ -1,7 +1,7 @@
 #!/bin/bash -l
-#PBS -N TFNO_planetswe_v1.0
-#PBS -o /glade/work/gaccarino/waveletflux/scripts/logs/TFNO_planetswe_v1.0.out
-#PBS -e /glade/work/gaccarino/waveletflux/scripts/logs/TFNO_planetswe_v1.0.err
+#PBS -N FNO_active_matter_v1.0
+#PBS -o /glade/work/gaccarino/waveletflux/scripts/logs/FNO_active_matter_v1.0.out
+#PBS -e /glade/work/gaccarino/waveletflux/scripts/logs/FNO_active_matter_v1.0.err
 
 # === Project / Queue ===
 #PBS -A UCLB0062
@@ -30,19 +30,19 @@ conda activate mlenv
 # === Run ===
 REPO=/glade/work/gaccarino/waveletflux
 torchrun --nproc_per_node=2 ${REPO}/waveletflux/train_neural_ops.py \
-        --model tfno \
+        --model fno \
         --modes 16 \
         --n_blocks 4 \
         --hidden 128 \
         --epochs 500 \
         --batch_size 16 \
-        --lr 5e-4 \
+        --lr 5e-3 \
         --num_workers 16 \
         --patience 20 \
         --min_delta 1e-6 \
         --n_steps_input 4 \
         --n_steps_output 1 \
         --well_base_path /glade/work/gaccarino/data/datasets \
-        --well_dataset planetswe \
-        --stats_path /glade/work/gaccarino/data/datasets/planetswe/stats.yaml \
-        --checkpoint_dir ${REPO}/experiments/planetswe/TFNO_planetswe_v1.0
+        --well_dataset active_matter \
+        --stats_path /glade/work/gaccarino/data/datasets/active_matter/stats.yaml \
+        --checkpoint_dir ${REPO}/experiments/active_matter/FNO_active_matter_v1.0

@@ -1,23 +1,23 @@
 [main]
-    exp_name   = 'WaveletFlow_turbulent_radiative_layer_2D_3scales_db2_v1.2'
+    exp_name   = 'WaveletFlow_rayleigh_benard_3scales_db2_v2.0'
 
 [resume]
-    ckpt = '/glade/work/gaccarino/waveletflux/experiments/turbulent_radiative_layer_2D/WaveletFlow_turbulent_radiative_layer_2D_3scales_db2_v1.1/artifacts/checkpoints/WaveletFlow_turbulent_radiative_layer_2D_3scales_db2_v1.1_20260325_104723-epoch=250-val_loss=0.0215.ckpt'
+    ckpt = ''
 
 [path]
     project_path      = '/glade/work/gaccarino/waveletflux'
     well_base_path    = '/glade/work/gaccarino/data/datasets'
-    well_dataset_name = 'turbulent_radiative_layer_2D'
-    stats_path        = '/glade/work/gaccarino/data/datasets/turbulent_radiative_layer_2D/stats.yaml'
-    experiments_path  = '/glade/work/gaccarino/waveletflux/experiments/turbulent_radiative_layer_2D'
+    well_dataset_name = 'rayleigh_benard'
+    stats_path        = '/glade/work/gaccarino/data/datasets/rayleigh_benard/stats.yaml'
+    experiments_path  = '/glade/work/gaccarino/waveletflux/experiments/rayleigh_benard'
 
 [random]
-    seed = 1264
+    seed = 6783
 
 [train]
-    epochs            = 500
-    warmup_epochs     = 50
-    batch_size        = 32 #16
+    epochs            = 200
+    warmup_epochs     = 20
+    batch_size        = 32
     n_steps_input     = 4
     n_steps_output    = 1
     max_rollout_steps = 1
@@ -26,7 +26,8 @@
     test_shuffle      = false
     rollout_shuffle   = false
     target_dtype      = 'torch.float32'
-    augmentations     = []
+    augmentations     = []                  # stochastic: random_axis_flip, etc. — train only
+    transformations   = ['log_scalars']     # deterministic: applied to ALL splits
 
 [wavelet]
     cls         = 'WaveletDecomposer2D'
@@ -42,7 +43,7 @@
     cls = 'WaveletFlowUNet'
     [velocity_net.params]
         # conditioning / context
-        num_cond            = 1
+        num_cond            = 2
         context_in_channels = 4   # physical fields
         num_context_frames  = 3   # number of previous frames to condition on
         # architecture
@@ -75,8 +76,9 @@
 
 [scheduler]
     cls = 'CosineAnnealingLR'
-    [scheduler.params]
-        eta_min = 1e-7
+
+[scheduler.params]
+    eta_min = 1e-7
 
 [lightning]
     [lightning.datamodules]

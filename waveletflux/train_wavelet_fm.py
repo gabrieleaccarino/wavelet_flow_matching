@@ -116,6 +116,7 @@ model = WaveletFlowModule(
     data_shape        = data_shape,
     n_steps_output    = train_cfg.n_steps_output,
     scale_weights     = config.loss.scale_weights,
+    subband_weights   = config.loss.get('subband_weights', None),
     wavelet_cfg       = wavelet_cfg,
     velocity_net_cfg  = velocity_net_cfg,
     flow_matching_cfg = flow_matching_cfg,
@@ -196,7 +197,18 @@ if is_rank0:
 if not config.resume.ckpt:
     trainer.fit(model, datamodule=data_module)
 else:   
-    trainer.fit(model, datamodule=data_module, ckpt_path=config.resume.ckpt)
+    ckpt_path = config.resume.ckpt
+
+    # Patch old checkpoints that predate the subband_weights buffer.
+    # We inject the current model's buffer value so strict loading succeeds.
+    ckpt = torch.load(ckpt_path, map_location='cpu')
+    if 'subband_weights' not in ckpt['state_dict']:
+        ckpt['state_dict']['subband_weights'] = model.subband_weights.cpu()
+        patched_path = ckpt_path.replace('.ckpt', '_patched.ckpt')
+        torch.save(ckpt, patched_path)
+        ckpt_path = patched_path
+
+    trainer.fit(model, datamodule=data_module, ckpt_path=ckpt_path)
 
 if is_rank0:
     end_time = datetime.datetime.now()
