@@ -1,7 +1,7 @@
 #!/bin/bash -l
-#PBS -N WaveletFlow_3scales_db2_v2.1_inference_rayleigh_benard
-#PBS -o /glade/work/gaccarino/waveletflux/scripts/logs/rayleigh_benard/WaveletFlow_3scales_db2_v2.1_inference_rayleigh_benard.out
-#PBS -e /glade/work/gaccarino/waveletflux/scripts/logs/rayleigh_benard/WaveletFlow_3scales_db2_v2.1_inference_rayleigh_benard.err
+#PBS -N FM_data_space_v4.0_active_matter_inference
+#PBS -o /glade/work/gaccarino/waveletflux/scripts/logs/active_matter/FM_data_space_v4.0_active_matter_inference.out
+#PBS -e /glade/work/gaccarino/waveletflux/scripts/logs/active_matter/FM_data_space_v4.0_active_matter_inference.err
 
 # === Project / Queue ===
 #PBS -A UCLB0062
@@ -9,19 +9,19 @@
 
 # === Resources ===
 #PBS -l select=1:ncpus=64:mpiprocs=4:ngpus=4:gpu_type=a100:mem=400GB
-#PBS -l walltime=02:00:00
+#PBS -l walltime=01:30:00
 
 # === Move to submission directory ===
 cd $PBS_O_WORKDIR
 
-DATASET_NAME="rayleigh_benard"
+DATASET_NAME="active_matter"
 REPO=/glade/work/gaccarino/waveletflux
 CONFIG=${REPO}/configs/${DATASET_NAME}/inference_${DATASET_NAME}.yaml
 N_GPUS=4
-N_ENSEMBLE=5
+N_ENSEMBLE=8
 NUM_SAMPLING=50
-ODE_METHOD="heun"        # NEW
-CLAMP_SIGMA=0.0          # NEW
+ODE_METHOD="euler"        
+CLAMP_SIGMA=5.0 
 
 export NCCL_DEBUG=INFO
 export NCCL_IB_DISABLE=1

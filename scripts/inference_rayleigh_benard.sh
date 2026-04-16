@@ -1,7 +1,7 @@
 #!/bin/bash -l
-#PBS -N FM_data_space_active_matter_inference
-#PBS -o /glade/work/gaccarino/waveletflux/scripts/logs/active_matter/FM_data_space_active_matter_inference.out
-#PBS -e /glade/work/gaccarino/waveletflux/scripts/logs/active_matter/FM_data_space_active_matter_inference.err
+#PBS -N WaveletFlow_3scales_db2_v4.0_rayleigh_benard_inference
+#PBS -o /glade/work/gaccarino/waveletflux/scripts/logs/rayleigh_benard/WaveletFlow_3scales_db2_v4.0_rayleigh_benard_inference.out
+#PBS -e /glade/work/gaccarino/waveletflux/scripts/logs/rayleigh_benard/WaveletFlow_3scales_db2_v4.0_rayleigh_benard_inference.err
 
 # === Project / Queue ===
 #PBS -A UCLB0062
@@ -9,17 +9,19 @@
 
 # === Resources ===
 #PBS -l select=1:ncpus=64:mpiprocs=4:ngpus=4:gpu_type=a100:mem=400GB
-#PBS -l walltime=02:00:00
+#PBS -l walltime=01:00:00
 
 # === Move to submission directory ===
 cd $PBS_O_WORKDIR
 
-DATASET_NAME="active_matter"
+DATASET_NAME="rayleigh_benard"
 REPO=/glade/work/gaccarino/waveletflux
 CONFIG=${REPO}/configs/${DATASET_NAME}/inference_${DATASET_NAME}.yaml
 N_GPUS=4
 N_ENSEMBLE=8
-NUM_SAMPLING=20
+NUM_SAMPLING=50
+ODE_METHOD="euler"        
+CLAMP_SIGMA=5.0          
 
 export NCCL_DEBUG=INFO
 export NCCL_IB_DISABLE=1
@@ -37,6 +39,8 @@ echo "  GPUs        : ${N_GPUS}"
 echo "  Config      : ${CONFIG}"
 echo "  N_ENSEMBLE  : ${N_ENSEMBLE}"
 echo "  NUM_SAMPLING: ${NUM_SAMPLING}"
+echo "  ODE_METHOD   : ${ODE_METHOD}"
+echo "  CLAMP_SIGMA  : ${CLAMP_SIGMA}"
 echo "  Started     : $(date)"
 echo "========================================================"
 
@@ -48,7 +52,9 @@ torchrun \
     --config ${CONFIG} \
     --override \
         n_ensemble=${N_ENSEMBLE} \
-        num_sampling_steps=${NUM_SAMPLING}
+        num_sampling_steps=${NUM_SAMPLING} \
+        ode_method=${ODE_METHOD} \
+        clamp_sigma=${CLAMP_SIGMA}
 
 EXIT_CODE=$?
 

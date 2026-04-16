@@ -1,7 +1,7 @@
 #!/bin/bash -l
-#PBS -N WaveletFlow_rayleigh_benard_3scales_db2_v0.0
-#PBS -o /glade/work/gaccarino/waveletflux/scripts/logs/WaveletFlow_rayleigh_benard_3scales_db2_v0.0.out
-#PBS -e /glade/work/gaccarino/waveletflux/scripts/logs/WaveletFlow_rayleigh_benard_3scales_db2_v0.0.err
+#PBS -N FM_data_space_active_matter_v4.0
+#PBS -o /glade/work/gaccarino/waveletflux/scripts/logs/active_matter/FM_data_space_active_matter_v4.0.out
+#PBS -e /glade/work/gaccarino/waveletflux/scripts/logs/active_matter/FM_data_space_active_matter_v4.0.err
 
 # === Project / Queue ===
 #PBS -A UCLB0062
@@ -30,6 +30,6 @@ conda activate mlenv
 # === Run ===
 REPO=/glade/work/gaccarino/waveletflux
 torchrun --nproc_per_node=4 \
-    ${REPO}/waveletflux/train.py \
-    -c ${REPO}/configs/rayleigh_benard/WaveletFlow_rayleigh_benard_3scales_db2_v0.0.toml \
+    ${REPO}/waveletflux/train_wavelet_fm.py \
+    -c ${REPO}/configs/active_matter/FM_data_space_active_matter_v4.0.toml \
     -n 1 -d 4

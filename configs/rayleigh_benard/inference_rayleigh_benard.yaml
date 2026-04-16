@@ -7,11 +7,11 @@ project_root:    "/glade/work/gaccarino/waveletflux"
 well_base_path:  "/glade/work/gaccarino/data/datasets"
 well_dataset_name: "rayleigh_benard"
 
-#ckpt_name: FM_data_space_rayleigh_benard_v2.0_20260411_172753-epoch=188-val_loss=0.0096_portable.ckpt
-#ckpt_name: "WaveletFlow_rayleigh_benard_3scales_db2_v1.0_20260401_150336-epoch=194-val_loss=0.0207_portable.ckpt"
-#ckpt_name: "WaveletFlow_rayleigh_benard_1scale_db2_v1.0_20260406_075915-epoch=193-val_loss=0.0157_portable.ckpt"
-#ckpt_name: "WaveletFlow_rayleigh_benard_3scales_db2_v2.0_20260413_171522-epoch=178-val_loss=0.0201_portable.ckpt"
-ckpt_name: "WaveletFlow_rayleigh_benard_3scales_db2_v2.1_20260413_181933-epoch=197-val_loss=0.0208_portable.ckpt"
+#ckpt_name: "FM_data_space_rayleigh_benard_v4.0_20260415_135807-epoch=194-train_loss=0.0077-val_loss=0.0100_portable.ckpt" 
+#ckpt_name: "WaveletFlow_rayleigh_benard_1scale_db2_v4.0_20260415_135235-epoch=188-train_loss=0.0185-val_loss=0.0194_portable.ckpt"
+ckpt_name: "WaveletFlow_rayleigh_benard_3scales_db2_v4.0_20260415_230754-epoch=188-train_loss=0.0223-val_loss=0.0264_portable.ckpt"
+
+stats_path: "/glade/work/gaccarino/data/datasets/rayleigh_benard/stats.yaml"
 
 split:     "test"
 steps:     -1

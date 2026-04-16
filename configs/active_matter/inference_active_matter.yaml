@@ -9,10 +9,11 @@ well_dataset_name: "active_matter"
 
 # ── Checkpoint ────────────────────────────────────────────────────────────────
 # Uncomment the checkpoint you want to evaluate
-#ckpt_name: "WaveletFlow_active_matter_3scales_db2_v1.0_20260410_130543-epoch=198-val_loss=0.0102_portable.ckpt"
-#ckpt_name: "WaveletFlow_active_matter_1scale_db2_v1.0_20260410_212850-epoch=185-val_loss=0.0078_portable.ckpt"
-ckpt_name: "FM_data_space_active_matter_v1.0_20260410_214008-epoch=196-val_loss=0.0031_portable.ckpt"
+ckpt_name: "FM_data_space_active_matter_v4.0_20260416_090223-epoch=179-train_loss=0.0048-val_loss=0.0026_portable.ckpt"
+#ckpt_name: "WaveletFlow_active_matter_1scale_db2_v4.0_20260415_231646-epoch=195-train_loss=0.0647-val_loss=0.0586_portable.ckpt"
+#ckpt_name: "WaveletFlow_active_matter_3scales_db2_v4.0_20260415_231722-epoch=199-train_loss=0.0221-val_loss=0.0163_portable.ckpt"
 
+stats_path: "/glade/work/gaccarino/data/datasets/active_matter/stats.yaml"
 
 # ── Dataset ───────────────────────────────────────────────────────────────────
 split:     "test"

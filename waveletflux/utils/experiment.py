@@ -221,15 +221,9 @@ class ExperimentManager:
             mode = "min",
             save_top_k = 3,
             save_last = True,
-            filename = f"{self.run_name}" + "-{epoch}-{val_loss:.4f}",
+            filename = f"{self.run_name}" + "-{epoch}-{train_loss:.4f}-{val_loss:.4f}",
             )
     
-    #def get_portable_checkpoint_callback(self, ckpt_dir: str, every_n_epochs: int = 5):
-    #    return PortableCheckpointCallback(
-    #        dirpath = ckpt_dir,
-    #        every_n_epochs = every_n_epochs,
-    #    )
-
     def get_callbacks(self):
         """
         Returns ModelCheckpoint callback configured for the experiment.
@@ -250,10 +244,6 @@ class ExperimentManager:
             callbacks.append(self.get_performance_callback(self.dirs["performance"]))
             #performance_ckpt = self.get_performance_callback(self.dirs["performance"])
             #callbacks.append(performance_ckpt)
-
-        #if 'portable_checkpoint_cb' in self.callbacks:
-        #    portable_ckpt = self.get_portable_checkpoint_callback(self.dirs["checkpoints"], self.log_every_n_epochs)
-        #    callbacks.append(portable_ckpt)
 
         return callbacks
 

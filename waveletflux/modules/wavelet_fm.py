@@ -339,6 +339,7 @@ class WaveletFlowModule(pl.LightningModule):
         self.log(f"{log_prefix}_loss", total,
                  on_epoch=True, on_step=(log_prefix == 'train'),
                  prog_bar=True, sync_dist=True, batch_size=B)
+        
         return total
 
     # ─────────────────────────────────────────────────────────────────────────
