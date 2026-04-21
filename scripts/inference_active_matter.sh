@@ -1,7 +1,7 @@
 #!/bin/bash -l
-#PBS -N FM_data_space_v4.0_active_matter_inference
-#PBS -o /glade/work/gaccarino/waveletflux/scripts/logs/active_matter/FM_data_space_v4.0_active_matter_inference.out
-#PBS -e /glade/work/gaccarino/waveletflux/scripts/logs/active_matter/FM_data_space_v4.0_active_matter_inference.err
+#PBS -N WaveletFlow_3scales_db2_v4.0_active_matter_inference
+#PBS -o /glade/work/gaccarino/waveletflux/scripts/logs/active_matter/WaveletFlow_3scales_db2_v4.0_active_matter_inference.out
+#PBS -e /glade/work/gaccarino/waveletflux/scripts/logs/active_matter/WaveletFlow_3scales_db2_v4.0_active_matter_inference.err
 
 # === Project / Queue ===
 #PBS -A UCLB0062
@@ -9,7 +9,7 @@
 
 # === Resources ===
 #PBS -l select=1:ncpus=64:mpiprocs=4:ngpus=4:gpu_type=a100:mem=400GB
-#PBS -l walltime=01:30:00
+#PBS -l walltime=01:00:00
 
 # === Move to submission directory ===
 cd $PBS_O_WORKDIR

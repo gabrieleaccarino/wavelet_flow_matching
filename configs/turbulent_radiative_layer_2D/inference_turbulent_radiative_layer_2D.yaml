@@ -9,9 +9,9 @@ well_dataset_name: "turbulent_radiative_layer_2D"
 
 # ── Checkpoint ────────────────────────────────────────────────────────────────
 # Uncomment the checkpoint you want to evaluate
-ckpt_name: "FM_turbulent_radiative_layer_2D_data_space_v1.0_20260407_203939-epoch=130-val_loss=0.0076_portable.ckpt"
-#ckpt_name: "WaveletFlow_turbulent_radiative_layer_2D_3scales_db2_v1.0_20260406_073804-epoch=193-val_loss=0.0190_portable.ckpt"
-#ckpt_name: "WaveletFlow_turbulent_radiative_layer_2D_1scale_db2_v1.0_20260406_074619-epoch=189-val_loss=0.0094_portable.ckpt"
+#ckpt_name: "FM_turbulent_radiative_layer_2D_data_space_v4.0_20260416_173718-epoch=193-train_loss=0.0082-val_loss=0.0078_portable.ckpt"
+#ckpt_name: "WaveletFlow_turbulent_radiative_layer_2D_1scale_db2_v4.0_20260416_173735-epoch=188-train_loss=0.0145-val_loss=0.0154_portable.ckpt"
+ckpt_name: "WaveletFlow_turbulent_radiative_layer_2D_3scales_db2_v4.0_20260416_173735-epoch=176-train_loss=0.0248-val_loss=0.0220_portable.ckpt"
 
 # ── Dataset ───────────────────────────────────────────────────────────────────
 split:     "test"

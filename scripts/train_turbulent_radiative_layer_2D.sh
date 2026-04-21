@@ -1,14 +1,14 @@
 #!/bin/bash -l
-#PBS -N WaveletFlow_turbulent_radiative_layer_2D_data_space_v1.0
-#PBS -o /glade/work/gaccarino/waveletflux/scripts/logs/WaveletFlow_turbulent_radiative_layer_2D_data_space_v1.0.out
-#PBS -e /glade/work/gaccarino/waveletflux/scripts/logs/WaveletFlow_turbulent_radiative_layer_2D_data_space_v1.0.err
+#PBS -N WaveletFlow_turbulent_radiative_layer_2D_1scale_db2_v4.0
+#PBS -o /glade/work/gaccarino/waveletflux/scripts/logs/turbulent_radiative_layer_2D/WaveletFlow_turbulent_radiative_layer_2D_1scale_db2_v4.0.out
+#PBS -e /glade/work/gaccarino/waveletflux/scripts/logs/turbulent_radiative_layer_2D/WaveletFlow_turbulent_radiative_layer_2D_1scale_db2_v4.0.err
 
 # === Project / Queue ===
 #PBS -A UCLB0062
 #PBS -q main
 
 # === Resources ===
-#PBS -l select=1:ncpus=32:mpiprocs=2:ngpus=2:gpu_type=a100:mem=400GB
+#PBS -l select=1:ncpus=64:mpiprocs=4:ngpus=4:gpu_type=a100:mem=400GB
 #PBS -l walltime=12:00:00
 
 # === Move to submission directory ===
@@ -29,7 +29,7 @@ conda activate mlenv
 
 # === Run ===
 REPO=/glade/work/gaccarino/waveletflux
-torchrun --nproc_per_node=2 \
+torchrun --nproc_per_node=4 \
     ${REPO}/waveletflux/train_wavelet_fm.py \
-    -c ${REPO}/configs/turbulent_radiative_layer_2D/WaveletFlow_turbulent_radiative_layer_2D_data_space_v1.0.toml \
-    -n 1 -d 2
+    -c ${REPO}/configs/turbulent_radiative_layer_2D/WaveletFlow_turbulent_radiative_layer_2D_1scale_db2_v4.0.toml \
+    -n 1 -d 4
