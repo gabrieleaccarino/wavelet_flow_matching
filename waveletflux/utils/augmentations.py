@@ -6,6 +6,7 @@ from the_well.data.augmentation import (
     RandomAxisPermute,
     RandomAxisRoll,
 )
+import torch
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Deterministic transformations  (applied to all splits)
@@ -40,6 +41,53 @@ class LogScalars(Augmentation):
         return data
     
 
+class NormalizeActiveMatterScalars(Augmentation):
+    """
+    Normalizes Active Matter simulation constants before they enter
+    the scalar conditioning pathway of the model.
+
+    - zeta  (activity strength, always > 0):
+        log-transform → {0, 1.61, 2.40, 2.83}
+        Rationale: zeta spans nearly an order of magnitude {1,5,11,17};
+        log makes the spacing more uniform and matches how physical
+        energy injection scales.
+
+    - alpha (flow type, always < 0):
+        affine → [-1, +1] via (alpha + 3) / 2
+        Rationale: alpha ∈ {-1,-2,-3,-4,-5}, center = -3, half-range = 2.
+        Cannot log-transform (negative). Centering avoids the bias
+        that would arise from passing values like -4,-5 raw into a
+        linear layer alongside the O(1) time embedding.
+    """
+
+    def __call__(
+        self, data: TrajectoryData, metadata: TrajectoryMetadata
+    ) -> TrajectoryData:
+        scalars = data["constant_scalars"]
+
+        if "L" in scalars:
+            # drop L since it's redundant with the spatial grid size
+            del scalars["L"]  
+
+        if "zeta" in scalars:
+            v = scalars["zeta"]
+            assert (v > 0).all(), (
+                f"NormalizeActiveMatterScalars: 'zeta' has non-positive "
+                f"values {v}. Cannot take log."
+            )
+            scalars["zeta"] = v.log()
+
+        if "alpha" in scalars:
+            # alpha ∈ {-1,-2,-3,-4,-5}  →  {+1, 0, -0.5, -1} ... wait
+            # mean = -3, half-range = 2  →  maps to {+1, +0.5, 0, -0.5, -1}
+            scalars["alpha"] = (scalars["alpha"] + 3.0) / 2.0
+
+        #keys_to_use = ["zeta", "alpha"]  # drop L
+        #label = torch.stack([scalars[k] for k in keys_to_use], dim=-1)
+        data["constant_scalars"] = scalars
+        return data
+    
+
 def compose_transformation(*names: str) -> Augmentation:
     """
     Build a deterministic transformation pipeline applied to ALL dataset splits.
@@ -47,6 +95,7 @@ def compose_transformation(*names: str) -> Augmentation:
     """
     registry = {
         "log_scalars": LogScalars,
+        "normalize_active_matter_scalars": NormalizeActiveMatterScalars,
     }
     ops = []
     for name in names:
@@ -84,20 +133,3 @@ def compose_augmentation(*names: str) -> Augmentation:
             )
         ops.append(registry[name]())
     return Compose(*ops) if ops else None
-
-#def compose_augmentation(*names: str) -> Augmentation:
-#    augmentations = []
-#
-#    for name in names:
-#        if name == "random_axis_flip":
-#            augmentations.append(RandomAxisFlip())
-#        elif name == "random_axis_permute":
-#            augmentations.append(RandomAxisPermute())
-#        elif name == "random_axis_roll":
-#            augmentations.append(RandomAxisRoll())
-#        elif name == "log_scalars":
-#            augmentations.append(LogScalars())
-#        else:
-#            raise NotImplementedError()
-#
-#    return Compose(*augmentations)

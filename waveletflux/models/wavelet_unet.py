@@ -285,10 +285,15 @@ class WaveletFlowUNet(nn.Module):
             nn.Linear(cond_dim, cond_dim * 2), nn.SiLU(),
             nn.Linear(cond_dim * 2, cond_dim),
         )
-        self.scalar_proj = (
-            nn.Linear(num_scalar_conds, cond_dim)
-            if num_scalar_conds > 0 else None
-        )
+        
+        #self.scalar_proj = (
+        #    nn.Linear(num_scalar_conds, cond_dim)
+        #    if num_scalar_conds > 0 else None
+        #)
+        self.scalar_proj = nn.Sequential(
+            nn.Linear(num_scalar_conds, cond_dim), nn.SiLU(),
+            nn.Linear(cond_dim, cond_dim),
+        ) if num_scalar_conds > 0 else None
 
         # ── Stems (one per wavelet scale) ─────────────────────────────────────
         # stem[0]  : initial input at UNet level 0
