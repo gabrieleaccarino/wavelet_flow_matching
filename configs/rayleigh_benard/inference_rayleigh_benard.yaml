@@ -9,7 +9,8 @@ well_dataset_name: "rayleigh_benard"
 
 #ckpt_name: "FM_data_space_rayleigh_benard_v4.0_20260415_135807-epoch=194-train_loss=0.0077-val_loss=0.0100_portable.ckpt" 
 #ckpt_name: "WaveletFlow_rayleigh_benard_1scale_db2_v4.0_20260415_135235-epoch=188-train_loss=0.0185-val_loss=0.0194_portable.ckpt"
-ckpt_name: "WaveletFlow_rayleigh_benard_3scales_db2_v4.0_20260415_230754-epoch=188-train_loss=0.0223-val_loss=0.0264_portable.ckpt"
+#ckpt_name: "WaveletFlow_rayleigh_benard_3scales_db2_v4.0_20260415_230754-epoch=188-train_loss=0.0223-val_loss=0.0264_portable.ckpt"
+ckpt_name: "FourierFlow_rayleigh_benard_32modes_v4.0_20260421_081051-epoch=109-train_loss=0.0317-val_loss=0.0571_portable.ckpt"
 
 stats_path: "/glade/work/gaccarino/data/datasets/rayleigh_benard/stats.yaml"
 

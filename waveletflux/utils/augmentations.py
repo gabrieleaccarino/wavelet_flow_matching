@@ -88,6 +88,26 @@ class NormalizeActiveMatterScalars(Augmentation):
         return data
     
 
+class NormalizeTurbulentRadiativeScalars(Augmentation):
+    """
+    The single scalar spans {0.03 ... 3.16} in log-uniform steps.
+    Log-transform maps it to a uniform grid around zero: [-3.51, +1.15].
+    """
+    def __call__(
+        self, data: TrajectoryData, metadata: TrajectoryMetadata
+    ) -> TrajectoryData:
+        scalars = data["constant_scalars"]
+
+        # replace with whatever key TheWell uses for this parameter
+        for key in scalars:
+            v = scalars[key]
+            assert (v > 0).all(), f"'{key}' has non-positive values, cannot log."
+            scalars[key] = v.log()
+
+        data["constant_scalars"] = scalars
+        return data
+
+        
 def compose_transformation(*names: str) -> Augmentation:
     """
     Build a deterministic transformation pipeline applied to ALL dataset splits.
@@ -96,6 +116,7 @@ def compose_transformation(*names: str) -> Augmentation:
     registry = {
         "log_scalars": LogScalars,
         "normalize_active_matter_scalars": NormalizeActiveMatterScalars,
+        "normalize_turbulent_radiative_scalars": NormalizeTurbulentRadiativeScalars,
     }
     ops = []
     for name in names:

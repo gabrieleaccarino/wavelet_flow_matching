@@ -1,5 +1,5 @@
 [main]
-    exp_name   = 'WaveletFlow_active_matter_1scale_db2_v4.0'
+    exp_name   = 'WaveletFlow_active_matter_1scale_db2_v4.1'
 
 [resume]
     ckpt = ''

@@ -1,7 +1,7 @@
 """
 inference.py
 ------------
-Distributed ensemble inference for WaveletFlowModule (and data-space variants).
+Distributed ensemble inference for FourierFlowModule (and data-space variants).
 
 Parallelism strategy
 --------------------
@@ -14,6 +14,20 @@ Parallelism strategy
   This avoids any GPU-to-GPU communication for the data gather, which would
   require allocating world_size x shard_size bytes on each GPU simultaneously
   and cause OOM on large fields.
+
+Trajectory subsampling
+----------------------
+  N_TRAJ_PER_FILE controls how many trajectories are drawn from each HDF5 file.
+  Set to 1 to evaluate one trajectory per unique scalar-condition combination
+  (cheapest), or to -1 to use every trajectory in each file (full evaluation).
+
+  Examples
+    n_traj_per_file: 1    →  9 trajectories for a 9-file Rayleigh-Bénard test set
+    n_traj_per_file: 3    →  27 trajectories
+    n_traj_per_file: -1   →  all trajectories (45 for 9 files × 5 traj/file)
+
+  CLI override:
+    torchrun ... inference.py --config ... --override n_traj_per_file=3
 
 Outputs (all written by rank 0)
 --------------------------------
@@ -33,7 +47,7 @@ Usage — multi-GPU with torchrun
 CLI overrides
     torchrun --nproc_per_node=4 inference.py \\
         --config configs/trl2d/inference_trl2d.yaml \\
-        --override n_ensemble=16 num_sampling_steps=50 verbose=true
+        --override n_ensemble=16 num_sampling_steps=50 n_traj_per_file=1 verbose=true
 """
 
 from the_well.data.normalization import ZScoreNormalization
@@ -55,18 +69,32 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 
 # ─────────────────────────────────────────────────────────────────────────────
+# !! TRAJECTORY SUBSAMPLING MACRO !!
+# ─────────────────────────────────────────────────────────────────────────────
+# Number of trajectories to evaluate per HDF5 file.
+#   1   → one trajectory per unique scalar-condition (fastest, recommended for sweeps)
+#   N   → first N trajectories from each file
+#  -1   → all trajectories in each file (full evaluation)
+#
+# This default is overridden by the YAML key `n_traj_per_file` or the CLI flag
+# --override n_traj_per_file=N, so you never need to edit this file directly.
+N_TRAJ_PER_FILE_DEFAULT: int = 1
+# ─────────────────────────────────────────────────────────────────────────────
+
+
+# ─────────────────────────────────────────────────────────────────────────────
 # CLI
 # ─────────────────────────────────────────────────────────────────────────────
 
 def parse_args() -> argparse.Namespace:
-    p = argparse.ArgumentParser(description="WaveletFlow ensemble inference")
+    p = argparse.ArgumentParser(description="FourierFlow ensemble inference")
     p.add_argument("--config", required=True, help="Path to YAML experiment config")
     p.add_argument(
         "--override",
         nargs="*",
         metavar="KEY=VALUE",
         default=[],
-        help="Override any config key, e.g. --override n_ensemble=32 verbose=true",
+        help="Override any config key, e.g. --override n_ensemble=32 n_traj_per_file=1",
     )
     return p.parse_args()
 
@@ -136,13 +164,6 @@ def _shard_path(shard_dir: Path, rank: int) -> Path:
     return shard_dir / f"shard_rank{rank:02d}.pkl"
 
 
-#   def write_shard(obj: object, shard_dir: Path, rank: int) -> Path:
-#       path = _shard_path(shard_dir, rank)
-#       with open(path, "wb") as fh:
-#           pickle.dump(obj, fh, protocol=pickle.HIGHEST_PROTOCOL)
-#       return path
-
-# ── Filesystem-based shard gather ─────────────────────────────────────────────
 def write_shard(obj: object, shard_dir: Path, rank: int) -> Path:
     path = _shard_path(shard_dir, rank)
     # Defensive mkdir: handles Lustre metadata lag on non-zero ranks
@@ -168,6 +189,41 @@ def remove_shards(shard_dir: Path, world_size: int) -> None:
         shard_dir.rmdir()
     except OSError:
         pass
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Trajectory index helpers
+# ─────────────────────────────────────────────────────────────────────────────
+
+def build_traj_index(
+    n_traj_per_file:   list[int],
+    steps_per_file:    list[int],
+    traj_per_file_cap: int,
+) -> tuple[list[int], list[int]]:
+    """Return (dataset_indices, n_steps) for the selected trajectories.
+
+    Parameters
+    ----------
+    n_traj_per_file   : list of trajectory counts per file  (from dataset)
+    steps_per_file    : list of step counts per file        (from metadata)
+    traj_per_file_cap : how many trajectories to take from each file;
+                        -1 means take all.
+
+    Returns
+    -------
+    traj_indices   : flat list of integer indices into the dataset
+    n_steps_list   : corresponding number of steps for each selected trajectory
+    """
+    traj_indices = []
+    n_steps_list = []
+    offset = 0
+    for n_traj, n_steps in zip(n_traj_per_file, steps_per_file):
+        cap = n_traj if traj_per_file_cap == -1 else min(traj_per_file_cap, n_traj)
+        for local_i in range(cap):
+            traj_indices.append(offset + local_i)
+            n_steps_list.append(n_steps)
+        offset += n_traj
+    return traj_indices, n_steps_list
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -224,7 +280,7 @@ def main() -> None:
     # Late imports — project_root must be on sys.path first
     from waveletflux.utils.well_data import get_well_dataset, get_well_inputs
     from waveletflux.utils.eval import build_stats_df, build_psd_df
-    from waveletflux.modules.wavelet_fm import WaveletFlowModule
+    from waveletflux.modules.fourier_fm import FourierFlowModule
 
     # ── Distributed init ──────────────────────────────────────────────────────
     rank, world_size, device = init_distributed()
@@ -238,6 +294,8 @@ def main() -> None:
     N_ENSEMBLE        = cfg["n_ensemble"]
     ODE_METHOD        = cfg.get("ode_method", "euler")
     CLAMP_SIGMA       = cfg.get("clamp_sigma", 5.0)
+    # Trajectory cap: YAML > CLI override > module-level default
+    N_TRAJ_PER_FILE   = cfg.get("n_traj_per_file", N_TRAJ_PER_FILE_DEFAULT)
 
     ckpt_base_name = re.split(r"_\d{8}_", ckpt_name)[0]
     if ckpt_base_name == ckpt_name:
@@ -253,8 +311,8 @@ def main() -> None:
     # concurrent inference runs never share the same shard folder.
     stem = f"{ckpt_base_name}_nsampling{NUM_SAMPLING}_nens{N_ENSEMBLE}"
 
-    save_dir  = Path(project_root) / "experiments" / well_dataset_name / "results"
-    
+    save_dir = Path(project_root) / "experiments" / well_dataset_name / "results"
+
     # Embed the PBS job ID (or PID as fallback) so that concurrent jobs with
     # identical configs never share the same shard directory.
     job_id = (
@@ -285,17 +343,18 @@ def main() -> None:
         print(f"\n{'═'*64}")
         print(f"  Inference Pipeline")
         print(f"{'═'*64}")
-        print(f"  Config      : {args.config}")
-        print(f"  Dataset     : {well_dataset_name}")
-        print(f"  Checkpoint  : {ckpt_name}")
-        print(f"  N_ensemble  : {N_ENSEMBLE}")
-        print(f"  World size  : {world_size}  |  Device : {device}")
+        print(f"  Config          : {args.config}")
+        print(f"  Dataset         : {well_dataset_name}")
+        print(f"  Checkpoint      : {ckpt_name}")
+        print(f"  N_ensemble      : {N_ENSEMBLE}")
+        print(f"  N_traj_per_file : {N_TRAJ_PER_FILE}  (-1 = all)")
+        print(f"  World size      : {world_size}  |  Device : {device}")
         print(f"{'─'*64}\n")
 
     barrier(world_size, device)
 
     # ── Model — every rank loads its own copy ─────────────────────────────────
-    model = WaveletFlowModule.from_checkpoint(ckpt_path, map_location=device)
+    model = FourierFlowModule.from_checkpoint(ckpt_path, map_location=device)
     model.eval()
     model.to(device)
     print(f"  [rank {rank}] model loaded on {device}")
@@ -311,25 +370,25 @@ def main() -> None:
         augment   = cfg.get("augment", []),
     )
 
-    #n_steps_per_traj = dataset.metadata.n_steps_per_trajectory
-    #N_TRAJ           = len(n_steps_per_traj)
-    N_TRAJ            = len(dataset)
-    steps_per_file    = dataset.metadata.n_steps_per_trajectory
-    n_traj_per_file   = dataset.n_trajectories_per_file
+    # ── Trajectory index construction ─────────────────────────────────────────
+    # dataset.metadata.n_steps_per_trajectory is indexed by FILE, not trajectory.
+    # dataset.n_trajectories_per_file gives the per-file trajectory counts.
+    # build_traj_index flattens these into a per-trajectory index list,
+    # respecting the N_TRAJ_PER_FILE cap.
+    steps_per_file  = dataset.metadata.n_steps_per_trajectory  # one entry per file
+    n_traj_per_file = dataset.n_trajectories_per_file           # one entry per file
 
-    # Build a per-trajectory steps list by repeating each file's step count
-    n_steps_per_traj  = [
-        steps
-        for steps, n in zip(steps_per_file, n_traj_per_file)
-        for _ in range(n)
-    ] 
+    traj_indices, n_steps_per_traj = build_traj_index(
+        n_traj_per_file   = n_traj_per_file,
+        steps_per_file    = steps_per_file,
+        traj_per_file_cap = N_TRAJ_PER_FILE,
+    )
+    N_TRAJ = len(traj_indices)
 
     # ── Scalar condition names ────────────────────────────────────────────────
     scalar_names: list[str] = list(
         getattr(dataset.metadata, "constant_scalar_names", []) or []
     )
-    if is_main(rank):
-        print(f"  Scalar conditions : {scalar_names or '(none)'}")
 
     # ── Ensemble split ────────────────────────────────────────────────────────
     n_ens_base      = N_ENSEMBLE // world_size
@@ -337,18 +396,19 @@ def main() -> None:
     n_ens_local     = n_ens_base + (1 if rank < n_ens_remainder else 0)
 
     if is_main(rank):
-        print(f"  N_TRAJ        : {N_TRAJ}")
-        print(f"  N_STEPS_INPUT : {N_STEPS_INPUT}")
-        print(f"  NUM_SAMPLING  : {NUM_SAMPLING}")
-        print(f"  ODE method    : {ODE_METHOD}")
-        print(f"  Clamp sigma   : {CLAMP_SIGMA}")
-        print(f"  N_ENSEMBLE    : {N_ENSEMBLE}  "
+        print(f"  Scalar conditions : {scalar_names or '(none)'}")
+        print(f"  N_TRAJ            : {N_TRAJ}  "
+              f"({N_TRAJ_PER_FILE} traj/file × {len(steps_per_file)} files)")
+        print(f"  N_STEPS_INPUT     : {N_STEPS_INPUT}")
+        print(f"  NUM_SAMPLING      : {NUM_SAMPLING}")
+        print(f"  ODE method        : {ODE_METHOD}")
+        print(f"  Clamp sigma       : {CLAMP_SIGMA}")
+        print(f"  N_ENSEMBLE        : {N_ENSEMBLE}  "
               f"({n_ens_local} member(s) on this rank)\n")
 
     # ── Inference loop ────────────────────────────────────────────────────────
-    # local_preds  : {traj_idx: Tensor(n_ens_local, T, H, W, C)} on CPU
-    # local_targets: {traj_idx: Tensor(T, H, W, C)}              on CPU
-    # local_labels : {traj_idx: dict[str, float]}
+    # Keyed by position i (0..N_TRAJ-1), NOT by raw dataset index.
+    # This keeps labels aligned with the 0-based traj column in stats/psd CSVs.
     local_preds   = {}
     local_targets = {}
     local_labels  = {}
@@ -356,18 +416,18 @@ def main() -> None:
     t0 = time.perf_counter()
 
     with torch.inference_mode():
-        for traj_idx in range(N_TRAJ):
-            n_rollout = n_steps_per_traj[traj_idx] - N_STEPS_INPUT
+        for i, (traj_idx, n_steps) in enumerate(zip(traj_indices, n_steps_per_traj)):
+            n_rollout = n_steps - N_STEPS_INPUT
 
             if is_main(rank):
-                pct = (traj_idx + 1) / N_TRAJ * 100
-                print(f"  [{pct:5.1f}%] traj {traj_idx:>3d}/{N_TRAJ}  "
-                      f"rollout_steps={n_rollout}")
+                pct = (i + 1) / N_TRAJ * 100
+                print(f"  [{pct:5.1f}%] traj {i:>3d}/{N_TRAJ}  "
+                      f"(dataset_idx={traj_idx})  rollout_steps={n_rollout}")
 
             item          = dataset[traj_idx]
             x_full, label = get_well_inputs(item, device=device)   # (T,H,W,C), (C_cond,)
 
-            local_labels[traj_idx] = label_to_dict(label, scalar_names)
+            local_labels[i] = label_to_dict(label, scalar_names)
 
             seed      = x_full[:N_STEPS_INPUT]
             seed_exp  = seed.unsqueeze(0).expand(n_ens_local, -1, -1, -1, -1).contiguous()
@@ -390,8 +450,8 @@ def main() -> None:
             # (n_ens_local, 1, T, H, W, C) → (n_ens_local, T, H, W, C)
             preds_phys = preds_phys.squeeze(1)
 
-            local_preds[traj_idx]   = preds_phys.cpu()
-            local_targets[traj_idx] = x_full[N_STEPS_INPUT:].cpu()
+            local_preds[i]   = preds_phys.cpu()
+            local_targets[i] = x_full[N_STEPS_INPUT:].cpu()
 
             if device.type == "cuda":
                 torch.cuda.empty_cache()
@@ -467,7 +527,7 @@ def main() -> None:
 
     # ── Labels DataFrame ──────────────────────────────────────────────────────
     # Tidy table: one row per trajectory, one column per scalar condition.
-    # Keyed on "traj" to match the stats / psd DataFrames.
+    # Keyed on "traj" (0-based position) to match build_stats_df / build_psd_df.
     labels_df = build_labels_df(merged_labels, all_indices)
     if is_main(rank) and not labels_df.empty:
         print(f"  scalar conditions sample:\n{labels_df.head()}\n")
@@ -477,13 +537,14 @@ def main() -> None:
     with open(full_pkl, "wb") as fh:
         pickle.dump(
             {
-                "preds":        preds_arr,      # (N_TRAJ, N_ENS, T, H, W, C)
-                "targets":      targets_arr,    # (N_TRAJ,        T, H, W, C)
-                "config":       cfg,
-                "traj_indices": all_indices,
-                "field_names":  field_names,
-                "labels":       merged_labels,
-                "scalar_names": scalar_names,
+                "preds":           preds_arr,      # (N_TRAJ, N_ENS, T, H, W, C)
+                "targets":         targets_arr,    # (N_TRAJ,        T, H, W, C)
+                "config":          cfg,
+                "traj_indices":    all_indices,    # 0-based position indices
+                "dataset_indices": traj_indices,   # raw dataset indices for provenance
+                "field_names":     field_names,
+                "labels":          merged_labels,
+                "scalar_names":    scalar_names,
             },
             fh, protocol=pickle.HIGHEST_PROTOCOL,
         )
@@ -494,13 +555,14 @@ def main() -> None:
     with open(single_pkl, "wb") as fh:
         pickle.dump(
             {
-                "preds":        preds_arr[:, :1],   # (N_TRAJ, 1, T, H, W, C)
-                "targets":      targets_arr,
-                "config":       cfg,
-                "traj_indices": all_indices,
-                "field_names":  field_names,
-                "labels":       merged_labels,
-                "scalar_names": scalar_names,
+                "preds":           preds_arr[:, :1],   # (N_TRAJ, 1, T, H, W, C)
+                "targets":         targets_arr,
+                "config":          cfg,
+                "traj_indices":    all_indices,
+                "dataset_indices": traj_indices,
+                "field_names":     field_names,
+                "labels":          merged_labels,
+                "scalar_names":    scalar_names,
             },
             fh, protocol=pickle.HIGHEST_PROTOCOL,
         )
@@ -510,8 +572,8 @@ def main() -> None:
     print(f"\n  Rebuilding full truth tensor (Ti={N_STEPS_INPUT}) ...")
 
     seeds_list = []
-    for idx in all_indices:
-        item      = dataset[idx]
+    for i, traj_idx in zip(all_indices, traj_indices):
+        item      = dataset[traj_idx]
         x_full, _ = get_well_inputs(item, device=torch.device("cpu"))
         seeds_list.append(x_full.numpy()[:N_STEPS_INPUT + min_T])
 
@@ -527,7 +589,6 @@ def main() -> None:
         Ti          = N_STEPS_INPUT,
         lead_times  = None,
     )
-    # Annotate with scalar conditions (merge on "traj", matching build_stats_df output).
     if not labels_df.empty:
         stats_df = stats_df.merge(labels_df, on="traj", how="left")
 
@@ -544,7 +605,6 @@ def main() -> None:
         lead_times    = None,
         min_bin_count = 3,
     )
-    # Annotate with scalar conditions.
     if not labels_df.empty:
         psd_df = psd_df.merge(labels_df, on="traj", how="left")
 

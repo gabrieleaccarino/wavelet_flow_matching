@@ -1,7 +1,7 @@
 #!/bin/bash -l
-#PBS -N WaveletFlow_3scales_db2_v4.0_rayleigh_benard_inference
-#PBS -o /glade/work/gaccarino/waveletflux/scripts/logs/rayleigh_benard/WaveletFlow_3scales_db2_v4.0_rayleigh_benard_inference.out
-#PBS -e /glade/work/gaccarino/waveletflux/scripts/logs/rayleigh_benard/WaveletFlow_3scales_db2_v4.0_rayleigh_benard_inference.err
+#PBS -N FourierFlow_32modes_v4.0_rayleigh_benard_inference
+#PBS -o /glade/work/gaccarino/waveletflux/scripts/logs/rayleigh_benard/FourierFlow_32modes_v4.0_rayleigh_benard_inference.out
+#PBS -e /glade/work/gaccarino/waveletflux/scripts/logs/rayleigh_benard/FourierFlow_32modes_v4.0_rayleigh_benard_inference.err
 
 # === Project / Queue ===
 #PBS -A UCLB0062
@@ -46,9 +46,10 @@ echo "========================================================"
 
 mkdir -p ${REPO}/scripts/logs/${DATASET_NAME}
 
+#${REPO}/waveletflux/inference_wavelet_fm.py \
 torchrun \
     --nproc_per_node=${N_GPUS} \
-    ${REPO}/waveletflux/inference.py \
+    ${REPO}/waveletflux/inference_fourier_fm.py \
     --config ${CONFIG} \
     --override \
         n_ensemble=${N_ENSEMBLE} \

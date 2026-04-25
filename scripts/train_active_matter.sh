@@ -1,7 +1,7 @@
 #!/bin/bash -l
-#PBS -N FM_data_space_active_matter_v4.0
-#PBS -o /glade/work/gaccarino/waveletflux/scripts/logs/active_matter/FM_data_space_active_matter_v4.0.out
-#PBS -e /glade/work/gaccarino/waveletflux/scripts/logs/active_matter/FM_data_space_active_matter_v4.0.err
+#PBS -N WaveletFlow_active_matter_1scale_db2_v4.1
+#PBS -o /glade/work/gaccarino/waveletflux/scripts/logs/active_matter/WaveletFlow_active_matter_1scale_db2_v4.1.out
+#PBS -e /glade/work/gaccarino/waveletflux/scripts/logs/active_matter/WaveletFlow_active_matter_1scale_db2_v4.1.err
 
 # === Project / Queue ===
 #PBS -A UCLB0062
@@ -28,8 +28,9 @@ export DS_SKIP_AUTOTUNE=1
 conda activate mlenv
 
 # === Run ===
+#${REPO}/waveletflux/train_fourier_fm.py \
 REPO=/glade/work/gaccarino/waveletflux
 torchrun --nproc_per_node=4 \
     ${REPO}/waveletflux/train_wavelet_fm.py \
-    -c ${REPO}/configs/active_matter/FM_data_space_active_matter_v4.0.toml \
+    -c ${REPO}/configs/active_matter/WaveletFlow_active_matter_1scale_db2_v4.1.toml \
     -n 1 -d 4
