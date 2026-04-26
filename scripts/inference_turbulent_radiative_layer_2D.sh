@@ -1,7 +1,7 @@
 #!/bin/bash -l
-#PBS -N FourierFlow_32modes_v4.0_turbulent_radiative_layer_2D_inference
-#PBS -o /glade/work/gaccarino/waveletflux/scripts/logs/turbulent_radiative_layer_2D/FourierFlow_32modes_v4.0_turbulent_radiative_layer_2D_inference.out
-#PBS -e /glade/work/gaccarino/waveletflux/scripts/logs/turbulent_radiative_layer_2D/FourierFlow_32modes_v4.0_turbulent_radiative_layer_2D_inference.err
+#PBS -N WaveletFlow_1scale_db2_v4.1_turbulent_radiative_layer_2D_inference
+#PBS -o /glade/work/gaccarino/waveletflux/scripts/logs/turbulent_radiative_layer_2D/WaveletFlow_1scale_db2_v4.1_turbulent_radiative_layer_2D_inference.out
+#PBS -e /glade/work/gaccarino/waveletflux/scripts/logs/turbulent_radiative_layer_2D/WaveletFlow_1scale_db2_v4.1_turbulent_radiative_layer_2D_inference.err
 
 # === Project / Queue ===
 #PBS -A UCLB0062
@@ -46,10 +46,10 @@ echo "========================================================"
 
 mkdir -p ${REPO}/scripts/logs/${DATASET_NAME}
 
-#${REPO}/waveletflux/inference_wavelet_fm.py \
+#${REPO}/waveletflux/inference_fourier_fm.py \
 torchrun \
     --nproc_per_node=${N_GPUS} \
-    ${REPO}/waveletflux/inference_fourier_fm.py \
+    ${REPO}/waveletflux/inference_wavelet_fm.py \
     --config ${CONFIG} \
     --override \
         n_ensemble=${N_ENSEMBLE} \

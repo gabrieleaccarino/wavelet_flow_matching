@@ -1,7 +1,7 @@
 #!/bin/bash -l
-#PBS -N FourierFlow_active_matter_32modes_v4.0_active_matter_inference
-#PBS -o /glade/work/gaccarino/waveletflux/scripts/logs/active_matter/FourierFlow_32modes_v4.0_active_matter_inference.out
-#PBS -e /glade/work/gaccarino/waveletflux/scripts/logs/active_matter/FourierFlow_32modes_v4.0_active_matter_inference.err
+#PBS -N WaveletFlow_1scale_db2_v4.1_active_matter_inference
+#PBS -o /glade/work/gaccarino/waveletflux/scripts/logs/active_matter/WaveletFlow_1scale_db2_v4.1_active_matter_inference.out
+#PBS -e /glade/work/gaccarino/waveletflux/scripts/logs/active_matter/WaveletFlow_1scale_db2_v4.1_active_matter_inference.err
 
 # === Project / Queue ===
 #PBS -A UCLB0062
@@ -46,10 +46,10 @@ echo "========================================================"
 
 mkdir -p ${REPO}/scripts/logs/${DATASET_NAME}
 
-#${REPO}/waveletflux/inference_wavelet_fm.py \
+#${REPO}/waveletflux/inference_fourier_fm.py \
 torchrun \
     --nproc_per_node=${N_GPUS} \
-    ${REPO}/waveletflux/inference_fourier_fm.py \
+    ${REPO}/waveletflux/inference_wavelet_fm.py \
     --config ${CONFIG} \
     --override \
         n_ensemble=${N_ENSEMBLE} \

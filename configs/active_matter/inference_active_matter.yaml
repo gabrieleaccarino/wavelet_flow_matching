@@ -12,14 +12,17 @@ well_dataset_name: "active_matter"
 #ckpt_name: "FM_data_space_active_matter_v4.0_20260416_090223-epoch=179-train_loss=0.0048-val_loss=0.0026_portable.ckpt"
 #ckpt_name: "WaveletFlow_active_matter_1scale_db2_v4.0_20260415_231646-epoch=195-train_loss=0.0647-val_loss=0.0586_portable.ckpt"
 #ckpt_name: "WaveletFlow_active_matter_3scales_db2_v4.0_20260415_231722-epoch=199-train_loss=0.0221-val_loss=0.0163_portable.ckpt"
-ckpt_name: "FourierFlow_active_matter_32modes_v4.0_20260421_203224-epoch=199-train_loss=0.0952-val_loss=0.1335_portable.ckpt"
+#ckpt_name: "FourierFlow_active_matter_32modes_v4.0_20260421_203224-epoch=199-train_loss=0.0952-val_loss=0.1335_portable.ckpt"
+
+#ckpt_name: "WaveletFlow_active_matter_3scales_db2_v4.1_20260425_171812-epoch=194-train_loss=0.0232-val_loss=0.0164_portable.ckpt"
+ckpt_name: "WaveletFlow_active_matter_1scale_db2_v4.1_20260425_172300-epoch=193-train_loss=0.0703-val_loss=0.0636_portable.ckpt"
 
 stats_path: "/glade/work/gaccarino/data/datasets/active_matter/stats.yaml"
 
 # ── Dataset ───────────────────────────────────────────────────────────────────
 split:     "test"
 steps:     -1           # -1 = use all steps in each trajectory
-transform: []
+transform: ['normalize_active_matter_scalars']
 augment:   []
 
 # ── Model / inference ─────────────────────────────────────────────────────────

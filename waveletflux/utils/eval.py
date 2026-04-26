@@ -8,6 +8,7 @@ FIX 2  CRPS:   Fair CRPS uses 1/(n(n-1)) not 1/n²  (Ferro 2014).
 FIX 3  Band edges consistent between compute_stats and build_psd_df.
 FIX 4  build_psd_df uses k[0] from the full grid for band edges (not
        k[_valid][0] after applying the min-bin-count mask).
+FIX 5  rmse_lp: log-ratio spectral metric — symmetric and robust.
 
 WHY rmse_p BLOWS UP FOR NEAR-ZERO-MEAN FIELDS
 ----------------------------------------------
@@ -24,6 +25,24 @@ is unbounded.  Two failure modes appear in the active-matter stats:
   Mode B — ratio explosion at large power.  When the model concentrates
   spectral energy in the wrong band (p_v ≫ p_u, both above ε), the
   ratio p_v / p_u can reach 10⁴, giving se_p ≈ 10⁸.
+
+WHY rmse_lp IS ROBUST
+----------------------
+The log-ratio formula replaces the relative error with its log-domain
+equivalent:
+
+    se_lp = ( log(p_v + ε) − log(p_u + ε) )²
+           = ( log( (p_v + ε) / (p_u + ε) ) )²
+
+Properties:
+  • Symmetric:   swapping u ↔ v changes sign only, same magnitude.
+  • Bounded:     a ratio of 10⁴ gives se_lp = (log 10⁴)² ≈ 85, not 10⁸.
+  • Zero-safe:   ε regularises both sides identically; Mode A is tamed
+                 because log(p_v/ε) is large but finite (~18 for p_v~1).
+  • Scale-free:  measures multiplicative deviation, natural for power
+                 spectra whose dynamic range spans many decades.
+  • Interpretable units: rmse_lp ≈ 1 means roughly e-fold (≈2.7×) error
+                 in spectral power; rmse_lp ≈ ln 2 ≈ 0.69 means ~2× error.
 
 Note on rmse_c: the coherence denominator is sqrt(p_u·p_v), so by
 Cauchy–Schwarz |S_xy|² ≤ S_xx S_yy the ratio c_uv / sqrt(p_u·p_v)
@@ -64,12 +83,24 @@ def _spectral_band_metrics(
     eps:       float,
 ) -> dict:
     """
-    Compute rmse_p and rmse_c for each of the four frequency bands.
+    Compute rmse_p, rmse_lp, and rmse_c for each of the four frequency bands.
 
-    rmse_p can blow up for near-zero-mean fields (see module docstring).
-    rmse_c is bounded in [0, 2] by Cauchy–Schwarz and is always robust.
+    rmse_p   — original relative formula; can blow up (see module docstring).
+    rmse_lp  — log-ratio formula; symmetric, bounded, robust to near-zero PSDs.
+    rmse_c   — coherence metric; bounded in [0, 2] by Cauchy–Schwarz.
     """
+    # ── Original relative error (kept for backward compatibility) ─────────────
     se_p = torch.square(1.0 - (p_v_mean + eps) / (p_u + eps))
+
+    # ── Log-ratio error (FIX 5) ───────────────────────────────────────────────
+    # se_lp = ( log(p_v + ε) − log(p_u + ε) )²
+    # Equivalent to ( log((p_v + ε) / (p_u + ε)) )² but numerically cleaner
+    # to compute as the difference of two log calls.
+    se_lp = torch.square(
+        torch.log(p_v_mean + eps) - torch.log(p_u + eps)
+    )
+
+    # ── Coherence error ───────────────────────────────────────────────────────
     se_c = torch.square(
         1.0 - (c_uv_mean + eps) / torch.sqrt(p_u * p_v_mean + eps ** 2)
     )
@@ -84,11 +115,13 @@ def _spectral_band_metrics(
             else (edges[i] <= k)
         )
         if mask.any():
-            out[f"rmse_p_{band}"] = torch.sqrt(torch.mean(se_p[mask])).item()
-            out[f"rmse_c_{band}"] = torch.sqrt(torch.mean(se_c[mask])).item()
+            out[f"rmse_p_{band}"]  = torch.sqrt(torch.mean(se_p[mask])).item()
+            out[f"rmse_lp_{band}"] = torch.sqrt(torch.mean(se_lp[mask])).item()
+            out[f"rmse_c_{band}"]  = torch.sqrt(torch.mean(se_c[mask])).item()
         else:
-            out[f"rmse_p_{band}"] = float("nan")
-            out[f"rmse_c_{band}"] = float("nan")
+            out[f"rmse_p_{band}"]  = float("nan")
+            out[f"rmse_lp_{band}"] = float("nan")
+            out[f"rmse_c_{band}"]  = float("nan")
 
     return out
 
@@ -112,7 +145,7 @@ def compute_stats(
     u           : Ground-truth frame          (H, W)
     v           : Ensemble/predicted frames   (N_ENS, H, W)
     spatial     : Number of spatial dims.
-    eps         : Absolute stabiliser for the rmse_p / rmse_c formulas.
+    eps         : Absolute stabiliser for the rmse_p / rmse_lp / rmse_c formulas.
     compute_emd : Whether to compute the expensive 2-D Sliced-EMD.
 
     Returns
@@ -126,6 +159,7 @@ def compute_stats(
 
     Per-band spectral metrics
         rmse_p_{low,mid,high,vhigh}   — original formula (can blow up)
+        rmse_lp_{low,mid,high,vhigh}  — log-ratio formula (robust, symmetric)
         rmse_c_{low,mid,high,vhigh}   — coherence metric (robust by C-S)
     """
     samples = v.shape[0]
@@ -281,7 +315,7 @@ def build_stats_df(
     traj_indices : Subset of trajectories.  None = all.
     spatial      : Number of spatial dimensions (default 2).
     emd_fields   : Fields for which to compute the expensive Sliced-EMD.
-    eps          : Absolute stabiliser for rmse_p / rmse_c.
+    eps          : Absolute stabiliser for rmse_p / rmse_lp / rmse_c.
 
     Returns
     -------
