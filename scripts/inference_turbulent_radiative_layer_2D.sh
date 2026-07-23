@@ -1,7 +1,7 @@
 #!/bin/bash -l
-#PBS -N WaveletFlow_1scale_db2_v4.1_turbulent_radiative_layer_2D_inference
-#PBS -o /glade/work/gaccarino/waveletflux/scripts/logs/turbulent_radiative_layer_2D/WaveletFlow_1scale_db2_v4.1_turbulent_radiative_layer_2D_inference.out
-#PBS -e /glade/work/gaccarino/waveletflux/scripts/logs/turbulent_radiative_layer_2D/WaveletFlow_1scale_db2_v4.1_turbulent_radiative_layer_2D_inference.err
+#PBS -N WaveletFlow_turbulent_radiative_layer_2D_1scale_db6_v4.0_inference
+#PBS -o /glade/work/gaccarino/waveletflux/scripts/logs/turbulent_radiative_layer_2D/WaveletFlow_turbulent_radiative_layer_2D_1scale_db6_v4.0_inference.out
+#PBS -e /glade/work/gaccarino/waveletflux/scripts/logs/turbulent_radiative_layer_2D/WaveletFlow_turbulent_radiative_layer_2D_1scale_db6_v4.0_inference.err
 
 # === Project / Queue ===
 #PBS -A UCLB0062

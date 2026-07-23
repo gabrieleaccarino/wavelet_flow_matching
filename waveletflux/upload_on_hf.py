@@ -4,7 +4,7 @@ login(token="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")
 
 api = HfApi()
 
-PDE = "active_matter"
+PDE = "viscoelastic_instability"
 base_path = f"/glade/work/gaccarino/data/datasets/{PDE}/data"
 
 try:

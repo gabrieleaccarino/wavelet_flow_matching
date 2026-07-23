@@ -1,7 +1,7 @@
 #!/bin/bash -l
-#PBS -N FourierFlow_rayleigh_benard_32modes_v4.0
-#PBS -o /glade/work/gaccarino/waveletflux/scripts/logs/rayleigh_benard/FourierFlow_rayleigh_benard_32modes_v4.0.out
-#PBS -e /glade/work/gaccarino/waveletflux/scripts/logs/rayleigh_benard/FourierFlow_rayleigh_benard_32modes_v4.0.err
+#PBS -N WaveletFlow_rayleigh_benard_1scale_db6_v4.0
+#PBS -o /glade/work/gaccarino/waveletflux/scripts/logs/rayleigh_benard/WaveletFlow_rayleigh_benard_1scale_db6_v4.0.out
+#PBS -e /glade/work/gaccarino/waveletflux/scripts/logs/rayleigh_benard/WaveletFlow_rayleigh_benard_1scale_db6_v4.0.err
 
 # === Project / Queue ===
 #PBS -A UCLB0062
@@ -28,9 +28,9 @@ export DS_SKIP_AUTOTUNE=1
 conda activate mlenv
 
 # === Run ===
+#${REPO}/waveletflux/train_waveley_fm.py \
 REPO=/glade/work/gaccarino/waveletflux
 torchrun --nproc_per_node=4 \
-    ${REPO}/waveletflux/train_fourier_fm.py \
-    #${REPO}/waveletflux/train_waveley_fm.py \
-    -c ${REPO}/configs/rayleigh_benard/FourierFlow_rayleigh_benard_32modes_v4.0.toml \
+    ${REPO}/waveletflux/train_wavelet_fm.py \
+    -c ${REPO}/configs/rayleigh_benard/WaveletFlow_rayleigh_benard_1scale_db6_v4.0.toml \
     -n 1 -d 4
