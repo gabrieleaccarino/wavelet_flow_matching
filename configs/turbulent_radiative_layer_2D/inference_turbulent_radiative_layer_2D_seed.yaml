@@ -1,0 +1,44 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# configs/turbulent_radiative_layer_2D/inference_turbulent_radiative_layer_2D.yaml
+# ─────────────────────────────────────────────────────────────────────────────
+
+# ── Paths ─────────────────────────────────────────────────────────────────────
+project_root:    "/glade/work/gaccarino/waveletflux"
+well_base_path:  "/glade/work/gaccarino/data/datasets"
+well_dataset_name: "turbulent_radiative_layer_2D"
+
+# ── Checkpoint ────────────────────────────────────────────────────────────────
+# Uncomment the checkpoint you want to evaluate
+#ckpt_name: "FM_turbulent_radiative_layer_2D_data_space_v4.0_20260416_173718-epoch=193-train_loss=0.0082-val_loss=0.0078_portable.ckpt"
+#ckpt_name: "FourierFlow_turbulent_radiative_layer_2D_32modes_v4.0_20260421_203139-epoch=198-train_loss=0.0451-val_loss=0.0513_portable.ckpt"
+#ckpt_name: "FourierFlow_turbulent_radiative_layer_2D_16modes_v4.0_20260427_090856-epoch=198-train_loss=0.0651-val_loss=0.0756_portable.ckpt"
+
+#ckpt_name: "FM_data_space_turbulent_radiative_layer_2D_v4.1_20260426_092449-epoch=126-train_loss=0.0087-val_loss=0.0072_portable.ckpt"
+#ckpt_name: "WaveletFlow_turbulent_radiative_layer_2D_3scales_db2_v4.1_20260425_173113-epoch=189-train_loss=0.0226-val_loss=0.0224_portable.ckpt"
+#ckpt_name: "WaveletFlow_turbulent_radiative_layer_2D_1scale_db2_v4.1_20260425_174003-epoch=182-train_loss=0.0192-val_loss=0.0140_portable.ckpt"
+
+# 1-scale models with different wavelets
+#ckpt_name: "WaveletFlow_turbulent_radiative_layer_2D_1scale_haar_v4.0_20260503_215441-epoch=193-train_loss=0.0181-val_loss=0.0153_portable.ckpt"
+#ckpt_name: "WaveletFlow_turbulent_radiative_layer_2D_1scale_db2_v4.0_20260416_173735-epoch=188-train_loss=0.0145-val_loss=0.0154_portable.ckpt"
+#ckpt_name: "WaveletFlow_turbulent_radiative_layer_2D_1scale_db4_v4.0_20260503_215441-epoch=183-train_loss=0.0169-val_loss=0.0141_portable.ckpt"
+#ckpt_name: "WaveletFlow_turbulent_radiative_layer_2D_1scale_db6_v4.0_20260503_215615-epoch=189-train_loss=0.0172-val_loss=0.0153_portable.ckpt"
+
+# 3-scale models with different wavelets
+#ckpt_name: "WaveletFlow_turbulent_radiative_layer_2D_3scales_haar_v4.0_20260429_200656-epoch=181-train_loss=0.0191-val_loss=0.0228_portable.ckpt"
+ckpt_name: "WaveletFlow_turbulent_radiative_layer_2D_3scales_db2_v4.0_20260416_173735-epoch=176-train_loss=0.0248-val_loss=0.0220_portable.ckpt"
+#ckpt_name: "WaveletFlow_turbulent_radiative_layer_2D_3scales_db4_v4.0_20260429_200442-epoch=193-train_loss=0.0290-val_loss=0.0276_portable.ckpt"
+#ckpt_name: "WaveletFlow_turbulent_radiative_layer_2D_3scales_db6_v4.0_20260429_200321-epoch=196-train_loss=0.0310-val_loss=0.0381_portable.ckpt"
+
+# Dataset
+split:     "test"
+steps:     -1           # -1 = use all steps in each trajectory
+transform: [] #['normalize_turbulent_radiative_scalars']
+augment:   []
+
+# ── Model / inference ─────────────────────────────────────────────────────────
+n_steps_input:      4    # Ti — must match the value used during training
+num_sampling_steps: 20   # ODE integration steps per prediction
+n_ensemble:         8    # total ensemble members (split across GPUs)
+verbose:            true
+seed:               168
+run_tag:            "seed168"

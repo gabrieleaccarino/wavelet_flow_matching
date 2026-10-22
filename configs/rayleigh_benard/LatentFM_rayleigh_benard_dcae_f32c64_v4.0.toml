@@ -1,0 +1,102 @@
+[main]
+    exp_name   = 'LatentFM_rayleigh_benard_dcae_f32c64_v4.0'
+
+[resume]
+    ckpt = ''
+
+[path]
+    project_path      = '/glade/work/gaccarino/waveletflux'
+    well_base_path    = '/glade/work/gaccarino/data/datasets'
+    well_dataset_name = 'rayleigh_benard'
+    stats_path        = '/glade/work/gaccarino/data/datasets/rayleigh_benard/stats.yaml'
+    experiments_path  = '/glade/work/gaccarino/waveletflux/experiments/rayleigh_benard'
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Pre-trained (frozen) LOLA autoencoder.
+#   Point run_dir at the AE run directory (must contain config.yaml + state.pth).
+#   f32c64 = spatial factor 32, 64 latent channels  ->  512x128x4  →  16x4x64
+#   Compression rate: 4*512*128 / (64*16*4) = ÷64   (see notes for c16 / c4).
+# You may instead give explicit `config_yaml` and `state_path` keys.
+# ─────────────────────────────────────────────────────────────────────────────
+[autoencoder]
+    run_dir = '/glade/work/gaccarino/waveletflux/experiments/rayleigh_benard/DCAE/dcae_fc32c64'
+    config_yaml = '/glade/work/gaccarino/waveletflux/experiments/rayleigh_benard/DCAE/dcae_fc32c64/config.yaml'
+    state_path  = '/glade/work/gaccarino/waveletflux/experiments/rayleigh_benard/DCAE/dcae_fc32c64/state.pth'
+
+[random]
+    seed = 8940
+
+[train]
+    epochs            = 200
+    warmup_epochs     = 20
+    batch_size        = 32
+    n_steps_input     = 4
+    n_steps_output    = 1
+    max_rollout_steps = 1
+    train_shuffle     = true
+    val_shuffle       = false
+    test_shuffle      = false
+    rollout_shuffle   = false
+    target_dtype      = 'torch.float32'
+    augmentations     = []                  # stochastic — train only
+    transformations   = ['log_scalars']     # deterministic — all splits (logs Ra, Pr)
+
+[velocity_net]
+    cls = 'WaveletFlowUNet'
+    [velocity_net.params]
+        # conditioning / context
+        num_cond            = 2   # Ra, Pr (log-transformed) via FiLM
+        context_in_channels = 4   # (unused by LatentFM — context is latent; kept for schema parity)
+        num_context_frames  = 3   # previous latent frames to condition on (= n_steps_input - 1)
+        # architecture — identical width/depth-per-level to WFM
+        n_levels = 2              # LATENT U-Net depth. NOTE: the f32 latent is 16x4, so the
+                                  # pixel-space depth of 3 would collapse the width. 2 is the
+                                  # sensible analog (16x4 -> 8x2 -> 4x1). Set 1 for a shallower net.
+        base_ch  = 64
+        n_res    = 3
+        cond_dim = 256
+
+[flow_matching]
+    cls        = 'OT_CFM'
+    n_ensemble = 1
+
+[flow_matching.params]
+    sigma = 0.0
+
+[sampling]
+    solver             = 'euler'
+    num_sampling_steps = 20
+
+[optimizer]
+    cls = 'AdamW'
+    [optimizer.params]
+        lr           = 1e-4
+        weight_decay = 1e-2
+        betas        = [0.9, 0.999]
+
+[scheduler]
+    cls = 'CosineAnnealingLR'
+
+[scheduler.params]
+    eta_min = 1e-7
+
+[lightning]
+    [lightning.datamodules]
+        data_workers = 16
+
+    [lightning.trainer]
+        accelerator         = 'gpu'
+        strategy            = 'ddp'
+        precision           = 'bf16-mixed'
+        matmul_precision    = 'high'
+        gradient_clip_val   = 1.0
+        log_every_n_steps   = 1
+        limit_train_batches = 1.0
+        limit_val_batches   = 1.0
+
+[loggers]
+    loggers            = ['csv']
+    log_every_n_epochs = 5
+
+[callbacks]
+    callbacks = ['model_checkpoint_cb', 'emergency_cb', 'performance_cb']

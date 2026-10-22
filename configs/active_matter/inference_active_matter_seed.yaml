@@ -1,0 +1,47 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# configs/active_matter/inference_active_matter.yaml
+# ─────────────────────────────────────────────────────────────────────────────
+
+# ── Paths ─────────────────────────────────────────────────────────────────────
+project_root:    "/glade/work/gaccarino/waveletflux"
+well_base_path:  "/glade/work/gaccarino/data/datasets"
+well_dataset_name: "active_matter"
+
+# ── Checkpoint ────────────────────────────────────────────────────────────────
+# Uncomment the checkpoint you want to evaluate
+#ckpt_name: "FM_data_space_active_matter_v4.0_20260416_090223-epoch=179-train_loss=0.0048-val_loss=0.0026_portable.ckpt"
+#ckpt_name: "FourierFlow_active_matter_32modes_v4.0_20260421_203224-epoch=199-train_loss=0.0952-val_loss=0.1335_portable.ckpt"
+#ckpt_name: "FourierFlow_active_matter_16modes_v4.0_20260427_091207-epoch=187-train_loss=0.1839-val_loss=0.2510_portable.ckpt"
+
+#ckpt_name: "WaveletFlow_active_matter_3scales_db2_v4.1_20260425_171812-epoch=194-train_loss=0.0232-val_loss=0.0164_portable.ckpt"
+#ckpt_name: "WaveletFlow_active_matter_1scale_db2_v4.1_20260425_172300-epoch=193-train_loss=0.0703-val_loss=0.0636_portable.ckpt"
+#ckpt_name: "FM_data_space_active_matter_v4.1_20260426_091420-epoch=196-train_loss=0.0040-val_loss=0.0024_portable.ckpt"
+
+# 1-scale models with different wavelets
+#ckpt_name: "WaveletFlow_active_matter_1scale_haar_v4.0_20260503_224309-epoch=198-train_loss=0.0652-val_loss=0.0612_portable.ckpt"
+#ckpt_name: "WaveletFlow_active_matter_1scale_db2_v4.0_20260415_231646-epoch=195-train_loss=0.0647-val_loss=0.0586_portable.ckpt"
+#ckpt_name: "WaveletFlow_active_matter_1scale_db4_v4.0_20260503_224309-epoch=192-train_loss=0.0644-val_loss=0.0605_portable.ckpt"
+#ckpt_name: "WaveletFlow_active_matter_1scale_db6_v4.0_20260503_224309-epoch=194-train_loss=0.0701-val_loss=0.0639_portable.ckpt"
+
+# 3-scale models with different wavelets
+ckpt_name: "WaveletFlow_active_matter_3scales_haar_v4.0_20260502_090045-epoch=190-train_loss=0.0181-val_loss=0.0140_portable.ckpt"
+#ckpt_name: "WaveletFlow_active_matter_3scales_db2_v4.0_20260415_231722-epoch=199-train_loss=0.0221-val_loss=0.0163_portable.ckpt"
+#ckpt_name: "WaveletFlow_active_matter_3scales_db4_v4.0_20260502_090054-epoch=187-train_loss=0.0292-val_loss=0.0234_portable.ckpt"
+#ckpt_name: "WaveletFlow_active_matter_3scales_db6_v4.0_20260502_090102-epoch=185-train_loss=0.0365-val_loss=0.0306_portable.ckpt"
+
+
+stats_path: "/glade/work/gaccarino/data/datasets/active_matter/stats.yaml"
+
+# ── Dataset ───────────────────────────────────────────────────────────────────
+split:     "test"
+steps:     -1           # -1 = use all steps in each trajectory
+transform: [] #['normalize_active_matter_scalars']
+augment:   []
+
+# ── Model / inference ─────────────────────────────────────────────────────────
+n_steps_input:      4    # Ti — must match the value used during training
+num_sampling_steps: 20   # ODE integration steps per prediction
+n_ensemble:         8    # total ensemble members (split across GPUs)
+verbose:            true
+seed:               168
+run_tag:            "seed168"

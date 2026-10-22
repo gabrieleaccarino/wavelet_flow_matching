@@ -1,0 +1,64 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# configs/rayleigh_benard_wavelet.yaml
+# Rayleigh-Bénard convection — wavelet-space model
+# ─────────────────────────────────────────────────────────────────────────────
+
+project_root      : "/glade/work/gaccarino/waveletflux"
+well_base_path    : "/glade/work/gaccarino/data/datasets"
+well_dataset_name : "rayleigh_benard"
+stats_path        : "/glade/work/gaccarino/data/datasets/rayleigh_benard/stats.yaml"
+
+# ── Checkpoints ───────────────────────────────────────────────────────────────
+# --- wavelet / data-space (use model_class: "wavelet") ---
+#ckpt_name: "FM_data_space_rayleigh_benard_v4.0_20260415_135807-epoch=194-train_loss=0.0077-val_loss=0.0100_portable.ckpt" 
+#ckpt_name: "FourierFlow_rayleigh_benard_16modes_v4.0_20260427_091028-epoch=158-train_loss=0.0311-val_loss=0.0795_portable.ckpt"
+#ckpt_name: "FourierFlow_rayleigh_benard_32modes_v4.0_20260421_081051-epoch=109-train_loss=0.0317-val_loss=0.0571_portable.ckpt"
+
+# 1-scale models with different wavelets
+#ckpt_name: "WaveletFlow_rayleigh_benard_1scale_haar_v4.0_20260503_215615-epoch=190-train_loss=0.0169-val_loss=0.0197_portable.ckpt"
+#ckpt_name: "WaveletFlow_rayleigh_benard_1scale_db2_v4.0_20260415_135235-epoch=188-train_loss=0.0185-val_loss=0.0194_portable.ckpt"
+#ckpt_name: "WaveletFlow_rayleigh_benard_1scale_db4_v4.0_20260503_215846-epoch=178-train_loss=0.0176-val_loss=0.0193_portable.ckpt"
+#ckpt_name: "WaveletFlow_rayleigh_benard_1scale_db6_v4.0_20260503_221904-epoch=185-train_loss=0.0178-val_loss=0.0189_portable.ckpt"
+
+# 3-scale models with different wavelets
+#ckpt_name: "WaveletFlow_rayleigh_benard_3scales_haar_ablation_v4.0_20260429_203221-epoch=188-train_loss=0.0216-val_loss=0.0258_portable.ckpt"
+ckpt_name: "WaveletFlow_rayleigh_benard_3scales_db2_v4.0_20260415_230754-epoch=188-train_loss=0.0223-val_loss=0.0264_portable.ckpt"
+#ckpt_name: "WaveletFlow_rayleigh_benard_3scales_db4_ablation_v4.0_20260429_203420-epoch=185-train_loss=0.0266-val_loss=0.0314_portable.ckpt"
+#ckpt_name: "WaveletFlow_rayleigh_benard_3scales_db6_ablation_v4.0_20260429_204026-epoch=198-train_loss=0.0316-val_loss=0.0356_portable.ckpt"
+
+# --- latent (use model_class: "latent") ---
+#ckpt_name: "LatentFM_rayleigh_benard_dcae_f32c64_v4.0_20260725_130020-epoch=195-train_loss=0.2117-val_loss=0.2147_portable.ckpt"
+
+# ── Model selection ───────────────────────────────────────────────────────────
+#   "latent"  -> LatentFlowModule   (rebuilds the frozen AE from the checkpoint)
+#   "wavelet" -> WaveletFlowModule  (also the data-space / Fourier variants)
+#   "auto"    -> detect from the checkpoint (latent iff it stores an ae_cfg)
+
+model_class: "auto"
+ae_state_path: "/glade/work/gaccarino/waveletflux/experiments/rayleigh_benard/DCAE/dcae_fc32c64/state.pth"
+
+
+# ── Dataset ───────────────────────────────────────────────────────────────────
+split:     "test"
+steps:     -1
+transform: ["log_scalars"]
+augment:   []
+
+# ── Rollout / sampling ────────────────────────────────────────────────────────
+n_steps_input: 4
+n_ensemble: 8
+ode_method: "heun"         # "euler", "heun", or "midpoint"
+
+clamp_sigma: 5.0           # soft clamp on normalized predictions (0 = off)
+num_sampling_steps: 50     # increase from default if using euler
+verbose: true
+
+# ── Seeding ───────────────────────────────────────────────────────────────────
+seed: 168
+run_tag: "seed168"
+ 
+# ── Physics evaluation (optional; on by default in inference.py) ──────────────
+# physics:
+#   enabled: true
+#   stride:  1
+#   max_members: 8

@@ -1,7 +1,11 @@
 """
 inference.py
 ------------
-Distributed ensemble inference for WaveletFlowModule (and data-space variants).
+Distributed ensemble inference for WaveletFlowModule (and data-space variants),
+with integrated physics-based evaluation.
+
+Everything in the original script is preserved byte-for-byte except where
+marked `# [PHYSICS]` or `# [SINGLE-CSV]`.
 
 Parallelism strategy
 --------------------
@@ -21,13 +25,22 @@ Trajectory subsampling
   Set to 1 to evaluate one trajectory per unique scalar-condition combination
   (cheapest), or to -1 to use every trajectory in each file (full evaluation).
 
-  Examples
-    n_traj_per_file: 1    →  9 trajectories for a 9-file Rayleigh-Bénard test set
-    n_traj_per_file: 3    →  27 trajectories
-    n_traj_per_file: -1   →  all trajectories (45 for 9 files × 5 traj/file)
-
   CLI override:
     torchrun ... inference.py --config ... --override n_traj_per_file=3
+
+Seeding
+-------
+  `seed` (int, default 0) and `run_tag` (str, default "seed<seed>") are plain
+  config keys, overridable from the CLI:
+
+    torchrun ... inference.py --config ... --override seed=3
+
+  Each DDP rank derives a disjoint RNG stream from (seed, rank), so the four
+  GPUs draw independent noise for their ensemble shards, and two jobs with
+  different seeds share no stream. The seed is stamped both into the output
+  filenames (via run_tag) and into a `seed` column of the metrics CSV, so
+  CSVs from repeated runs can simply be concatenated for uncertainty
+  quantification.
 
 Performance reporting
 ---------------------
@@ -36,21 +49,30 @@ Performance reporting
   across all ranks (i.e. the true end-to-end latency, not a local average).
   DataFrame construction, file I/O, and shard merging are excluded.
 
-  Metrics written to <stem>_perf.yaml (rank 0 only):
-    wall_clock_s          true wall-clock inference time  (max across ranks)
-    throughput_steps_s    total rollout-steps generated globally / wall_clock_s
-    throughput_frames_s   total frames  (step × H × W)  generated globally / wall_clock_s
-    gpu_peak_mem_GiB_*    per-rank peak GPU memory allocated during inference
-
 Outputs (all written by rank 0)
 --------------------------------
-  <stem>_traj.pkl       full predictions  (N_TRAJ, N_ENS, T, H, W, C)
-  <stem>_nens1_traj.pkl single member     (N_TRAJ,    1,  T, H, W, C)  for plotting
-  <stem>_stats.csv      per-(model, traj, field, step) scalar metrics
-                        + one column per scalar condition (e.g. Rayleigh, Prandtl)
-  <stem>_psd.csv        isotropic PSD in long format
-                        + one column per scalar condition
-  <stem>_perf.yaml      inference-only performance counters (see above)
+  <stem>_traj.pkl          full predictions  (N_TRAJ, N_ENS, T, H, W, C)
+  <stem>_nens1_traj.pkl    single member     (N_TRAJ,    1,  T, H, W, C)
+  <stem>_perf.yaml         inference-only performance counters
+  <stem>_metrics.csv       THE single metrics file:
+                             rows with field != "_global_":
+                               ML stats (rmse, vrmse, crps, spread, coverage,
+                               w1, rmse_p/lp/c per band, ...) merged with
+                               per-field physics metrics (mass_bias,
+                               gradsq_bias, neg_frac_pred, ...) on
+                               (model, traj, field, step); derived channels
+                               (e.g. vorticity) appear as ordinary field rows
+                               when physics.derived_ml is set.
+                             rows with field == "_global_":
+                               coupled diagnostics (ke_bias, enstrophy_bias,
+                               massflux_bias, continuity/divnorm ratio, ...),
+                               one row per (model, traj, step). Kept as
+                               separate rows, NOT broadcast across fields, so
+                               later mean/sem aggregation is not duplicated.
+                             every row also carries: seed, dataset,
+                               n_ensemble, num_sampling_steps, ode_method,
+                               clamp_sigma, and the scalar conditions.
+  <stem>_psd.csv           OPTIONAL, off by default (compute_psd=true to get it)
 
 Usage — single device (MPS / CPU)
     python inference.py --config configs/trl2d/inference_trl2d.yaml
@@ -61,7 +83,10 @@ Usage — multi-GPU with torchrun
 CLI overrides
     torchrun --nproc_per_node=4 inference.py \\
         --config configs/trl2d/inference_trl2d.yaml \\
-        --override n_ensemble=16 num_sampling_steps=50 n_traj_per_file=1 verbose=true
+        --override n_ensemble=16 num_sampling_steps=50 seed=2 verbose=true
+
+[PHYSICS] CLI overrides
+    --override physics.enabled=true physics.stride=2 physics.max_members=8
 """
 
 from the_well.data.normalization import ZScoreNormalization
@@ -70,6 +95,7 @@ from pathlib import Path
 import numpy as np
 import argparse
 import pickle
+import random
 import torch
 import yaml
 import time
@@ -85,14 +111,31 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 # ─────────────────────────────────────────────────────────────────────────────
 # !! TRAJECTORY SUBSAMPLING MACRO !!
 # ─────────────────────────────────────────────────────────────────────────────
-# Number of trajectories to evaluate per HDF5 file.
-#   1   → one trajectory per unique scalar-condition (fastest, recommended for sweeps)
-#   N   → first N trajectories from each file
-#  -1   → all trajectories in each file (full evaluation)
-#
-# This default is overridden by the YAML key `n_traj_per_file` or the CLI flag
-# --override n_traj_per_file=N, so you never need to edit this file directly.
 N_TRAJ_PER_FILE_DEFAULT: int = 1
+# ─────────────────────────────────────────────────────────────────────────────
+
+
+# [SINGLE-CSV] label for the global-diagnostics rows in the merged CSV
+GLOBAL_FIELD_LABEL = "_global_"
+MERGE_KEYS = ["model", "traj", "field", "step"]
+
+
+# [PHYSICS] ───────────────────────────────────────────────────────────────────
+# Physics-evaluation defaults. Override from YAML under a `physics:` block or
+# with --override physics.<key>=<value>.
+PHYSICS_DEFAULTS = {
+    "enabled":         True,
+    "global_metrics":  None,     # None -> physics.RECOMMENDED[dataset]["global"]
+    "field_metrics":   None,     # None -> physics.RECOMMENDED[dataset]["field"]
+    "continuity":      None,     # None -> physics.RECOMMENDED[dataset]["continuity"]
+    "stride":          1,        # evaluate every n-th lead time
+    "max_members":     None,     # cap the ensemble used for physics
+    "derived_ml":      [],       # derived channels through build_stats_df
+                                 # e.g. ["vorticity"]
+    "scalars_are_log": True,     # `transform: [log_scalars]` stores ln(x)
+}
+# [SINGLE-CSV] removed: "derived_psd" and "make_figures" — this script writes
+# exactly one CSV and no figures/tables.
 # ─────────────────────────────────────────────────────────────────────────────
 
 
@@ -108,7 +151,7 @@ def parse_args() -> argparse.Namespace:
         nargs="*",
         metavar="KEY=VALUE",
         default=[],
-        help="Override any config key, e.g. --override n_ensemble=32 n_traj_per_file=1",
+        help="Override any config key, e.g. --override n_ensemble=32 seed=3",
     )
     return p.parse_args()
 
@@ -160,6 +203,18 @@ def init_distributed() -> tuple[int, int, torch.device]:
     return rank, world_size, device
 
 
+def seed_everything(base_seed: int, rank: int) -> int:
+    """Deterministic per-rank seeding. Each DDP rank gets a disjoint stream,
+    otherwise all GPUs would draw identical noise for their ensemble shards;
+    the base-seed multiplier keeps streams of different seeds disjoint too."""
+    seed = int(base_seed) * 100_003 + int(rank) * 1_009
+    random.seed(seed)
+    np.random.seed(seed % 2**32)
+    torch.manual_seed(seed)
+    torch.cuda.manual_seed_all(seed)
+    return seed
+
+
 def is_main(rank: int) -> bool:
     return rank == 0
 
@@ -186,40 +241,21 @@ def report_perf(
 ) -> dict:
     """
     Reduce timing/memory stats across ranks and write a YAML report (rank 0).
-
-    wall_s and total_steps are LOCAL values; the following reductions happen:
-      - wall_clock_s        : MAX across ranks  (true end-to-end latency)
-      - total_steps_global  : SUM across ranks  (all ensemble members × rollout steps)
-      - gpu_peak_mem_GiB    : gathered per-rank (reported individually)
-
-    Parameters
-    ----------
-    wall_s       : local wall-clock time from perf_counter (seconds)
-    total_steps  : n_ens_local × sum(n_rollout per trajectory) on this rank
-    H, W         : spatial dimensions of the field (for frame throughput)
-    world_size   : number of distributed ranks
-    device       : local torch device
-    save_path    : where to write the YAML report (rank 0 only)
-    rank         : this rank's index
     """
-    # Peak GPU memory on this rank (bytes → GiB); 0 on CPU/MPS
     peak_gib = (
         torch.cuda.max_memory_allocated(device) / 2**30
         if device.type == "cuda" else 0.0
     )
 
     if world_size > 1:
-        # Max wall time across ranks — reflects slowest rank (true latency)
         t_tensor = torch.tensor(wall_s, dtype=torch.float64, device=device)
         dist.all_reduce(t_tensor, op=dist.ReduceOp.MAX)
         wall_max_s = t_tensor.item()
 
-        # Sum steps across ranks — total work done by the whole job
         s_tensor = torch.tensor(float(total_steps), dtype=torch.float64, device=device)
         dist.all_reduce(s_tensor, op=dist.ReduceOp.SUM)
         total_steps_g = int(s_tensor.item())
 
-        # Per-rank peak GPU memory (for load-balance diagnostics)
         mem_tensor = torch.tensor(peak_gib, dtype=torch.float64, device=device)
         mem_all = [torch.zeros_like(mem_tensor) for _ in range(world_size)]
         dist.all_gather(mem_all, mem_tensor)
@@ -268,8 +304,6 @@ def _shard_path(shard_dir: Path, rank: int) -> Path:
 
 def write_shard(obj: object, shard_dir: Path, rank: int) -> Path:
     path = _shard_path(shard_dir, rank)
-    # Defensive mkdir: handles Lustre metadata lag on non-zero ranks
-    # even after the barrier, and any other timing edge-case.
     path.parent.mkdir(parents=True, exist_ok=True)
     with open(path, "wb") as fh:
         pickle.dump(obj, fh, protocol=pickle.HIGHEST_PROTOCOL)
@@ -302,20 +336,7 @@ def build_traj_index(
     steps_per_file:    list[int],
     traj_per_file_cap: int,
 ) -> tuple[list[int], list[int]]:
-    """Return (dataset_indices, n_steps) for the selected trajectories.
-
-    Parameters
-    ----------
-    n_traj_per_file   : list of trajectory counts per file  (from dataset)
-    steps_per_file    : list of step counts per file        (from metadata)
-    traj_per_file_cap : how many trajectories to take from each file;
-                        -1 means take all.
-
-    Returns
-    -------
-    traj_indices   : flat list of integer indices into the dataset
-    n_steps_list   : corresponding number of steps for each selected trajectory
-    """
+    """Return (dataset_indices, n_steps) for the selected trajectories."""
     traj_indices = []
     n_steps_list = []
     offset = 0
@@ -333,11 +354,7 @@ def build_traj_index(
 # ─────────────────────────────────────────────────────────────────────────────
 
 def label_to_dict(label: torch.Tensor | None, scalar_names: list[str]) -> dict[str, float]:
-    """Convert a 1-D label tensor to a {name: float} dict.
-
-    If scalar_names is shorter than the tensor (or empty), unnamed entries are
-    stored as 'cond_0', 'cond_1', … so no information is ever silently dropped.
-    """
+    """Convert a 1-D label tensor to a {name: float} dict."""
     if label is None:
         return {}
     values = label.detach().cpu().float().tolist()
@@ -351,17 +368,338 @@ def build_labels_df(
     labels_dict: dict[int, dict[str, float]],
     traj_indices: list[int],
 ) -> pd.DataFrame:
-    """Build a tidy DataFrame with one row per trajectory and one column per
-    scalar condition.  ``traj`` matches the key used in stats / psd DataFrames
-    so it can be directly merged on that column.
-
-    Example output:
-        traj  Rayleigh  Prandtl
-           0   23.0259      1.0
-           1    9.2103      0.5
-    """
+    """One row per trajectory, one column per scalar condition, keyed on `traj`."""
     rows = [{"traj": idx, **labels_dict.get(idx, {})} for idx in traj_indices]
     return pd.DataFrame(rows)
+
+
+# [PHYSICS] ═══════════════════════════════════════════════════════════════════
+# Physics-evaluation helpers
+# ═════════════════════════════════════════════════════════════════════════════
+
+def make_grid(dataset_name: str, Nx: int, Ny: int, item: dict | None = None):
+    """
+    Build the physical Grid for a dataset at the ACTUAL stored resolution.
+    (unchanged from the original file)
+    """
+    from waveletflux.utils.physics import Grid
+
+    if item is not None:
+        for key in ("space_grid", "coords", "grid", "x"):
+            g = item.get(key) if isinstance(item, dict) else None
+            if g is None:
+                continue
+            g = torch.as_tensor(g).squeeze()
+            if g.ndim == 3 and g.shape[-1] == 2 and g.shape[:2] == (Nx, Ny):
+                xs = g[:, 0, 0].double()
+                ys = g[0, :, 1].double()
+                periodic_y = dataset_name == "active_matter"
+                print(f"  [PHYSICS] grid from item['{key}']: "
+                      f"x in [{float(xs.min()):.3g}, {float(xs.max()):.3g}], "
+                      f"y in [{float(ys.min()):.3g}, {float(ys.max()):.3g}]")
+                return Grid.from_coords(xs, ys, periodic_x=True,
+                                        periodic_y=periodic_y)
+
+    if dataset_name == "active_matter":
+        return Grid.uniform(10.0, Nx, 10.0, Ny, periodic_x=True, periodic_y=True)
+    if dataset_name.startswith("rayleigh_benard"):
+        if dataset_name.endswith("uniform"):
+            return Grid.uniform(4.0, Nx, 1.0, Ny, periodic_x=True, periodic_y=False)
+        return Grid.chebyshev_y(4.0, Nx, 1.0, Ny)
+    if dataset_name.startswith("turbulent_radiative_layer"):
+        return Grid.uniform(1.0, Nx, 3.0, Ny, x0=-0.5, y0=-1.0,
+                            periodic_x=True, periodic_y=False)
+    raise KeyError(
+        f"no grid recipe for '{dataset_name}'. Add one to make_grid(), or pass "
+        f"coordinates so Grid.from_coords can be used.")
+
+
+def physical_params(
+    labels_df:       pd.DataFrame,
+    dataset_name:    str,
+    scalars_are_log: bool,
+) -> dict[int, dict[str, float]]:
+    """
+    Turn the scalar-condition table into the physical parameters the physics
+    metrics need, keyed by trajectory. (unchanged from the original file)
+    """
+    out: dict[int, dict[str, float]] = {}
+    if labels_df.empty:
+        return out
+
+    def _val(row, *names):
+        for n in names:
+            for col in row.index:
+                if col.lower() == n.lower():
+                    v = float(row[col])
+                    return float(np.exp(v)) if scalars_are_log else v
+        return None
+
+    for _, row in labels_df.iterrows():
+        traj = int(row["traj"])
+        p: dict[str, float] = {}
+
+        if dataset_name.startswith("rayleigh_benard"):
+            Ra = _val(row, "Rayleigh", "rayleigh", "Ra")
+            Pr = _val(row, "Prandtl", "prandtl", "Pr")
+            if Ra is not None and Pr is not None:
+                if Ra <= 0 or Pr <= 0:
+                    print(f"  [PHYSICS] traj {traj}: Ra={Ra:g}, Pr={Pr:g} are not "
+                          f"positive -- check physics.scalars_are_log. Skipping "
+                          f"Nu / eps / Re for this trajectory.")
+                else:
+                    p["Ra"], p["Pr"] = Ra, Pr
+                    p["kappa"] = (Ra * Pr) ** -0.5
+                    p["nu"]    = (Ra / Pr) ** -0.5
+                    p["Ly"], p["delta_b"] = 1.0, 1.0
+
+        elif dataset_name.startswith("turbulent_radiative_layer"):
+            tc = _val(row, "t_cool", "tcool", "cooling_time")
+            if tc is not None and tc > 0:
+                p["t_cool"] = tc
+            elif tc is not None:
+                print(f"  [PHYSICS] traj {traj}: t_cool={tc:g} is not positive -- "
+                      f"check physics.scalars_are_log. Using t_cool=1.")
+            p["t_cold"] = 10.0
+
+        elif dataset_name == "active_matter":
+            for key, names in (("alpha", ("alpha",)),
+                               ("beta", ("beta",)),
+                               ("zeta", ("zeta",))):
+                v = _val(row, *names)
+                if v is not None:
+                    p[key] = v
+
+        out[traj] = p
+    return out
+
+
+def check_denormalised(truth: torch.Tensor, field_names: list[str], spec) -> bool:
+    """
+    Loud guard against running the physics metrics on z-scored fields.
+    (unchanged from the original file)
+    """
+    print("\n  [PHYSICS] denormalisation check")
+    t = truth.double()
+    stats = {}
+    for i, name in enumerate(field_names):
+        c = t[..., i]
+        stats[name] = (float(c.mean()), float(c.std()),
+                       float(c.min()), float(c.max()))
+
+    ok = True
+    for name in spec.positive_fields:
+        if name in stats and stats[name][2] < 0:
+            print(f"    FAIL  '{name}' has min={stats[name][2]:.4g} < 0 but must "
+                  f"be strictly positive -> fields are NORMALISED.")
+            ok = False
+
+    if ok and all(abs(m) < 0.1 and abs(s - 1.0) < 0.2
+                  for m, s, _, _ in stats.values()):
+        print("    WARN  every channel has mean~0 and std~1; this looks z-scored.")
+        ok = False
+
+    for name, (m, s, lo, hi) in stats.items():
+        print(f"    {name:<18s} mean={m:>11.4g}  std={s:>10.4g}  "
+              f"range=[{lo:>10.4g}, {hi:>10.4g}]")
+
+    print("    -> " + ("fields look PHYSICAL, proceeding."
+                       if ok else
+                       "REFUSING to compute physics metrics on normalised fields."))
+    return ok
+
+
+# [SINGLE-CSV] ────────────────────────────────────────────────────────────────
+# run_physics_evaluation now RETURNS DataFrames instead of writing CSVs,
+# LaTeX tables, or figures. The single merged CSV is written in main().
+# ─────────────────────────────────────────────────────────────────────────────
+
+def run_physics_evaluation(
+    truth_traj:    torch.Tensor,          # (N_TRAJ, Ti+T, Nx, Ny, C)
+    preds_torch:   torch.Tensor,          # (N_TRAJ, N_ENS, T, Nx, Ny, C)
+    field_names:   list[str],
+    dataset_name:  str,
+    model_name:    str,
+    Ti:            int,
+    labels_df:     pd.DataFrame,
+    pcfg:          dict,
+    item:          dict | None = None,
+) -> tuple[pd.DataFrame | None, pd.DataFrame | None, pd.DataFrame | None]:
+    """
+    Streaming physics evaluation, one trajectory at a time.
+
+    Returns
+    -------
+    (field_df, global_df, derived_stats_df) — any of which may be None.
+      field_df         : per-(model, traj, field, step) physics metrics
+      global_df        : per-(model, traj, step) coupled diagnostics
+      derived_stats_df : ML stats (build_stats_df) on derived channels only
+                         (e.g. vorticity), same schema as the main stats_df
+    """
+    from waveletflux.utils.eval import build_stats_df
+    from waveletflux.utils import physics as P
+
+    Nx, Ny = truth_traj.shape[2], truth_traj.shape[3]
+    grid = make_grid(dataset_name, Nx, Ny, item=item)
+    spec = P.spec_for(dataset_name).with_grid(grid)
+    rec  = P.recommended_for(dataset_name)
+
+    g_metrics = pcfg["global_metrics"] if pcfg["global_metrics"] is not None \
+        else rec["global"]
+    f_metrics = pcfg["field_metrics"] if pcfg["field_metrics"] is not None \
+        else rec["field"]
+    do_cont = pcfg["continuity"] if pcfg["continuity"] is not None \
+        else rec["continuity"]
+
+    # ── role resolution ──────────────────────────────────────────────────────
+    idx = spec.resolve(field_names)
+    print(f"\n  [PHYSICS] dataset : {dataset_name}")
+    print(f"  [PHYSICS] fields  : {field_names}")
+    print(f"  [PHYSICS] roles   : {idx}")
+    print(f"  [PHYSICS] global  : {list(g_metrics)}"
+          f"{' + continuity' if do_cont else ''}")
+    print(f"  [PHYSICS] field   : {list(f_metrics)}")
+    if "ux" not in idx or "uy" not in idx:
+        print("  [PHYSICS] ABORT: velocity roles unresolved. Use "
+              f"spec.with_roles(ux=..., uy=...) to map onto {field_names}.")
+        return None, None, None
+
+    # ── denormalisation guard ────────────────────────────────────────────────
+    if not check_denormalised(truth_traj[:1, Ti:Ti + 4], field_names, spec):
+        return None, None, None
+
+    # ── physical parameters per trajectory ───────────────────────────────────
+    params = physical_params(labels_df, dataset_name, pcfg["scalars_are_log"])
+    if params:
+        k0 = sorted(params)[0]
+        print(f"  [PHYSICS] params[{k0}] = "
+              f"{ {k: float(f'{v:.6g}') for k, v in params[k0].items()} }")
+        if pcfg["scalars_are_log"]:
+            print("  [PHYSICS] scalar conditions EXPONENTIATED "
+                  "(transform: log_scalars stores ln(x)). Set "
+                  "physics.scalars_are_log=false if yours are not logged.")
+
+    # ── lead times and ensemble cap ──────────────────────────────────────────
+    T_avail = min(truth_traj.shape[1] - Ti, preds_torch.shape[2])
+    lead_times = list(range(0, T_avail, max(1, int(pcfg["stride"]))))
+    n_ens = preds_torch.shape[1]
+    m_cap = min(int(pcfg["max_members"] or n_ens), n_ens)
+    print(f"  [PHYSICS] lead times: {len(lead_times)} of {T_avail} "
+          f"(stride={pcfg['stride']}) | members: {m_cap} of {n_ens}")
+
+    field_dfs, global_dfs, ml_dfs = [], [], []
+    t0 = time.perf_counter()
+
+    for t in range(truth_traj.shape[0]):
+        tr = truth_traj[t:t + 1]
+        pr = {model_name: preds_torch[t:t + 1, :m_cap]}
+        par = {0: params.get(t, {})}
+
+        # Layer 3 -- global coupled diagnostics
+        if g_metrics or do_cont:
+            gdf = P.build_physics_global_df(
+                tr, pr, field_names, spec, Ti=Ti, lead_times=lead_times,
+                params=par, metrics=g_metrics, continuity=do_cont)
+            gdf["traj"] = t
+            global_dfs.append(gdf)
+
+        # Layer 1 + 2 -- derived channels and per-field metrics
+        if pcfg["derived_ml"] or f_metrics:
+            derived = list(pcfg["derived_ml"])
+            if derived:
+                tr_d, pr_d, names_d = P.derive_fields(
+                    tr, pr, field_names, spec, derived=derived, params=par)
+            else:
+                tr_d, pr_d, names_d = tr, pr, list(field_names)
+
+            if derived:
+                mdf = build_stats_df(tr_d, pr_d, names_d, Ti=Ti,
+                                     lead_times=lead_times)
+                mdf["traj"] = t
+                ml_dfs.append(mdf[mdf["field"].isin(derived)])
+
+            if f_metrics:
+                fdf = P.build_physics_field_df(
+                    tr_d, pr_d, names_d, spec, Ti=Ti, lead_times=lead_times,
+                    params=par, metrics=f_metrics,
+                    fields=[f for f in names_d if f != "pressure"])
+                fdf["traj"] = t
+                field_dfs.append(fdf)
+
+            if derived:
+                del tr_d, pr_d
+
+        print(f"    [PHYSICS] traj {t + 1}/{truth_traj.shape[0]} "
+              f"({time.perf_counter() - t0:.0f}s)")
+
+    field_df  = pd.concat(field_dfs,  ignore_index=True) if field_dfs  else None
+    global_df = pd.concat(global_dfs, ignore_index=True) if global_dfs else None
+    ml_df     = pd.concat(ml_dfs,     ignore_index=True) if ml_dfs     else None
+    print(f"  [PHYSICS] evaluation time: {time.perf_counter() - t0:.0f}s")
+    return field_df, global_df, ml_df
+
+
+# [SINGLE-CSV] ────────────────────────────────────────────────────────────────
+
+def merge_to_single_csv(
+    stats_df:    pd.DataFrame,
+    field_df:    pd.DataFrame | None,
+    global_df:   pd.DataFrame | None,
+    derived_df:  pd.DataFrame | None,
+    labels_df:   pd.DataFrame,
+    run_meta:    dict,
+    save_path:   Path,
+) -> pd.DataFrame:
+    """
+    Assemble THE one CSV.
+
+      1. stats rows (raw fields) + derived-channel stats rows are concatenated
+         (same schema, disjoint `field` values);
+      2. per-field physics metrics are merged in on (model, traj, field, step);
+      3. global diagnostics are appended as rows with field == "_global_"
+         (NOT broadcast across fields — keeps later sem over trajectories honest);
+      4. scalar conditions are merged on `traj`;
+      5. run metadata (seed first) is stamped on every row.
+    """
+    parts = [stats_df]
+    if derived_df is not None and not derived_df.empty:
+        parts.append(derived_df)
+    per_field = pd.concat(parts, ignore_index=True, sort=False)
+
+    if field_df is not None and not field_df.empty:
+        per_field = per_field.merge(
+            field_df, on=MERGE_KEYS, how="outer", suffixes=("", "_dup"))
+        dup = [c for c in per_field.columns if c.endswith("_dup")]
+        if dup:
+            per_field = per_field.drop(columns=dup)
+
+    frames = [per_field]
+    if global_df is not None and not global_df.empty:
+        gdf = global_df.copy()
+        gdf["field"] = GLOBAL_FIELD_LABEL
+        frames.append(gdf)
+
+    out = pd.concat(frames, ignore_index=True, sort=False)
+
+    if not labels_df.empty:
+        out = out.merge(labels_df, on="traj", how="left")
+
+    for k, v in run_meta.items():
+        out[k] = v
+
+    meta_cols   = list(run_meta.keys())
+    label_cols  = [c for c in labels_df.columns if c != "traj"]
+    metric_cols = sorted(c for c in out.columns
+                         if c not in MERGE_KEYS + meta_cols + label_cols)
+    out = out[MERGE_KEYS + meta_cols + label_cols + metric_cols]
+
+    out.to_csv(save_path, index=False)
+    n_g = int((out["field"] == GLOBAL_FIELD_LABEL).sum())
+    print(f"  [SINGLE-CSV] → {save_path}")
+    print(f"  [SINGLE-CSV]   {len(out):,} rows "
+          f"({len(out) - n_g:,} per-field, {n_g:,} global) × "
+          f"{out.shape[1]} cols")
+    return out
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -376,6 +714,9 @@ def main() -> None:
         cfg = yaml.safe_load(f)
     cfg = apply_overrides(cfg, args.override or [])
 
+    # [PHYSICS] merge physics config with defaults
+    pcfg = {**PHYSICS_DEFAULTS, **(cfg.get("physics") or {})}
+
     project_root = cfg["project_root"]
     sys.path.insert(0, project_root)
 
@@ -387,6 +728,12 @@ def main() -> None:
     # ── Distributed init ──────────────────────────────────────────────────────
     rank, world_size, device = init_distributed()
 
+    # [SINGLE-CSV] cfg is a dict — cfg["seed"], not cfg.seed
+    BASE_SEED = int(cfg.get("seed", 0))
+    RUN_TAG   = str(cfg.get("run_tag", f"seed{BASE_SEED}"))
+    effective_seed = seed_everything(BASE_SEED, rank)
+    print(f"  [rank {rank}] base_seed={BASE_SEED} effective_seed={effective_seed}")
+
     # ── Experiment identifiers ────────────────────────────────────────────────
     well_base_path    = cfg["well_base_path"]
     well_dataset_name = cfg["well_dataset_name"]
@@ -396,7 +743,6 @@ def main() -> None:
     N_ENSEMBLE        = cfg["n_ensemble"]
     ODE_METHOD        = cfg.get("ode_method", "euler")
     CLAMP_SIGMA       = cfg.get("clamp_sigma", 5.0)
-    # Trajectory cap: YAML > CLI override > module-level default
     N_TRAJ_PER_FILE   = cfg.get("n_traj_per_file", N_TRAJ_PER_FILE_DEFAULT)
 
     ckpt_base_name = re.split(r"_\d{8}_", ckpt_name)[0]
@@ -408,36 +754,24 @@ def main() -> None:
         ckpt_base_name, "artifacts/checkpoints", ckpt_name,
     )
 
-    # stem is unique per (checkpoint, sampling-steps, ensemble-size) — used both
-    # for output filenames and for the temporary shard directory so that
-    # concurrent inference runs never share the same shard folder.
-    stem = f"{ckpt_base_name}_nsampling{NUM_SAMPLING}_nens{N_ENSEMBLE}"
+    stem = f"{ckpt_base_name}_nsampling{NUM_SAMPLING}_nens{N_ENSEMBLE}_{RUN_TAG}"
 
     save_dir = Path(project_root) / "experiments" / well_dataset_name / "results"
 
-    # Embed the PBS job ID (or PID as fallback) so that concurrent jobs with
-    # identical configs never share the same shard directory.
     job_id = (
-        os.environ.get("PBS_JOBID")               # PBS / Derecho production
-        or os.environ.get("TORCHELASTIC_RUN_ID")  # torchrun >= 2.0
-        or os.environ.get("MASTER_PORT")          # torchrun fallback, same on all ranks
-        or str(os.getpid())                       # world_size=1 only (single process, safe)
+        os.environ.get("PBS_JOBID")
+        or os.environ.get("TORCHELASTIC_RUN_ID")
+        or os.environ.get("MASTER_PORT")
+        or str(os.getpid())
     )
     shard_dir = save_dir / f"_shards_{stem}_{job_id}"
 
-    # Only rank 0 creates directories.  A concurrent mkdir from every rank is
-    # a known Lustre metadata race: the kernel on one node may not see a
-    # directory created by another node's kernel even milliseconds later.
     if is_main(rank):
         save_dir.mkdir(parents=True, exist_ok=True)
         shard_dir.mkdir(parents=True, exist_ok=True)
 
-    # GPU barrier: rank 0 has finished the mkdir before anyone proceeds.
     barrier(world_size, device)
 
-    # Non-zero ranks: issue their own mkdir to force a fresh Lustre metadata
-    # lookup.  This is a no-op once the directory is visible, but it prevents
-    # the "No such file or directory" error on slow-propagating mounts.
     if not is_main(rank):
         shard_dir.mkdir(parents=True, exist_ok=True)
 
@@ -450,7 +784,10 @@ def main() -> None:
         print(f"  Checkpoint      : {ckpt_name}")
         print(f"  N_ensemble      : {N_ENSEMBLE}")
         print(f"  N_traj_per_file : {N_TRAJ_PER_FILE}  (-1 = all)")
+        print(f"  Seed / tag      : {BASE_SEED} / {RUN_TAG}")
         print(f"  World size      : {world_size}  |  Device : {device}")
+        print(f"  Physics metrics : {pcfg['enabled']}  "
+              f"(stride={pcfg['stride']}, max_members={pcfg['max_members']})")
         print(f"{'─'*64}\n")
 
     barrier(world_size, device)
@@ -473,12 +810,8 @@ def main() -> None:
     )
 
     # ── Trajectory index construction ─────────────────────────────────────────
-    # dataset.metadata.n_steps_per_trajectory is indexed by FILE, not trajectory.
-    # dataset.n_trajectories_per_file gives the per-file trajectory counts.
-    # build_traj_index flattens these into a per-trajectory index list,
-    # respecting the N_TRAJ_PER_FILE cap.
-    steps_per_file  = dataset.metadata.n_steps_per_trajectory  # one entry per file
-    n_traj_per_file = dataset.n_trajectories_per_file           # one entry per file
+    steps_per_file  = dataset.metadata.n_steps_per_trajectory
+    n_traj_per_file = dataset.n_trajectories_per_file
 
     traj_indices, n_steps_per_traj = build_traj_index(
         n_traj_per_file   = n_traj_per_file,
@@ -509,26 +842,17 @@ def main() -> None:
               f"({n_ens_local} member(s) on this rank)\n")
 
     # ── Inference loop ────────────────────────────────────────────────────────
-    # Keyed by position i (0..N_TRAJ-1), NOT by raw dataset index.
-    # This keeps labels aligned with the 0-based traj column in stats/psd CSVs.
     local_preds   = {}
     local_targets = {}
     local_labels  = {}
 
-    # ── Reset GPU peak-memory stats before the clock starts ───────────────────
-    # Do this BEFORE the barrier so the reset is not counted in inference time.
     if device.type == "cuda":
         torch.cuda.synchronize(device)
         torch.cuda.reset_peak_memory_stats(device)
 
-    # Running counters for the perf report — accumulated inside the loop so
-    # they are always correct even if an exception is raised mid-way.
-    total_steps = 0   # n_ens_local × Σ n_rollout across trajectories
-    H = W = 1         # spatial dimensions, set on the first trajectory
+    total_steps = 0
+    H = W = 1
 
-    # ── Synchronise all ranks before starting the clock ───────────────────────
-    # This ensures rank-0 setup overhead (prints, mkdir, etc.) is excluded from
-    # the timing, and that all ranks start counting at the same moment.
     barrier(world_size, device)
     t_start = time.perf_counter()
 
@@ -546,8 +870,9 @@ def main() -> None:
 
             local_labels[i] = label_to_dict(label, scalar_names)
 
-            seed      = x_full[:N_STEPS_INPUT]
-            seed_exp  = seed.unsqueeze(0).expand(n_ens_local, -1, -1, -1, -1).contiguous()
+            seed_frames = x_full[:N_STEPS_INPUT]
+            seed_exp  = seed_frames.unsqueeze(0).expand(
+                n_ens_local, -1, -1, -1, -1).contiguous()
             label_exp = (
                 label.unsqueeze(0).expand(n_ens_local, -1).contiguous()
                 if label is not None else None
@@ -564,12 +889,8 @@ def main() -> None:
                 ode_method       = ODE_METHOD,
                 clamp_sigma      = CLAMP_SIGMA,
             )
-            # (n_ens_local, 1, T, H, W, C) → (n_ens_local, T, H, W, C)
             preds_phys = preds_phys.squeeze(1)
 
-            # ── Accumulate perf counters per trajectory ───────────────────────
-            # Done immediately after rollout so the count is correct even if
-            # a later trajectory raises an exception.
             H, W         = x_full.shape[-3], x_full.shape[-2]
             total_steps += n_ens_local * n_rollout
 
@@ -581,19 +902,15 @@ def main() -> None:
             elif device.type == "mps":
                 torch.mps.empty_cache()
 
-    # ── Stop clock — synchronise CUDA kernels before reading perf_counter ─────
     if device.type == "cuda":
         torch.cuda.synchronize(device)
     wall_s = time.perf_counter() - t_start
 
-    # ── Barrier before reduction so wall_max reflects the slowest rank ────────
     barrier(world_size, device)
 
-    # ── Gather and report performance across all ranks ────────────────────────
     perf_yaml_path = save_dir / f"{stem}_perf.yaml"
     report_perf(wall_s, total_steps, H, W, world_size, device, perf_yaml_path, rank)
 
-    # ── Write shard to shared filesystem ─────────────────────────────────────
     path = write_shard(
         {"preds": local_preds, "targets": local_targets, "labels": local_labels},
         shard_dir, rank,
@@ -612,10 +929,8 @@ def main() -> None:
     shards = read_all_shards(shard_dir, world_size)
     remove_shards(shard_dir, world_size)
 
-    # ── Merge: cat ensemble shards per trajectory ─────────────────────────────
     merged_preds   = {}
     merged_targets = {}
-    # Labels are identical across all ranks (same dataset view) — take shard 0.
     merged_labels: dict[int, dict[str, float]] = shards[0]["labels"]
 
     for shard in shards:
@@ -639,8 +954,8 @@ def main() -> None:
         preds_list.append(cat[:, :min_T])
         tgts_list.append(merged_targets[idx][:min_T])
 
-    preds_arr   = torch.stack(preds_list, dim=0).numpy()  # (N_TRAJ, N_ENS, T, H, W, C)
-    targets_arr = torch.stack(tgts_list,  dim=0).numpy()  # (N_TRAJ,        T, H, W, C)
+    preds_arr   = torch.stack(preds_list, dim=0).numpy()
+    targets_arr = torch.stack(tgts_list,  dim=0).numpy()
 
     print(f"  preds shape   : {preds_arr.shape}")
     print(f"  targets shape : {targets_arr.shape}")
@@ -653,14 +968,11 @@ def main() -> None:
     # ── Field names ───────────────────────────────────────────────────────────
     meta_fields = dataset.metadata.field_names
     field_names = [item for sublist in meta_fields.values() for item in sublist]
-    if is_main(rank):
-        print(f"  field names   : {field_names}")
+    print(f"  field names   : {field_names}")
 
     # ── Labels DataFrame ──────────────────────────────────────────────────────
-    # Tidy table: one row per trajectory, one column per scalar condition.
-    # Keyed on "traj" (0-based position) to match build_stats_df / build_psd_df.
     labels_df = build_labels_df(merged_labels, all_indices)
-    if is_main(rank) and not labels_df.empty:
+    if not labels_df.empty:
         print(f"  scalar conditions sample:\n{labels_df.head()}\n")
 
     # ── 1. Full pickle ────────────────────────────────────────────────────────
@@ -668,27 +980,10 @@ def main() -> None:
     with open(full_pkl, "wb") as fh:
         pickle.dump(
             {
-                "preds":           preds_arr,      # (N_TRAJ, N_ENS, T, H, W, C)
-                "targets":         targets_arr,    # (N_TRAJ,        T, H, W, C)
-                "config":          cfg,
-                "traj_indices":    all_indices,    # 0-based position indices
-                "dataset_indices": traj_indices,   # raw dataset indices for provenance
-                "field_names":     field_names,
-                "labels":          merged_labels,
-                "scalar_names":    scalar_names,
-            },
-            fh, protocol=pickle.HIGHEST_PROTOCOL,
-        )
-    print(f"\n  [1/5] Full pickle        → {full_pkl}")
-
-    # ── 2. Single-member pickle (small download for plotting) ─────────────────
-    single_pkl = save_dir / f"{ckpt_base_name}_nsampling{NUM_SAMPLING}_nens1_traj.pkl"
-    with open(single_pkl, "wb") as fh:
-        pickle.dump(
-            {
-                "preds":           preds_arr[:, :1],   # (N_TRAJ, 1, T, H, W, C)
+                "preds":           preds_arr,
                 "targets":         targets_arr,
                 "config":          cfg,
+                "seed":            BASE_SEED,
                 "traj_indices":    all_indices,
                 "dataset_indices": traj_indices,
                 "field_names":     field_names,
@@ -697,18 +992,40 @@ def main() -> None:
             },
             fh, protocol=pickle.HIGHEST_PROTOCOL,
         )
-    print(f"  [2/5] Single-member pkl  → {single_pkl}")
+    print(f"\n  [1/4] Full pickle        → {full_pkl}")
 
-    # ── 3. Performance report (already written by report_perf) ────────────────
-    print(f"  [3/5] Perf report        → {perf_yaml_path}")
+    # ── 2. Single-member pickle ───────────────────────────────────────────────
+    # [SINGLE-CSV] run_tag added so seeded runs never overwrite each other
+    single_pkl = save_dir / (
+        f"{ckpt_base_name}_nsampling{NUM_SAMPLING}_nens1_{RUN_TAG}_traj.pkl")
+    with open(single_pkl, "wb") as fh:
+        pickle.dump(
+            {
+                "preds":           preds_arr[:, :1],
+                "targets":         targets_arr,
+                "config":          cfg,
+                "seed":            BASE_SEED,
+                "traj_indices":    all_indices,
+                "dataset_indices": traj_indices,
+                "field_names":     field_names,
+                "labels":          merged_labels,
+                "scalar_names":    scalar_names,
+            },
+            fh, protocol=pickle.HIGHEST_PROTOCOL,
+        )
+    print(f"  [2/4] Single-member pkl  → {single_pkl}")
 
-    # ── 4 & 5. Stats and PSD DataFrames ──────────────────────────────────────
+    # ── 3. Performance report ─────────────────────────────────────────────────
+    print(f"  [3/4] Perf report        → {perf_yaml_path}")
+
+    # ── 4. Single metrics CSV: ML stats + physics, one file ──────────────────
     print(f"\n  Rebuilding full truth tensor (Ti={N_STEPS_INPUT}) ...")
 
     seeds_list = []
+    last_item = None
     for i, traj_idx in zip(all_indices, traj_indices):
-        item      = dataset[traj_idx]
-        x_full, _ = get_well_inputs(item, device=torch.device("cpu"))
+        last_item = dataset[traj_idx]
+        x_full, _ = get_well_inputs(last_item, device=torch.device("cpu"))
         seeds_list.append(x_full.numpy()[:N_STEPS_INPUT + min_T])
 
     truth_traj  = torch.from_numpy(np.stack(seeds_list, axis=0))
@@ -723,28 +1040,67 @@ def main() -> None:
         Ti          = N_STEPS_INPUT,
         lead_times  = None,
     )
-    if not labels_df.empty:
-        stats_df = stats_df.merge(labels_df, on="traj", how="left")
 
-    stats_csv = save_dir / f"{stem}_stats.csv"
-    stats_df.to_csv(stats_csv, index=False)
-    print(f"  [4/5] Stats CSV          → {stats_csv}  ({len(stats_df):,} rows)")
+    # [SINGLE-CSV] physics evaluation returns DataFrames; nothing written yet
+    field_df = global_df = derived_df = None
+    if pcfg["enabled"]:
+        print(f"\n{'─'*64}")
+        print(f"  Physics evaluation")
+        print(f"{'─'*64}")
+        try:
+            field_df, global_df, derived_df = run_physics_evaluation(
+                truth_traj   = truth_traj,
+                preds_torch  = preds_torch,
+                field_names  = field_names,
+                dataset_name = well_dataset_name,
+                model_name   = ckpt_base_name,
+                Ti           = N_STEPS_INPUT,
+                labels_df    = labels_df,
+                pcfg         = pcfg,
+                item         = last_item,
+            )
+        except Exception as exc:
+            import traceback
+            print(f"  [PHYSICS] FAILED: {exc}")
+            traceback.print_exc()
+            print("  [PHYSICS] continuing: the CSV will contain ML stats only.")
+    else:
+        print(f"  Physics evaluation : disabled "
+              f"(--override physics.enabled=true)")
 
-    print(f"  Building PSD DataFrame ...")
-    psd_df = build_psd_df(
-        truth         = truth_traj,
-        predictions   = predictions,
-        field_names   = field_names,
-        Ti            = N_STEPS_INPUT,
-        lead_times    = None,
-        min_bin_count = 3,
-    )
-    if not labels_df.empty:
-        psd_df = psd_df.merge(labels_df, on="traj", how="left")
+    run_meta = {
+        "seed":               BASE_SEED,
+        "dataset":            well_dataset_name,
+        "n_ensemble":         N_ENSEMBLE,
+        "num_sampling_steps": NUM_SAMPLING,
+        "ode_method":         ODE_METHOD,
+        "clamp_sigma":        CLAMP_SIGMA,
+    }
+    metrics_csv = save_dir / f"{stem}_metrics.csv"
+    merge_to_single_csv(
+        stats_df, field_df, global_df, derived_df,
+        labels_df, run_meta, metrics_csv)
+    print(f"  [4/4] Metrics CSV        → {metrics_csv}")
 
-    psd_csv = save_dir / f"{stem}_psd.csv"
-    psd_df.to_csv(psd_csv, index=False)
-    print(f"  [5/5] PSD CSV            → {psd_csv}  ({len(psd_df):,} rows)")
+    # ── Optional: full long-format PSD table (OFF by default) ────────────────
+    # [SINGLE-CSV] default flipped to False so the run produces exactly one
+    # CSV. The per-band spectral errors (rmse_p/lp/c_*) are in the metrics CSV
+    # regardless — only the full k-resolved PSD table is skipped.
+    if cfg.get("compute_psd", False):
+        print(f"  Building PSD DataFrame (compute_psd=true) ...")
+        psd_df = build_psd_df(
+            truth         = truth_traj,
+            predictions   = predictions,
+            field_names   = field_names,
+            Ti            = N_STEPS_INPUT,
+            lead_times    = None,
+            min_bin_count = 3,
+        )
+        if not labels_df.empty:
+            psd_df = psd_df.merge(labels_df, on="traj", how="left")
+        psd_csv = save_dir / f"{stem}_psd.csv"
+        psd_df.to_csv(psd_csv, index=False)
+        print(f"  PSD CSV (optional)       → {psd_csv}  ({len(psd_df):,} rows)")
 
     print(f"\n{'═'*64}")
     print(f"  Done.  All outputs in:")

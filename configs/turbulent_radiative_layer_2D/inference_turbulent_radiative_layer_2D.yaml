@@ -27,7 +27,7 @@ well_dataset_name: "turbulent_radiative_layer_2D"
 # 1-scale models with different wavelets
 #ckpt_name: "WaveletFlow_turbulent_radiative_layer_2D_1scale_haar_v4.0_20260503_215441-epoch=193-train_loss=0.0181-val_loss=0.0153_portable.ckpt"
 #ckpt_name: "WaveletFlow_turbulent_radiative_layer_2D_1scale_db4_v4.0_20260503_215441-epoch=183-train_loss=0.0169-val_loss=0.0141_portable.ckpt"
-ckpt_name: "WaveletFlow_turbulent_radiative_layer_2D_1scale_db6_v4.0_20260503_215615-epoch=189-train_loss=0.0172-val_loss=0.0153_portable.ckpt"
+#ckpt_name: "WaveletFlow_turbulent_radiative_layer_2D_1scale_db6_v4.0_20260503_215615-epoch=189-train_loss=0.0172-val_loss=0.0153_portable.ckpt"
 
 # Dataset
 split:     "test"
@@ -40,3 +40,5 @@ n_steps_input:      4    # Ti — must match the value used during training
 num_sampling_steps: 20   # ODE integration steps per prediction
 n_ensemble:         8    # total ensemble members (split across GPUs)
 verbose:            true
+seed:               0
+run_tag:            "seed0"

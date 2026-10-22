@@ -1,42 +1,36 @@
-"""
-train_latent.py — Training script for LatentFlowModule.
+r"""
+train_latent_fm.py
+------------------
+Latent Flow Matching (LFM) baseline trainer.
 
-Diff from train.py
-──────────────────
-Three lines change relative to the wavelet_fm train.py:
+A near-verbatim sibling of ``train_wavelet_fm.py``: same CLI, same data module,
+same experiment manager, same Trainer wiring. The only differences are
 
-  1. Import LatentFlowModule instead of WaveletFlowModule
-  2. Parse vae_cfg  from config.vae  instead of wavelet_cfg from config.wavelet
-  3. Pass  vae_cfg  to the module constructor
+  * no wavelet / loss.scale_weights block (the FM is single-scale in latent space);
+  * an ``[autoencoder]`` block pointing at a pre-trained LOLA autoencoder run;
+  * the model is a :class:`LatentFlowModule` instead of a WaveletFlowModule.
 
-Everything else (datamodule, trainer, callbacks, loggers, experiment manager,
-normalizer, field discovery) is IDENTICAL — copy-paste from your existing
-train.py and apply the three changes below.
-
-The three-line diff is marked with  # ← CHANGED  comments.
+The frozen autoencoder is loaded once here and handed to the module.
 """
 
-from the_well.data.normalization import ZScoreNormalization
-from the_well.data import WellDataModule
 import pytorch_lightning as pl
 import argparse
-import fsspec
-import munch
-import torch
-import toml
-import yaml
 import datetime
+import torch
+import munch
+import toml
 import sys
 import os
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-# ── project imports ───────────────────────────────────────────────────────────
-from waveletflux.utils.configs import VelocityNetConfig, FlowMatchingConfig, OptimizerConfig, LatentVAEConfig
-from waveletflux.utils.augmentations import compose_augmentation
+from waveletflux.utils.configs import VelocityNetConfig, FlowMatchingConfig, OptimizerConfig
+from waveletflux.utils.augmentations import compose_augmentation, compose_transformation
 from waveletflux.utils.well_data import WellDataModuleLightning
-from waveletflux.modules.latent_fm import LatentFlowModule                     
+from waveletflux.utils.latent_norm import load_lola_autoencoder
+from waveletflux.modules.latent_fm import LatentFlowModule
 from waveletflux.utils.experiment import ExperimentManager
+
 
 def get_rank():
     return int(os.environ.get("RANK", "0"))
@@ -45,16 +39,16 @@ def get_rank():
 RANK     = get_rank()
 is_rank0 = (RANK == 0)
 
-print(f"[RANK {RANK}] starting train.py", flush=True)
+print(f"[RANK {RANK}] starting train_latent_fm.py", flush=True)
 
 # ─────────────────────────────────────────────────────────────────────────────
 # CLI
 # ─────────────────────────────────────────────────────────────────────────────
 
-parser = argparse.ArgumentParser(prog='LatentFlow', description='Latent Flow Matching')
+parser = argparse.ArgumentParser(prog='LatentFlow', description='Latent Flow Matching baseline')
 parser.add_argument('-c', '--config',    type=str, required=True, help='TOML config file')
 parser.add_argument('-n', '--num_nodes', type=int, required=True, help='Number of cluster nodes')
-parser.add_argument('-d', '--devices',  type=int, required=True, help='GPUs per node')
+parser.add_argument('-d', '--devices',   type=int, required=True, help='GPUs per node')
 args = parser.parse_args()
 
 num_nodes            = args.num_nodes
@@ -66,17 +60,11 @@ num_devices          = num_nodes * num_devices_per_node
 # ─────────────────────────────────────────────────────────────────────────────
 
 config = munch.munchify(toml.load(args.config))
-
 pl.seed_everything(config.random.seed)
 
 lt_train = config.lightning.trainer
 torch.set_float32_matmul_precision(lt_train.matmul_precision)
 
-# ─────────────────────────────────────────────────────────────────────────────
-# Typed configs  (all TOML → Python translation happens here, once)
-# ─────────────────────────────────────────────────────────────────────────────
-
-vae_cfg           = LatentVAEConfig.from_config(config.vae)               
 velocity_net_cfg  = VelocityNetConfig.from_config(config.velocity_net)
 flow_matching_cfg = FlowMatchingConfig.from_config(config.flow_matching, config.sampling)
 optimizer_cfg     = OptimizerConfig.from_config(config.optimizer, config.scheduler, config.train)
@@ -87,61 +75,84 @@ optimizer_cfg     = OptimizerConfig.from_config(config.optimizer, config.schedul
 
 train_cfg = config.train
 
-base_data_module = WellDataModule(
-    well_base_path     = config.path.well_base_path,
-    well_dataset_name  = config.path.well_dataset_name,
-    n_steps_input      = train_cfg.n_steps_input,
-    n_steps_output     = train_cfg.n_steps_output,
-    max_rollout_steps  = train_cfg.max_rollout_steps,
-    batch_size         = train_cfg.batch_size,
-    use_normalization  = False,
-    normalization_type = None,
-    transform          = compose_augmentation(*train_cfg.augmentations),
-    data_workers       = config.lightning.datamodules.data_workers,
-    world_size         = 1,   # Lightning manages distribution
-    rank               = 0,
+augmentation = (
+    compose_augmentation(*train_cfg.augmentations)
+    if train_cfg.augmentations else None
+)
+transformation = (
+    compose_transformation(*train_cfg.transformations)
+    if train_cfg.transformations else None
 )
 
 data_module = WellDataModuleLightning(
-    base_data_module,
-    train_shuffle   = train_cfg.train_shuffle,
-    val_shuffle     = train_cfg.val_shuffle,
-    test_shuffle    = train_cfg.test_shuffle,
-    rollout_shuffle = train_cfg.rollout_shuffle,
-    target_dtype    = eval(train_cfg.target_dtype),
+    well_base_path    = config.path.well_base_path,
+    well_dataset      = config.path.well_dataset_name,
+    stats_path        = config.path.stats_path,
+    n_steps_input     = config.train.n_steps_input,
+    n_steps_output    = config.train.n_steps_output,
+    max_rollout_steps = config.train.max_rollout_steps,
+    batch_size        = config.train.batch_size,
+    num_workers       = config.lightning.datamodules.data_workers,
+    train_shuffle     = train_cfg.train_shuffle,
+    val_shuffle       = train_cfg.val_shuffle,
+    test_shuffle      = train_cfg.test_shuffle,
+    target_dtype      = eval(train_cfg.target_dtype),
+    augmentation      = augmentation,
+    transformation    = transformation,
 )
 
-# Load normalization stats (computed from training data) and create normalizer instance
-with fsspec.open(config.path.stats_path, mode='r') as f:
-    stats = yaml.safe_load(f)
+data_module.setup()
 
-normalizer = ZScoreNormalization(
-    stats,
-    core_field_names          = base_data_module.train_dataset.core_field_names,
-    core_constant_field_names = base_data_module.train_dataset.core_constant_field_names,
-)
-
-data_shape  = base_data_module.train_dataset.metadata.spatial_resolution
-meta_fields = base_data_module.train_dataset.metadata.field_names
+data_shape  = data_module.train_dataset.metadata.spatial_resolution
+meta_fields = data_module.train_dataset.metadata.field_names
 field_names = [item for sublist in meta_fields.values() for item in sublist]
-in_channels = len(field_names)
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Frozen autoencoder  (loaded once, handed to the module)
+# ─────────────────────────────────────────────────────────────────────────────
+
+ae_block = config.autoencoder
+autoencoder, ae_cfg, pix_mean, pix_std, pix_transform = load_lola_autoencoder(
+    run_dir     = ae_block.get('run_dir', None),
+    config_yaml = ae_block.get('config_yaml', None),
+    state_path  = ae_block.get('state_path', None),
+)
+ae_state_path = ae_block.get('state_path', None) or os.path.join(ae_block.run_dir, 'state.pth')
+
+assert len(field_names) == len(pix_mean), (
+    f"field_names has {len(field_names)} fields but the autoencoder was trained "
+    f"with {len(pix_mean)} field statistics — check dataset/field ordering."
+)
+
+if is_rank0:
+    print(f"[AE] loaded {ae_cfg.get('name', 'dcae')} | pix stats "
+          f"mean={pix_mean.tolist()} std={pix_std.tolist()} transform={pix_transform}")
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Model
 # ─────────────────────────────────────────────────────────────────────────────
 
-model = LatentFlowModule(                                            
-    in_channels       = in_channels,
+model = LatentFlowModule(
+    in_channels       = len(field_names),
     field_names       = field_names,
     data_shape        = data_shape,
     n_steps_output    = train_cfg.n_steps_output,
-    scale_weights     = config.loss.scale_weights,
-    vae_cfg           = vae_cfg,                                          
     velocity_net_cfg  = velocity_net_cfg,
     flow_matching_cfg = flow_matching_cfg,
     optimizer_cfg     = optimizer_cfg,
-    normalizer        = normalizer,
+    autoencoder       = autoencoder,
+    ae_cfg            = ae_cfg,
+    ae_state_path     = ae_state_path,
+    pix_mean          = pix_mean,
+    pix_std           = pix_std,
+    pix_transform     = pix_transform,
 )
+
+if is_rank0:
+    print(f"[LFM] latent: {model.lat_channels} channels x {model.lat_shape} "
+          f"(spatial factor {model.spatial_factor}), "
+          f"n_levels={velocity_net_cfg.n_levels}, "
+          f"net params={sum(p.numel() for p in model.net.parameters()):.3e}")
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Experiment manager
@@ -150,7 +161,7 @@ model = LatentFlowModule(
 model.experiment_manager = ExperimentManager(
     base_dir           = config.path.experiments_path,
     experiment_name    = config.main.exp_name,
-    overwrite          = False, # config.resume.ckpt is not None
+    overwrite          = False,
     loggers            = config.loggers.loggers,
     callbacks          = config.callbacks.callbacks,
     log_every_n_epochs = config.loggers.log_every_n_epochs,
@@ -202,6 +213,9 @@ if is_rank0:
     em.append_readme(f'> Total devices        : {num_devices}\n')
     em.append_readme(f'> Local batch size     : {train_cfg.batch_size}\n')
     em.append_readme(f'> Global batch size    : {train_cfg.batch_size * num_devices}\n')
+    em.append_readme(f'> Autoencoder          : {ae_cfg.get("name", "dcae")}\n')
+    em.append_readme(f'> Latent               : {model.lat_channels} x {model.lat_shape} '
+                     f'(f{model.spatial_factor})\n')
     em.append_readme('')
 
     start_time = datetime.datetime.now()
@@ -212,10 +226,9 @@ if is_rank0:
 # Train
 # ─────────────────────────────────────────────────────────────────────────────
 
-# resume checkpoint if specified
 if not config.resume.ckpt:
     trainer.fit(model, datamodule=data_module)
-else:   
+else:
     trainer.fit(model, datamodule=data_module, ckpt_path=config.resume.ckpt)
 
 if is_rank0:

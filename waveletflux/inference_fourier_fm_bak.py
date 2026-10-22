@@ -29,6 +29,19 @@ Trajectory subsampling
   CLI override:
     torchrun ... inference.py --config ... --override n_traj_per_file=3
 
+Performance reporting
+---------------------
+  Inference-only timing is measured with a barrier *before* the loop and
+  another barrier *after* it, so the reported wall-clock time is the max
+  across all ranks (i.e. the true end-to-end latency, not a local average).
+  DataFrame construction, file I/O, and shard merging are excluded.
+
+  Metrics written to <stem>_perf.yaml (rank 0 only):
+    wall_clock_s          true wall-clock inference time  (max across ranks)
+    throughput_steps_s    total rollout-steps generated globally / wall_clock_s
+    throughput_frames_s   total frames  (step × H × W)  generated globally / wall_clock_s
+    gpu_peak_mem_GiB_*    per-rank peak GPU memory allocated during inference
+
 Outputs (all written by rank 0)
 --------------------------------
   <stem>_traj.pkl       full predictions  (N_TRAJ, N_ENS, T, H, W, C)
@@ -37,6 +50,7 @@ Outputs (all written by rank 0)
                         + one column per scalar condition (e.g. Rayleigh, Prandtl)
   <stem>_psd.csv        isotropic PSD in long format
                         + one column per scalar condition
+  <stem>_perf.yaml      inference-only performance counters (see above)
 
 Usage — single device (MPS / CPU)
     python inference.py --config configs/trl2d/inference_trl2d.yaml
@@ -154,6 +168,94 @@ def barrier(world_size: int, device: torch.device | None = None) -> None:
     if world_size > 1:
         device_ids = [device.index] if device is not None and device.type == "cuda" else None
         dist.barrier(device_ids=device_ids)
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Performance reporting
+# ─────────────────────────────────────────────────────────────────────────────
+
+def report_perf(
+    wall_s:      float,
+    total_steps: int,
+    H:           int,
+    W:           int,
+    world_size:  int,
+    device:      torch.device,
+    save_path:   Path,
+    rank:        int,
+) -> dict:
+    """
+    Reduce timing/memory stats across ranks and write a YAML report (rank 0).
+
+    wall_s and total_steps are LOCAL values; the following reductions happen:
+      - wall_clock_s        : MAX across ranks  (true end-to-end latency)
+      - total_steps_global  : SUM across ranks  (all ensemble members × rollout steps)
+      - gpu_peak_mem_GiB    : gathered per-rank (reported individually)
+
+    Parameters
+    ----------
+    wall_s       : local wall-clock time from perf_counter (seconds)
+    total_steps  : n_ens_local × sum(n_rollout per trajectory) on this rank
+    H, W         : spatial dimensions of the field (for frame throughput)
+    world_size   : number of distributed ranks
+    device       : local torch device
+    save_path    : where to write the YAML report (rank 0 only)
+    rank         : this rank's index
+    """
+    # Peak GPU memory on this rank (bytes → GiB); 0 on CPU/MPS
+    peak_gib = (
+        torch.cuda.max_memory_allocated(device) / 2**30
+        if device.type == "cuda" else 0.0
+    )
+
+    if world_size > 1:
+        # Max wall time across ranks — reflects slowest rank (true latency)
+        t_tensor = torch.tensor(wall_s, dtype=torch.float64, device=device)
+        dist.all_reduce(t_tensor, op=dist.ReduceOp.MAX)
+        wall_max_s = t_tensor.item()
+
+        # Sum steps across ranks — total work done by the whole job
+        s_tensor = torch.tensor(float(total_steps), dtype=torch.float64, device=device)
+        dist.all_reduce(s_tensor, op=dist.ReduceOp.SUM)
+        total_steps_g = int(s_tensor.item())
+
+        # Per-rank peak GPU memory (for load-balance diagnostics)
+        mem_tensor = torch.tensor(peak_gib, dtype=torch.float64, device=device)
+        mem_all = [torch.zeros_like(mem_tensor) for _ in range(world_size)]
+        dist.all_gather(mem_all, mem_tensor)
+        peak_per_rank = {f"rank_{r}": round(m.item(), 3) for r, m in enumerate(mem_all)}
+    else:
+        wall_max_s    = wall_s
+        total_steps_g = total_steps
+        peak_per_rank = {"rank_0": round(peak_gib, 3)}
+
+    total_frames_g = total_steps_g * H * W
+    report = {
+        "wall_clock_s":        round(wall_max_s, 2),
+        "throughput_steps_s":  round(total_steps_g / wall_max_s, 1) if wall_max_s > 0 else 0,
+        "throughput_frames_s": round(total_frames_g / wall_max_s, 1) if wall_max_s > 0 else 0,
+        "total_steps_global":  total_steps_g,
+        "total_frames_global": total_frames_g,
+        "spatial_size_HW":     H * W,
+        "gpu_peak_mem_GiB":    peak_per_rank,
+    }
+
+    if rank == 0:
+        with open(save_path, "w") as fh:
+            yaml.dump(report, fh, default_flow_style=False, sort_keys=False)
+        print(
+            f"\n  ── Inference timing ───────────────────────────────────────\n"
+            f"  Wall clock (max across ranks) : {report['wall_clock_s']:.1f} s\n"
+            f"  Throughput                    : "
+            f"{report['throughput_steps_s']:,.0f} steps/s  |  "
+            f"{report['throughput_frames_s']:,.0f} frames/s\n"
+            f"  Total steps generated (global): {report['total_steps_global']:,}\n"
+            f"  Spatial size H×W              : {report['spatial_size_HW']:,}\n"
+            f"  Peak GPU memory (allocated)   : {peak_per_rank}\n"
+            f"  Perf report → {save_path}\n"
+            f"  ───────────────────────────────────────────────────────────\n"
+        )
+    return report
 
 
 # ─────────────────────────────────────────────────────────────────────────────
@@ -413,7 +515,22 @@ def main() -> None:
     local_targets = {}
     local_labels  = {}
 
-    t0 = time.perf_counter()
+    # ── Reset GPU peak-memory stats before the clock starts ───────────────────
+    # Do this BEFORE the barrier so the reset is not counted in inference time.
+    if device.type == "cuda":
+        torch.cuda.synchronize(device)
+        torch.cuda.reset_peak_memory_stats(device)
+
+    # Running counters for the perf report — accumulated inside the loop so
+    # they are always correct even if an exception is raised mid-way.
+    total_steps = 0   # n_ens_local × Σ n_rollout across trajectories
+    H = W = 1         # spatial dimensions, set on the first trajectory
+
+    # ── Synchronise all ranks before starting the clock ───────────────────────
+    # This ensures rank-0 setup overhead (prints, mkdir, etc.) is excluded from
+    # the timing, and that all ranks start counting at the same moment.
+    barrier(world_size, device)
+    t_start = time.perf_counter()
 
     with torch.inference_mode():
         for i, (traj_idx, n_steps) in enumerate(zip(traj_indices, n_steps_per_traj)):
@@ -450,6 +567,12 @@ def main() -> None:
             # (n_ens_local, 1, T, H, W, C) → (n_ens_local, T, H, W, C)
             preds_phys = preds_phys.squeeze(1)
 
+            # ── Accumulate perf counters per trajectory ───────────────────────
+            # Done immediately after rollout so the count is correct even if
+            # a later trajectory raises an exception.
+            H, W         = x_full.shape[-3], x_full.shape[-2]
+            total_steps += n_ens_local * n_rollout
+
             local_preds[i]   = preds_phys.cpu()
             local_targets[i] = x_full[N_STEPS_INPUT:].cpu()
 
@@ -458,9 +581,17 @@ def main() -> None:
             elif device.type == "mps":
                 torch.mps.empty_cache()
 
-    elapsed = time.perf_counter() - t0
-    print(f"  [rank {rank}] inference done in {elapsed:.1f}s  "
-          f"({n_ens_local} member(s) x {N_TRAJ} trajectories)")
+    # ── Stop clock — synchronise CUDA kernels before reading perf_counter ─────
+    if device.type == "cuda":
+        torch.cuda.synchronize(device)
+    wall_s = time.perf_counter() - t_start
+
+    # ── Barrier before reduction so wall_max reflects the slowest rank ────────
+    barrier(world_size, device)
+
+    # ── Gather and report performance across all ranks ────────────────────────
+    perf_yaml_path = save_dir / f"{stem}_perf.yaml"
+    report_perf(wall_s, total_steps, H, W, world_size, device, perf_yaml_path, rank)
 
     # ── Write shard to shared filesystem ─────────────────────────────────────
     path = write_shard(
@@ -548,7 +679,7 @@ def main() -> None:
             },
             fh, protocol=pickle.HIGHEST_PROTOCOL,
         )
-    print(f"\n  [1/4] Full pickle        → {full_pkl}")
+    print(f"\n  [1/5] Full pickle        → {full_pkl}")
 
     # ── 2. Single-member pickle (small download for plotting) ─────────────────
     single_pkl = save_dir / f"{ckpt_base_name}_nsampling{NUM_SAMPLING}_nens1_traj.pkl"
@@ -566,9 +697,12 @@ def main() -> None:
             },
             fh, protocol=pickle.HIGHEST_PROTOCOL,
         )
-    print(f"  [2/4] Single-member pkl  → {single_pkl}")
+    print(f"  [2/5] Single-member pkl  → {single_pkl}")
 
-    # ── 3 & 4. Stats and PSD DataFrames ──────────────────────────────────────
+    # ── 3. Performance report (already written by report_perf) ────────────────
+    print(f"  [3/5] Perf report        → {perf_yaml_path}")
+
+    # ── 4 & 5. Stats and PSD DataFrames ──────────────────────────────────────
     print(f"\n  Rebuilding full truth tensor (Ti={N_STEPS_INPUT}) ...")
 
     seeds_list = []
@@ -594,7 +728,7 @@ def main() -> None:
 
     stats_csv = save_dir / f"{stem}_stats.csv"
     stats_df.to_csv(stats_csv, index=False)
-    print(f"  [3/4] Stats CSV          → {stats_csv}  ({len(stats_df):,} rows)")
+    print(f"  [4/5] Stats CSV          → {stats_csv}  ({len(stats_df):,} rows)")
 
     print(f"  Building PSD DataFrame ...")
     psd_df = build_psd_df(
@@ -610,7 +744,7 @@ def main() -> None:
 
     psd_csv = save_dir / f"{stem}_psd.csv"
     psd_df.to_csv(psd_csv, index=False)
-    print(f"  [4/4] PSD CSV            → {psd_csv}  ({len(psd_df):,} rows)")
+    print(f"  [5/5] PSD CSV            → {psd_csv}  ({len(psd_df):,} rows)")
 
     print(f"\n{'═'*64}")
     print(f"  Done.  All outputs in:")

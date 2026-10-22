@@ -1,7 +1,7 @@
 #!/bin/bash -l
-#PBS -N WaveletFlow_rayleigh_benard_1scale_db6_v4.0_inference
-#PBS -o /glade/work/gaccarino/waveletflux/scripts/logs/rayleigh_benard/WaveletFlow_rayleigh_benard_1scale_db6_v4.0_inference.out
-#PBS -e /glade/work/gaccarino/waveletflux/scripts/logs/rayleigh_benard/WaveletFlow_rayleigh_benard_1scale_db6_v4.0_inference.err
+#PBS -N WaveletFlow_rayleigh_benard_3scales_db2_v4.0_inference_seed168
+#PBS -o /glade/work/gaccarino/waveletflux/scripts/logs/rayleigh_benard/WaveletFlow_rayleigh_benard_3scales_db2_v4.0_inference_seed168.out
+#PBS -e /glade/work/gaccarino/waveletflux/scripts/logs/rayleigh_benard/WaveletFlow_rayleigh_benard_3scales_db2_v4.0_inference_seed168.err
 
 # === Project / Queue ===
 #PBS -A UCLB0062
@@ -16,7 +16,7 @@ cd $PBS_O_WORKDIR
 
 DATASET_NAME="rayleigh_benard"
 REPO=/glade/work/gaccarino/waveletflux
-CONFIG=${REPO}/configs/${DATASET_NAME}/inference_${DATASET_NAME}.yaml
+CONFIG=${REPO}/configs/${DATASET_NAME}/inference_${DATASET_NAME}_seed.yaml
 N_GPUS=4
 N_ENSEMBLE=8
 NUM_SAMPLING=50
