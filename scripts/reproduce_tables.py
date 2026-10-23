@@ -16,5 +16,10 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from waveletflux.analysis import paper_tables as P
 
 if __name__ == "__main__":
-    summ = P.build_all()
+    import argparse
+    ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
+    ap.add_argument("--mean-only", action="store_true",
+                    help="LaTeX cells show the seed mean only (no +- std); same as SHOW_STD=False")
+    args = ap.parse_args()
+    summ = P.build_all(show_std=not args.mean_only)
     print("\nrelative std across seeds (%):\n", summ.to_string())
