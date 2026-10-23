@@ -38,31 +38,33 @@ DEFAULT_SHOW_STD = True
 
 
 @contextlib.contextmanager
-def _std(show, threshold=None):
+def _std(show, rel=None):
     """For one table: set the +- std switch (None = DEFAULT_SHOW_STD) and, in
-    mean-only mode, the std bound stated in the caption (None = keep current)."""
-    saved = T.STD_IN_LATEX, T.STD_THRESHOLD
+    mean-only mode, the relative std bound (fraction of the mean, None = keep 0.05)."""
+    saved = T.STD_IN_LATEX, T.STD_REL
     T.STD_IN_LATEX = DEFAULT_SHOW_STD if show is None else bool(show)
-    if threshold is not None:
-        T.STD_THRESHOLD = float(threshold)
+    if rel is not None:
+        T.STD_REL = float(rel)
     try:
         yield
     finally:
-        T.STD_IN_LATEX, T.STD_THRESHOLD = saved
+        T.STD_IN_LATEX, T.STD_REL = saved
 
 
-def seeds_note(*stds) -> str:
+def seeds_note(mean=None, std=None) -> str:
     """Caption sentence describing the cells. With std shown: "Mean +- std ...".
-    Mean only: states the std bound, and mentions the mark only if some cell of
-    `stds` (the std frames of the table) actually exceeds it."""
+    Mean only: states the relative std bound, and mentions the * mark only if
+    some cell of (mean, std) actually exceeds it."""
     if T.STD_IN_LATEX:
         return r" Mean\,$\pm$\,std over three inference seeds (42, 84, 168)."
-    thr = f"{T.STD_THRESHOLD:g}"
-    if T.any_exceeds(*stds):
-        return (r" Mean over three inference seeds (42, 84, 168); the standard deviation across seeds "
-                rf"is below {thr} for all entries except those marked {T.STD_MARK}.")
-    return (r" Mean over three inference seeds (42, 84, 168); the standard deviation across seeds "
-            rf"is below {thr} for all entries.")
+    pct = f"{100 * T.STD_REL:g}"
+    base = (r" Mean over three inference seeds (42, 84, 168); the standard deviation across seeds "
+            rf"is below {pct}\% of the mean for all entries")
+    if mean is not None and std is not None and T.any_exceeds(mean, std):
+        return base + rf" except those marked {T.STD_MARK}."
+    return base + "."
+
+
 DET_NOTE = r" Deterministic baselines (WNO, FNO, TFNO) are single runs."
 LF_NOTE = r" LatentFM$_{\div 64}$ is evaluated on Rayleigh--B\'enard only."
 
@@ -90,25 +92,25 @@ def load_all(verbose=True):
 # ---------------------------------------------------------------------------
 # Main text
 # ---------------------------------------------------------------------------
-def t1_wavelet_selection(df, show_std=None, show_std_s10=None, std_threshold=None, std_threshold_s10=None):
+def t1_wavelet_selection(df, show_std=None, show_std_s10=None, std_rel=None, std_rel_s10=None):
     """Table 1 and Table S10: band- and horizon-averaged spectral coherence RMSE.
     show_std: Table 1 cells; show_std_s10: S10 cells (defaults to show_std).
-    std_threshold(_s10): bound stated in the caption in mean-only mode."""
+    std_rel(_s10): bound stated in the caption in mean-only mode."""
     sel = T.across_seeds(T.selection_table, df, models=C.ROWS_GEN, time_agg="horizon")
     bad = T.check_selection(sel[0])
     if bad:
         raise ValueError("wavelet selection changed: " + "; ".join(bad))
-    with _std(show_std, std_threshold):
+    with _std(show_std, std_rel):
         _emit("T1_wavelet_selection", sel, T.latex_selection(
             sel[0], sel[1],
             r"Spectral Coherence RMSE averaged across \textit{Low}, \textit{Mid} and \textit{High} "
             r"frequency bands and rollout horizons per PDE system. For each WFM variant, \textbf{bold} "
-            r"denotes the optimal wavelet representation used in all subsequent experiments." + LF_NOTE + seeds_note(sel[1]),
+            r"denotes the optimal wavelet representation used in all subsequent experiments." + LF_NOTE + seeds_note(sel[0], sel[1]),
             "tab:avg_sc_rmse_gen_wavelets", C.GROUPS_GEN))
     s10 = T.s10_table(sel[0], sel[1])
     s10.to_csv(T.TABLES_CSV / "S10_optimal_wavelets.csv", index=False)
     with _std(show_std if show_std_s10 is None else show_std_s10,
-              std_threshold if std_threshold_s10 is None else std_threshold_s10):
+              std_rel if std_rel_s10 is None else std_rel_s10):
         (T.TABLES_TEX / "S10_optimal_wavelets.tex").write_text(latex_s10(s10))
     if VERBOSE:
         print("  wrote S10_optimal_wavelets")
@@ -140,7 +142,7 @@ def latex_s10(s10):
            + (r"the selected wavelet's score, mean\,$\pm$\,std over three inference seeds (42, 84, 168); "
               r"the selection is made on the seed mean."
               if T.STD_IN_LATEX else
-              r"the selected wavelet's score; the selection is made on the seed mean." + seeds_note(s10["std"])))
+              r"the selected wavelet's score; the selection is made on the seed mean." + seeds_note(s10["mean"], s10["std"])))
     return T._env(cap, "si-tab:optimal_wavelets", "lccc", body)
 
 
@@ -167,28 +169,28 @@ def t2_s19_s20_profiling():
 # ---------------------------------------------------------------------------
 # Appendix: horizons and bands
 # ---------------------------------------------------------------------------
-def s11_vrmse(df, show_std=None, std_threshold=None):
-    with _std(show_std, std_threshold):
+def s11_vrmse(df, show_std=None, std_rel=None):
+    with _std(show_std, std_rel):
         r = T.across_seeds(T.horizon_table, df, metric="vrmse", models=C.ROWS_ALL)
         return _emit("S11_vrmse", r, T.latex_table(
-            *r[:2], "VRMSE across rollout horizons for all models and PDE systems." + DET_NOTE + LF_NOTE + seeds_note(r[1]),
+            *r[:2], "VRMSE across rollout horizons for all models and PDE systems." + DET_NOTE + LF_NOTE + seeds_note(r[0], r[1]),
             "si-tab:appendix_vrmse", C.GROUPS_ALL, corner="Rollout", top_labels=C.PDE_LABELS, resize=True))
 
 
-def s12_crps(df, show_std=None, std_threshold=None):
-    with _std(show_std, std_threshold):
+def s12_crps(df, show_std=None, std_rel=None):
+    with _std(show_std, std_rel):
         r = T.across_seeds(T.horizon_table, df, metric="crps", models=C.ROWS_GEN)
         return _emit("S12_crps", r, T.latex_table(
-            *r[:2], "CRPS across rollout horizons for all models and PDE systems." + LF_NOTE + seeds_note(r[1]),
+            *r[:2], "CRPS across rollout horizons for all models and PDE systems." + LF_NOTE + seeds_note(r[0], r[1]),
             "tab:appendix_crps", C.GROUPS_GEN, corner="Rollout", top_labels=C.PDE_LABELS, resize=True))
 
 
-def s13_spectral_bands(df, show_std=None, std_threshold=None):
-    with _std(show_std, std_threshold):
+def s13_spectral_bands(df, show_std=None, std_rel=None):
+    with _std(show_std, std_rel):
         r = T.across_seeds(T.bands_table, df, models=C.ROWS_GEN, time_agg="horizon")
         return _emit("S13_spectral_bands", r, T.latex_table(
             *r[:2], r"Spectral coherence RMSE across \textit{Low}, \textit{Mid}, and \textit{High} "
-            r"frequency bands for all models and PDE systems, averaged over rollout horizons." + LF_NOTE + seeds_note(r[1]),
+            r"frequency bands for all models and PDE systems, averaged over rollout horizons." + LF_NOTE + seeds_note(r[0], r[1]),
             "tab:appendix_spectral", C.GROUPS_GEN, corner="Frequency Bands",
             top_labels=C.PDE_LABELS, resize=True))
 
@@ -209,37 +211,37 @@ _PARAM = {
 }
 
 
-def _crps_param(df, name, show_std=None, show_std_main=None, std_threshold=None, std_threshold_main=None):
+def _crps_param(df, name, show_std=None, show_std_main=None, std_rel=None, std_rel_main=None):
     pde, param, lab, cap, corner, lab3, name3 = _PARAM[name]
     r = T.across_seeds(T.param_table, df, pde=pde, param=param, models=C.ROWS_GEN, time_agg="step")
     fmt = C.PARAM_LABELS[param]
-    with _std(show_std, std_threshold):
-        _emit(name, r, T.latex_table(*r[:2], cap + seeds_note(r[1]), lab, C.GROUPS_GEN, corner=corner,
+    with _std(show_std, std_rel):
+        _emit(name, r, T.latex_table(*r[:2], cap + seeds_note(r[0], r[1]), lab, C.GROUPS_GEN, corner=corner,
                                      sub_labels=fmt, resize=param == "tcool"))
     if name3:                                   # main-text Table 3 subtable: first three values
         m, s, n = r
         cols = list(m.columns)[:3]
         sub = (m[cols], s[cols], n[cols])
         with _std(show_std if show_std_main is None else show_std_main,
-                  std_threshold if std_threshold_main is None else std_threshold_main):
-            _emit(name3, sub, T.latex_table(*sub[:2], cap + seeds_note(sub[1]), lab3, C.GROUPS_GEN,
+                  std_rel if std_rel_main is None else std_rel_main):
+            _emit(name3, sub, T.latex_table(*sub[:2], cap + seeds_note(sub[0], sub[1]), lab3, C.GROUPS_GEN,
                                             corner=corner, sub_labels=fmt))
     return r
 
 
-def s14_crps_tcool(df, show_std=None, show_std_main=None, std_threshold=None, std_threshold_main=None):
+def s14_crps_tcool(df, show_std=None, show_std_main=None, std_rel=None, std_rel_main=None):
     """S14 (show_std), and Table 3a = its first three t_cool values (show_std_main,
     defaults to show_std)."""
-    return _crps_param(df, "S14_crps_tcool", show_std, show_std_main, std_threshold, std_threshold_main)
+    return _crps_param(df, "S14_crps_tcool", show_std, show_std_main, std_rel, std_rel_main)
 
 
-def s16_crps_ra(df, show_std=None, show_std_main=None, std_threshold=None, std_threshold_main=None):
+def s16_crps_ra(df, show_std=None, show_std_main=None, std_rel=None, std_rel_main=None):
     """S16 (show_std), and Table 3b (show_std_main, defaults to show_std)."""
-    return _crps_param(df, "S16_crps_Ra", show_std, show_std_main, std_threshold, std_threshold_main)
+    return _crps_param(df, "S16_crps_Ra", show_std, show_std_main, std_rel, std_rel_main)
 
 
-def s17_crps_pr(df, show_std=None, std_threshold=None):
-    return _crps_param(df, "S17_crps_Pr", show_std, None, std_threshold)
+def s17_crps_pr(df, show_std=None, std_rel=None):
+    return _crps_param(df, "S17_crps_Pr", show_std, None, std_rel)
 
 
 _SPEC = {
@@ -255,51 +257,51 @@ _SPEC = {
 def _spectral_param(df, name):
     pde, param, lab, cap, plab = _SPEC[name]
     r = T.across_seeds(T.spectral_param_table, df, pde=pde, param=param, models=C.ROWS_GEN, time_agg="step")
-    return _emit(name, r, T.latex_spectral_param(*r[:2], cap + seeds_note(r[1]), lab, C.GROUPS_GEN, plab, param))
+    return _emit(name, r, T.latex_spectral_param(*r[:2], cap + seeds_note(r[0], r[1]), lab, C.GROUPS_GEN, plab, param))
 
 
-def s15_spectral_tcool(df, show_std=None, std_threshold=None):
-    with _std(show_std, std_threshold):
+def s15_spectral_tcool(df, show_std=None, std_rel=None):
+    with _std(show_std, std_rel):
         return _spectral_param(df, "S15_spectral_tcool")
 
 
-def s18a_spectral_ra(df, show_std=None, std_threshold=None):
-    with _std(show_std, std_threshold):
+def s18a_spectral_ra(df, show_std=None, std_rel=None):
+    with _std(show_std, std_rel):
         return _spectral_param(df, "S18a_spectral_Ra")
 
 
-def s18b_spectral_pr(df, show_std=None, std_threshold=None):
-    with _std(show_std, std_threshold):
+def s18b_spectral_pr(df, show_std=None, std_rel=None):
+    with _std(show_std, std_rel):
         return _spectral_param(df, "S18b_spectral_Pr")
 
 
 # ---------------------------------------------------------------------------
 # Rebuttal additions
 # ---------------------------------------------------------------------------
-def r1_rb_latentfm(df, show_std=None, std_threshold=None):
+def r1_rb_latentfm(df, show_std=None, std_rel=None):
     """RB summary as shown in the rebuttal (selected wavelets + generative baselines).
     Optional: LatentFM is now also a row of every table with an RB column."""
-    with _std(show_std, std_threshold):
+    with _std(show_std, std_rel):
         rows = C.ROWS_BEST_GEN
         r = T.across_seeds(T.rb_summary_table, T.best_view(df, keep=C.GEN_MODELS), models=rows)
         return _emit("R1_rb_latentfm", r, T.latex_table(
             *r[:2], r"Rayleigh--B\'enard: spectral coherence RMSE per band (averaged over rollout horizons) "
             r"and CRPS per rollout horizon, including the latent-space baseline LatentFM$_{\div 64}$ "
-            r"(autoencoder of~\citet{rozet2025})." + seeds_note(r[1]),
+            r"(autoencoder of~\citet{rozet2025})." + seeds_note(r[0], r[1]),
             "tab:rb_latentfm", [C.BEST, C.GEN_MODELS], corner="Model", resize=True))
 
 
-def r2_ke_mae(gdf, show_std=None, std_threshold=None):
+def r2_ke_mae(gdf, show_std=None, std_rel=None):
     """Kinetic-energy relative MAE per horizon (uses the _global_ rows)."""
-    with _std(show_std, std_threshold):
+    with _std(show_std, std_rel):
         r = ke_table(T.best_view(gdf, keep=C.GEN_MODELS), C.ROWS_BEST_GEN)
         return _emit("R2_ke_mae", r, T.latex_table(
             *r[:2], r"Kinetic-energy relative MAE across rollout horizons (error normalised by the "
-            r"trajectory time-mean of the true kinetic energy)." + seeds_note(r[1]),
+            r"trajectory time-mean of the true kinetic energy)." + seeds_note(r[0], r[1]),
             "tab:ke_mae", C.GROUPS_BEST_GEN, corner="Rollout", top_labels=C.PDE_LABELS, resize=True))
 
 
-def r3_ic_perturbation(show_std=None, std_threshold_crps=None, std_threshold_spectral=None):
+def r3_ic_perturbation(show_std=None, std_rel_crps=None, std_rel_spectral=None):
     """TRL, WFM 3-scale haar under IC noise: CRPS per horizon and spectral per band."""
     with _std(show_std):
         ic = ic_tables(load_ic())
@@ -313,15 +315,15 @@ def r3_ic_perturbation(show_std=None, std_threshold_crps=None, std_threshold_spe
             s.index = m.index
             n.index = m.index
             T.save(f"R3_ic_{key}", m, s, n)
-            thr = std_threshold_crps if key == "crps" else std_threshold_spectral
-            saved_thr = T.STD_THRESHOLD
+            thr = std_rel_crps if key == "crps" else std_rel_spectral
+            saved_rel = T.STD_REL
             if thr is not None:
-                T.STD_THRESHOLD = float(thr)
+                T.STD_REL = float(thr)
             tex = T.latex_table(m, s, f"TRL, WFM 3-scale (haar): {cap} under Gaussian perturbations of the "
                                 r"initial conditions with standard deviation $\eta\,\sigma_c$."
-                                + seeds_note(s), lab, [list(m.index)],
+                                + seeds_note(m, s), lab, [list(m.index)],
                                 corner="IC noise", rank=False)
-            T.STD_THRESHOLD = saved_thr
+            T.STD_REL = saved_rel
             (T.TABLES_TEX / f"R3_ic_{key}.tex").write_text(tex)
             if VERBOSE:
                 print(f"  wrote R3_ic_{key}")
@@ -349,32 +351,16 @@ def write_seed_spread():
     return summ.round(2)
 
 
-# Bound stated in mean-only captions, matched to each table's value scale:
-# 0.05 where entries are O(1) (VRMSE, TRL CRPS, kinetic energy), 0.01 where they
-# are O(0.1) or smaller (spectral coherence, RB CRPS), so the bound stays informative.
-RECOMMENDED_STD_THRESHOLD = {
-    "T1_wavelet_selection": 0.01, "S10_optimal_wavelets": 0.01,
-    "S11_vrmse": 0.05, "S12_crps": 0.01, "S13_spectral_bands": 0.01,
-    "S14_crps_tcool": 0.05, "T3_crps_tcool_main": 0.05,
-    "S16_crps_Ra": 0.01, "T3_crps_Ra_main": 0.01, "S17_crps_Pr": 0.01,
-    "S15_spectral_tcool": 0.01, "S18a_spectral_Ra": 0.01, "S18b_spectral_Pr": 0.01,
-    "R1_rb_latentfm": 0.01, "R2_ke_mae": 0.05, "R3_ic_crps": 0.05, "R3_ic_spectral": 0.01,
-}
-
-
-def build_all(verbose=True, show_std=True, std_threshold=None):
+def build_all(verbose=True, show_std=True, std_rel=None):
     """Build every table in paper order; returns the seed-spread summary.
 
     show_std: True/False for every table, or a dict {table name: bool} using the
     output names (e.g. {"T3_crps_tcool_main": False, "S15_spectral_tcool": False});
-    tables not in the dict use True."""
+    tables not in the dict use True.
+    std_rel: relative std bound for mean-only captions (fraction, default 0.05)."""
     f = (lambda n: show_std.get(n, True)) if isinstance(show_std, dict) else (lambda n: bool(show_std))
-    thr = dict(RECOMMENDED_STD_THRESHOLD)
-    if isinstance(std_threshold, dict):
-        thr.update(std_threshold)
-    elif std_threshold is not None:
-        thr = {k: float(std_threshold) for k in thr}
-    t = thr.get
+    # std_rel: None (5% everywhere), one fraction for all tables, or {table: fraction}
+    t = (lambda n: std_rel.get(n)) if isinstance(std_rel, dict) else (lambda n: std_rel)
     df, gdf = load_all(verbose)
     t1_wavelet_selection(df, f("T1_wavelet_selection"), f("S10_optimal_wavelets"),
                          t("T1_wavelet_selection"), t("S10_optimal_wavelets"))

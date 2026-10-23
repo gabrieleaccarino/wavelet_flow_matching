@@ -231,25 +231,24 @@ def spread_report(name, mean, std, n):
 # LaTeX
 # ===========================================================================
 # Mean-only mode (STD_IN_LATEX = False): cells whose across-seed std exceeds
-# STD_THRESHOLD get STD_MARK, and the caption states the bound (see std_note).
-STD_THRESHOLD = 0.05
-STD_MARK = r"$^{\dagger}$"
+# STD_REL x |mean| get STD_MARK, and the caption states the bound (see seeds_note).
+STD_REL = 0.05
+STD_MARK = r"$^{*}$"
 
 
-def exceeds(s) -> bool:
-    """True if a std value breaks the mean-only bound (single runs never do)."""
-    return s is not None and not pd.isna(s) and float(s) > STD_THRESHOLD
+def exceeds(v, s) -> bool:
+    """True if std s is above STD_REL of |mean v| (single runs never are)."""
+    if v is None or s is None or pd.isna(v) or pd.isna(s) or v == 0:
+        return False
+    return float(s) > STD_REL * abs(float(v))
 
 
-def any_exceeds(*stds) -> bool:
-    """True if any cell of the given std frames/series/scalars breaks the bound."""
-    for x in stds:
-        if x is None:
-            continue
-        arr = np.asarray(x.to_numpy() if hasattr(x, "to_numpy") else x, dtype=float).ravel()
-        if np.any(arr[~np.isnan(arr)] > STD_THRESHOLD):
-            return True
-    return False
+def any_exceeds(mean, std) -> bool:
+    """True if any cell of the (mean, std) frames/series breaks the relative bound."""
+    m = np.asarray(mean.to_numpy() if hasattr(mean, "to_numpy") else mean, dtype=float).ravel()
+    sd = np.asarray(std.to_numpy() if hasattr(std, "to_numpy") else std, dtype=float).ravel()
+    ok = ~np.isnan(m) & ~np.isnan(sd) & (m != 0)
+    return bool(np.any(sd[ok] > STD_REL * np.abs(m[ok])))
 
 
 def _fmt(v, s, rank):
@@ -264,20 +263,31 @@ def _fmt(v, s, rank):
         txt = r"\textbf{" + txt + "}"
     elif rank == 2:
         txt = r"\underline{" + txt + "}"
-    if not STD_IN_LATEX and exceeds(s):
+    if not STD_IN_LATEX and exceeds(v, s):
         txt += STD_MARK
     return txt
 
 
+# How best (bold) / second best (underline) are assigned per column:
+#   "unrounded": rank the full-precision means -> exactly one best and one second;
+#   "shared"   : rank the means rounded to DEC -> entries that PRINT the same
+#                share the mark (several bold / underlined cells possible).
+TIE_MODE = "unrounded"
+
+
 def _ranks(mean, rows):
-    """1 = best (lowest), 2 = second, per column, over the displayed rows.
-    Ranking uses the value rounded to DEC so printed ties share the mark."""
+    """1 = best (lowest), 2 = second, per column, over the displayed rows."""
     out = {}
     for c in mean.columns:
-        col = mean.loc[[r for r in rows if r in mean.index], c].dropna().round(DEC)
-        uniq = sorted(col.unique())
-        out[c] = {m: (1 if v == uniq[0] else 2 if len(uniq) > 1 and v == uniq[1] else 99)
-                  for m, v in col.items()}
+        col = mean.loc[[r for r in rows if r in mean.index], c].dropna()
+        if TIE_MODE == "shared":
+            col = col.round(DEC)
+            uniq = sorted(col.unique())
+            out[c] = {m: (1 if v == uniq[0] else 2 if len(uniq) > 1 and v == uniq[1] else 99)
+                      for m, v in col.items()}
+        else:
+            order = col.sort_values(kind="mergesort").index      # stable: row order breaks exact ties
+            out[c] = {m: (i + 1 if i < 2 else 99) for i, m in enumerate(order)}
     return out
 
 
