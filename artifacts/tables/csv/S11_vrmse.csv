@@ -98,6 +98,9 @@ WDNO_db2,WDNO,rayleigh_benard,65:196,1.39176,0.00197878,3
 WDNO_db2,WDNO,active_matter,01:16,4.47485,0.0109488,3
 WDNO_db2,WDNO,active_matter,17:32,2.1809,0.0018949,3
 WDNO_db2,WDNO,active_matter,33:77,1.39967,3.63059e-05,3
+LatentFM_dcae_f32c64_v4.0,LatentFM$_{\div 64}$,rayleigh_benard,01:32,9.51514,0.0422449,3
+LatentFM_dcae_f32c64_v4.0,LatentFM$_{\div 64}$,rayleigh_benard,33:64,4.08042,0.101776,3
+LatentFM_dcae_f32c64_v4.0,LatentFM$_{\div 64}$,rayleigh_benard,65:196,0.916941,0.020161,3
 WNO_3scales_db2,WNO,turbulent_radiative_layer_2D,01:32,inf,,1
 WNO_3scales_db2,WNO,turbulent_radiative_layer_2D,33:64,inf,,1
 WNO_3scales_db2,WNO,rayleigh_benard,01:32,44.2265,,1

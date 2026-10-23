@@ -25,6 +25,7 @@ from .profiling import load_profiles, selected
 
 SEEDS_NOTE = r" Mean\,$\pm$\,std over three inference seeds (42, 84, 168)."
 DET_NOTE = r" Deterministic baselines (WNO, FNO, TFNO) are single runs."
+LF_NOTE = r" LatentFM$_{\div 64}$ is evaluated on Rayleigh--B\'enard only."
 
 _SPREADS: dict[str, pd.DataFrame] = {}     # name -> per-cell seed spread (re-running a table overwrites)
 VERBOSE = True
@@ -60,7 +61,7 @@ def t1_wavelet_selection(df):
         sel[0], sel[1],
         r"Spectral Coherence RMSE averaged across \textit{Low}, \textit{Mid} and \textit{High} "
         r"frequency bands and rollout horizons per PDE system. For each WFM variant, \textbf{bold} "
-        r"denotes the optimal wavelet representation used in all subsequent experiments." + SEEDS_NOTE,
+        r"denotes the optimal wavelet representation used in all subsequent experiments." + LF_NOTE + SEEDS_NOTE,
         "tab:avg_sc_rmse_gen_wavelets", C.GROUPS_GEN))
     T.s10_table(sel[0], sel[1]).to_csv(T.TABLES_CSV / "S10_optimal_wavelets.csv", index=False)
     return sel
@@ -92,14 +93,14 @@ def t2_s19_s20_profiling():
 def s11_vrmse(df):
     r = T.across_seeds(T.horizon_table, df, metric="vrmse", models=C.ROWS_ALL)
     return _emit("S11_vrmse", r, T.latex_table(
-        *r[:2], "VRMSE across rollout horizons for all models and PDE systems." + DET_NOTE + SEEDS_NOTE,
+        *r[:2], "VRMSE across rollout horizons for all models and PDE systems." + DET_NOTE + LF_NOTE + SEEDS_NOTE,
         "si-tab:appendix_vrmse", C.GROUPS_ALL, corner="Rollout", top_labels=C.PDE_LABELS, resize=True))
 
 
 def s12_crps(df):
     r = T.across_seeds(T.horizon_table, df, metric="crps", models=C.ROWS_GEN)
     return _emit("S12_crps", r, T.latex_table(
-        *r[:2], "CRPS across rollout horizons for all models and PDE systems." + SEEDS_NOTE,
+        *r[:2], "CRPS across rollout horizons for all models and PDE systems." + LF_NOTE + SEEDS_NOTE,
         "tab:appendix_crps", C.GROUPS_GEN, corner="Rollout", top_labels=C.PDE_LABELS, resize=True))
 
 
@@ -107,7 +108,7 @@ def s13_spectral_bands(df):
     r = T.across_seeds(T.bands_table, df, models=C.ROWS_GEN, time_agg="horizon")
     return _emit("S13_spectral_bands", r, T.latex_table(
         *r[:2], r"Spectral coherence RMSE across \textit{Low}, \textit{Mid}, and \textit{High} "
-        r"frequency bands for all models and PDE systems, averaged over rollout horizons." + SEEDS_NOTE,
+        r"frequency bands for all models and PDE systems, averaged over rollout horizons." + LF_NOTE + SEEDS_NOTE,
         "tab:appendix_spectral", C.GROUPS_GEN, corner="Frequency Bands",
         top_labels=C.PDE_LABELS, resize=True))
 
@@ -189,14 +190,15 @@ def s18b_spectral_pr(df):
 # Rebuttal additions
 # ---------------------------------------------------------------------------
 def r1_rb_latentfm(df):
-    """RB: spectral bands + CRPS per horizon, selected wavelets, baselines + LatentFM."""
-    rows = C.ROWS_BEST_GEN + [C.LATENTFM]
-    r = T.across_seeds(T.rb_summary_table, T.best_view(df, keep=C.GEN_MODELS + [C.LATENTFM]), models=rows)
+    """RB summary as shown in the rebuttal (selected wavelets + generative baselines).
+    Optional: LatentFM is now also a row of every table with an RB column."""
+    rows = C.ROWS_BEST_GEN
+    r = T.across_seeds(T.rb_summary_table, T.best_view(df, keep=C.GEN_MODELS), models=rows)
     return _emit("R1_rb_latentfm", r, T.latex_table(
         *r[:2], r"Rayleigh--B\'enard: spectral coherence RMSE per band (averaged over rollout horizons) "
         r"and CRPS per rollout horizon, including the latent-space baseline LatentFM$_{\div 64}$ "
         r"(autoencoder of~\citet{rozet2025})." + SEEDS_NOTE,
-        "tab:rb_latentfm", [C.BEST, C.GEN_MODELS + [C.LATENTFM]], corner="Model", resize=True))
+        "tab:rb_latentfm", [C.BEST, C.GEN_MODELS], corner="Model", resize=True))
 
 
 def r2_ke_mae(gdf):

@@ -32,3 +32,4 @@ FourierFlow_16modes_v4.0,FM$_\text{fourier}$,active_matter,0.323697,0.000335216,
 WDNO_db2,WDNO,turbulent_radiative_layer_2D,0.271308,0.000114396,3
 WDNO_db2,WDNO,rayleigh_benard,0.466977,0.000210433,3
 WDNO_db2,WDNO,active_matter,0.303662,0.000254327,3
+LatentFM_dcae_f32c64_v4.0,LatentFM$_{\div 64}$,rayleigh_benard,0.162087,0.00021522,3

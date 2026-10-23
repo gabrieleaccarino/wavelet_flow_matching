@@ -1,6 +1,6 @@
 \begin{table}[ht]
 \centering
-\caption{CRPS across rollout horizons for all models and PDE systems. Mean\,$\pm$\,std over three inference seeds (42, 84, 168).}
+\caption{CRPS across rollout horizons for all models and PDE systems. LatentFM$_{\div 64}$ is evaluated on Rayleigh--B\'enard only. Mean\,$\pm$\,std over three inference seeds (42, 84, 168).}
 \label{tab:appendix_crps}
 \resizebox{\linewidth}{!}{%
 \begin{tabular}{l ccc ccc ccc}
@@ -22,6 +22,7 @@ WFM-3 db6 & 0.451{\scriptsize$\,\pm\,$0.006} & 1.026{\scriptsize$\,\pm\,$0.006} 
 FM$_\text{pixel}$ & \underline{0.418{\scriptsize$\,\pm\,$0.006}} & 1.088{\scriptsize$\,\pm\,$0.007} & 1.210{\scriptsize$\,\pm\,$0.017} & 0.005{\scriptsize$\,\pm\,$<0.001} & 0.036{\scriptsize$\,\pm\,$0.001} & 0.076{\scriptsize$\,\pm\,$0.005} & \textbf{0.059{\scriptsize$\,\pm\,$<0.001}} & \textbf{0.166{\scriptsize$\,\pm\,$0.001}} & \underline{0.194{\scriptsize$\,\pm\,$0.001}} \\
 FM$_\text{fourier}$ & 1.112{\scriptsize$\,\pm\,$0.003} & 1.632{\scriptsize$\,\pm\,$0.007} & 1.772{\scriptsize$\,\pm\,$0.011} & 0.013{\scriptsize$\,\pm\,$<0.001} & 0.040{\scriptsize$\,\pm\,$0.001} & 0.090{\scriptsize$\,\pm\,$0.001} & 0.197{\scriptsize$\,\pm\,$0.001} & 0.216{\scriptsize$\,\pm\,$0.002} & 0.211{\scriptsize$\,\pm\,$0.001} \\
 WDNO & 2.460{\scriptsize$\,\pm\,$0.002} & 3.374{\scriptsize$\,\pm\,$0.004} & 4.284{\scriptsize$\,\pm\,$0.013} & 0.050{\scriptsize$\,\pm\,$<0.001} & 0.102{\scriptsize$\,\pm\,$<0.001} & 0.138{\scriptsize$\,\pm\,$<0.001} & 0.218{\scriptsize$\,\pm\,$<0.001} & 0.245{\scriptsize$\,\pm\,$<0.001} & 0.266{\scriptsize$\,\pm\,$<0.001} \\
+LatentFM$_{\div 64}$ & -- & -- & -- & 0.026{\scriptsize$\,\pm\,$<0.001} & 0.057{\scriptsize$\,\pm\,$<0.001} & 0.088{\scriptsize$\,\pm\,$0.004} & -- & -- & -- \\
 \bottomrule
 \end{tabular}
 }

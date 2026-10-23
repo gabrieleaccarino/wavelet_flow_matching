@@ -98,3 +98,6 @@ WDNO_db2,WDNO,rayleigh_benard,65:196,0.138097,0.000279727,3
 WDNO_db2,WDNO,active_matter,01:16,0.217606,5.8865e-05,3
 WDNO_db2,WDNO,active_matter,17:32,0.245231,3.23917e-05,3
 WDNO_db2,WDNO,active_matter,33:77,0.266163,2.6011e-05,3
+LatentFM_dcae_f32c64_v4.0,LatentFM$_{\div 64}$,rayleigh_benard,01:32,0.0255099,0.000128957,3
+LatentFM_dcae_f32c64_v4.0,LatentFM$_{\div 64}$,rayleigh_benard,33:64,0.0573995,0.000321874,3
+LatentFM_dcae_f32c64_v4.0,LatentFM$_{\div 64}$,rayleigh_benard,65:196,0.0881796,0.00424329,3

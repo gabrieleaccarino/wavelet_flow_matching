@@ -32,6 +32,7 @@ FourierFlow_16modes_v4.0,active_matter,T1_wavelet_selection,0.323697,0.000335216
 WDNO_db2,turbulent_radiative_layer_2D,T1_wavelet_selection,0.271308,0.000114396,3,0.0421647,
 WDNO_db2,rayleigh_benard,T1_wavelet_selection,0.466977,0.000210433,3,0.0450628,
 WDNO_db2,active_matter,T1_wavelet_selection,0.303662,0.000254327,3,0.0837533,
+LatentFM_dcae_f32c64_v4.0,rayleigh_benard,T1_wavelet_selection,0.162087,0.00021522,3,0.132781,
 WaveletFlow_1scale_haar_v4.0,turbulent_radiative_layer_2D,S11_vrmse,0.54402,0.0109787,3,2.01806,01:32
 WaveletFlow_1scale_haar_v4.0,turbulent_radiative_layer_2D,S11_vrmse,0.791033,0.0163284,3,2.06419,33:64
 WaveletFlow_1scale_haar_v4.0,turbulent_radiative_layer_2D,S11_vrmse,0.788631,0.0137149,3,1.73907,65:97
@@ -131,6 +132,9 @@ WDNO_db2,rayleigh_benard,S11_vrmse,1.39176,0.00197878,3,0.142179,65:196
 WDNO_db2,active_matter,S11_vrmse,4.47485,0.0109488,3,0.244674,01:16
 WDNO_db2,active_matter,S11_vrmse,2.1809,0.0018949,3,0.0868864,17:32
 WDNO_db2,active_matter,S11_vrmse,1.39967,3.63059e-05,3,0.00259388,33:77
+LatentFM_dcae_f32c64_v4.0,rayleigh_benard,S11_vrmse,9.51514,0.0422449,3,0.443976,01:32
+LatentFM_dcae_f32c64_v4.0,rayleigh_benard,S11_vrmse,4.08042,0.101776,3,2.49426,33:64
+LatentFM_dcae_f32c64_v4.0,rayleigh_benard,S11_vrmse,0.916941,0.020161,3,2.19873,65:196
 WaveletFlow_1scale_haar_v4.0,turbulent_radiative_layer_2D,S12_crps,0.492047,0.00622009,3,1.26413,01:32
 WaveletFlow_1scale_haar_v4.0,turbulent_radiative_layer_2D,S12_crps,1.04719,0.0333866,3,3.18819,33:64
 WaveletFlow_1scale_haar_v4.0,turbulent_radiative_layer_2D,S12_crps,1.21825,0.0323081,3,2.652,65:97
@@ -230,6 +234,9 @@ WDNO_db2,rayleigh_benard,S12_crps,0.138097,0.000279727,3,0.202558,65:196
 WDNO_db2,active_matter,S12_crps,0.217606,5.8865e-05,3,0.0270512,01:16
 WDNO_db2,active_matter,S12_crps,0.245231,3.23917e-05,3,0.0132086,17:32
 WDNO_db2,active_matter,S12_crps,0.266163,2.6011e-05,3,0.00977259,33:77
+LatentFM_dcae_f32c64_v4.0,rayleigh_benard,S12_crps,0.0255099,0.000128957,3,0.505517,01:32
+LatentFM_dcae_f32c64_v4.0,rayleigh_benard,S12_crps,0.0573995,0.000321874,3,0.560761,33:64
+LatentFM_dcae_f32c64_v4.0,rayleigh_benard,S12_crps,0.0881796,0.00424329,3,4.8121,65:196
 WaveletFlow_1scale_haar_v4.0,turbulent_radiative_layer_2D,S13_spectral_bands,0.132458,0.000178156,3,0.134499,Low
 WaveletFlow_1scale_haar_v4.0,turbulent_radiative_layer_2D,S13_spectral_bands,0.174796,0.00056354,3,0.322398,Mid
 WaveletFlow_1scale_haar_v4.0,turbulent_radiative_layer_2D,S13_spectral_bands,0.133894,0.000213648,3,0.159564,High
@@ -329,6 +336,9 @@ WDNO_db2,rayleigh_benard,S13_spectral_bands,0.535371,0.000111579,3,0.0208414,Hig
 WDNO_db2,active_matter,S13_spectral_bands,0.366539,0.000698438,3,0.190549,Low
 WDNO_db2,active_matter,S13_spectral_bands,0.344576,8.45175e-05,3,0.024528,Mid
 WDNO_db2,active_matter,S13_spectral_bands,0.19987,1.09217e-05,3,0.00546438,High
+LatentFM_dcae_f32c64_v4.0,rayleigh_benard,S13_spectral_bands,0.196385,0.00018415,3,0.0937698,Low
+LatentFM_dcae_f32c64_v4.0,rayleigh_benard,S13_spectral_bands,0.159122,0.000327871,3,0.206051,Mid
+LatentFM_dcae_f32c64_v4.0,rayleigh_benard,S13_spectral_bands,0.130752,0.000515092,3,0.393944,High
 WaveletFlow_1scale_haar_v4.0,0.0299999993294477,S14_crps_tcool,1.16488,0.0430836,3,3.69854,
 WaveletFlow_1scale_haar_v4.0,0.0599999986588954,S14_crps_tcool,1.1354,0.0566223,3,4.98701,
 WaveletFlow_1scale_haar_v4.0,0.1000000014901161,S14_crps_tcool,0.865196,0.0524583,3,6.06316,
@@ -494,6 +504,9 @@ FourierFlow_16modes_v4.0,23.025850296020508,S16_crps_Ra,0.0621205,0.000605679,3,
 WDNO_db2,13.815510749816896,S16_crps_Ra,0.119937,0.000553499,3,0.461491,
 WDNO_db2,18.42068099975586,S16_crps_Ra,0.117395,0.000340312,3,0.289887,
 WDNO_db2,23.025850296020508,S16_crps_Ra,0.116484,0.000519311,3,0.445823,
+LatentFM_dcae_f32c64_v4.0,13.815510749816896,S16_crps_Ra,0.0869483,0.00652389,3,7.50318,
+LatentFM_dcae_f32c64_v4.0,18.42068099975586,S16_crps_Ra,0.0666175,0.00154419,3,2.31799,
+LatentFM_dcae_f32c64_v4.0,23.025850296020508,S16_crps_Ra,0.0652016,0.00184076,3,2.82318,
 WaveletFlow_1scale_haar_v4.0,13.815510749816896,T3_crps_Ra_main,0.0589628,0.00133847,3,2.27002,
 WaveletFlow_1scale_haar_v4.0,18.42068099975586,T3_crps_Ra_main,0.0601755,0.00506337,3,8.41434,
 WaveletFlow_1scale_haar_v4.0,23.025850296020508,T3_crps_Ra_main,0.0513387,0.0012066,3,2.35028,
@@ -527,6 +540,9 @@ FourierFlow_16modes_v4.0,23.025850296020508,T3_crps_Ra_main,0.0621205,0.00060567
 WDNO_db2,13.815510749816896,T3_crps_Ra_main,0.119937,0.000553499,3,0.461491,
 WDNO_db2,18.42068099975586,T3_crps_Ra_main,0.117395,0.000340312,3,0.289887,
 WDNO_db2,23.025850296020508,T3_crps_Ra_main,0.116484,0.000519311,3,0.445823,
+LatentFM_dcae_f32c64_v4.0,13.815510749816896,T3_crps_Ra_main,0.0869483,0.00652389,3,7.50318,
+LatentFM_dcae_f32c64_v4.0,18.42068099975586,T3_crps_Ra_main,0.0666175,0.00154419,3,2.31799,
+LatentFM_dcae_f32c64_v4.0,23.025850296020508,T3_crps_Ra_main,0.0652016,0.00184076,3,2.82318,
 WaveletFlow_1scale_haar_v4.0,-2.3025851249694824,S17_crps_Pr,0.0909576,0.000908769,3,0.999113,
 WaveletFlow_1scale_haar_v4.0,0.0,S17_crps_Pr,0.0503568,0.0041898,3,8.32023,
 WaveletFlow_1scale_haar_v4.0,2.3025851249694824,S17_crps_Pr,0.0291626,0.000922352,3,3.16278,
@@ -560,6 +576,9 @@ FourierFlow_16modes_v4.0,2.3025851249694824,S17_crps_Pr,0.0381005,0.000776497,3,
 WDNO_db2,-2.3025851249694824,S17_crps_Pr,0.145876,0.000589629,3,0.404198,
 WDNO_db2,0.0,S17_crps_Pr,0.111894,0.000255241,3,0.228111,
 WDNO_db2,2.3025851249694824,S17_crps_Pr,0.0960455,0.00022789,3,0.237273,
+LatentFM_dcae_f32c64_v4.0,-2.3025851249694824,S17_crps_Pr,0.100884,0.00763077,3,7.56394,
+LatentFM_dcae_f32c64_v4.0,0.0,S17_crps_Pr,0.0620244,0.00125104,3,2.01701,
+LatentFM_dcae_f32c64_v4.0,2.3025851249694824,S17_crps_Pr,0.0558594,0.000157309,3,0.281616,
 WaveletFlow_1scale_haar_v4.0,Low,S15_spectral_tcool,0.138454,0.00658418,3,4.75549,0.0299999993294477
 WaveletFlow_1scale_haar_v4.0,Low,S15_spectral_tcool,0.13922,0.00324638,3,2.33184,0.0599999986588954
 WaveletFlow_1scale_haar_v4.0,Low,S15_spectral_tcool,0.138497,0.00264007,3,1.90623,0.1000000014901161
@@ -956,6 +975,15 @@ WDNO_db2,Mid,S18a_spectral_Ra,0.447549,0.000726815,3,0.162399,23.025850296020508
 WDNO_db2,High,S18a_spectral_Ra,0.584959,0.000125566,3,0.0214659,13.815510749816896
 WDNO_db2,High,S18a_spectral_Ra,0.580629,0.000308188,3,0.0530783,18.42068099975586
 WDNO_db2,High,S18a_spectral_Ra,0.528885,0.000183848,3,0.0347614,23.025850296020508
+LatentFM_dcae_f32c64_v4.0,Low,S18a_spectral_Ra,0.206208,0.00489522,3,2.37392,13.815510749816896
+LatentFM_dcae_f32c64_v4.0,Low,S18a_spectral_Ra,0.183305,0.00333751,3,1.82074,18.42068099975586
+LatentFM_dcae_f32c64_v4.0,Low,S18a_spectral_Ra,0.167311,0.00224351,3,1.34092,23.025850296020508
+LatentFM_dcae_f32c64_v4.0,Mid,S18a_spectral_Ra,0.17746,0.0012293,3,0.692716,13.815510749816896
+LatentFM_dcae_f32c64_v4.0,Mid,S18a_spectral_Ra,0.148713,0.000424415,3,0.285391,18.42068099975586
+LatentFM_dcae_f32c64_v4.0,Mid,S18a_spectral_Ra,0.151097,0.00025837,3,0.170996,23.025850296020508
+LatentFM_dcae_f32c64_v4.0,High,S18a_spectral_Ra,0.111147,0.00116392,3,1.04719,13.815510749816896
+LatentFM_dcae_f32c64_v4.0,High,S18a_spectral_Ra,0.138622,0.000963499,3,0.695054,18.42068099975586
+LatentFM_dcae_f32c64_v4.0,High,S18a_spectral_Ra,0.195884,6.06139e-05,3,0.0309437,23.025850296020508
 WaveletFlow_1scale_haar_v4.0,Low,S18b_spectral_Pr,0.187233,0.00732385,3,3.91163,-2.3025851249694824
 WaveletFlow_1scale_haar_v4.0,Low,S18b_spectral_Pr,0.144002,0.00348662,3,2.42123,0.0
 WaveletFlow_1scale_haar_v4.0,Low,S18b_spectral_Pr,0.147292,0.00175092,3,1.18874,2.3025851249694824
@@ -1055,6 +1083,15 @@ WDNO_db2,Mid,S18b_spectral_Pr,0.505442,0.000881365,3,0.174375,2.3025851249694824
 WDNO_db2,High,S18b_spectral_Pr,0.573742,0.000280654,3,0.0489164,-2.3025851249694824
 WDNO_db2,High,S18b_spectral_Pr,0.57548,0.000244657,3,0.0425135,0.0
 WDNO_db2,High,S18b_spectral_Pr,0.54525,0.000229321,3,0.042058,2.3025851249694824
+LatentFM_dcae_f32c64_v4.0,Low,S18b_spectral_Pr,0.199007,0.0106038,3,5.32837,-2.3025851249694824
+LatentFM_dcae_f32c64_v4.0,Low,S18b_spectral_Pr,0.172981,0.00445543,3,2.57568,0.0
+LatentFM_dcae_f32c64_v4.0,Low,S18b_spectral_Pr,0.184837,0.00165622,3,0.896045,2.3025851249694824
+LatentFM_dcae_f32c64_v4.0,Mid,S18b_spectral_Pr,0.160453,0.00115755,3,0.721429,-2.3025851249694824
+LatentFM_dcae_f32c64_v4.0,Mid,S18b_spectral_Pr,0.159987,0.000177458,3,0.11092,0.0
+LatentFM_dcae_f32c64_v4.0,Mid,S18b_spectral_Pr,0.156831,0.000194925,3,0.12429,2.3025851249694824
+LatentFM_dcae_f32c64_v4.0,High,S18b_spectral_Pr,0.162863,0.00142227,3,0.873296,-2.3025851249694824
+LatentFM_dcae_f32c64_v4.0,High,S18b_spectral_Pr,0.150756,0.000631257,3,0.418727,0.0
+LatentFM_dcae_f32c64_v4.0,High,S18b_spectral_Pr,0.132034,0.00015686,3,0.118803,2.3025851249694824
 WFM_1scale_best,Spectral coherence RMSE,R1_rb_latentfm,0.168353,0.00486968,3,2.89254,Low
 WFM_1scale_best,Spectral coherence RMSE,R1_rb_latentfm,0.118007,0.000893793,3,0.757404,Mid
 WFM_1scale_best,Spectral coherence RMSE,R1_rb_latentfm,0.0768929,0.000180004,3,0.234097,High
@@ -1136,3 +1173,6 @@ WDNO_db2,rayleigh_benard,R2_ke_mae,2.30914,0.00305871,3,0.132461,65:196
 WDNO_db2,active_matter,R2_ke_mae,0.746825,0.00160633,3,0.215088,01:16
 WDNO_db2,active_matter,R2_ke_mae,0.890445,0.00157107,3,0.176436,17:32
 WDNO_db2,active_matter,R2_ke_mae,1.05206,0.00192725,3,0.183188,33:77
+LatentFM_dcae_f32c64_v4.0,rayleigh_benard,R2_ke_mae,0.251708,0.0033391,3,1.32657,01:32
+LatentFM_dcae_f32c64_v4.0,rayleigh_benard,R2_ke_mae,0.574001,0.00823153,3,1.43406,33:64
+LatentFM_dcae_f32c64_v4.0,rayleigh_benard,R2_ke_mae,0.913174,0.0363158,3,3.97687,65:196

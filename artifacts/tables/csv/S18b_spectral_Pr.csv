@@ -98,3 +98,12 @@ WDNO_db2,WDNO,Mid,2.30259,0.505442,0.000881365,3
 WDNO_db2,WDNO,High,-2.30259,0.573742,0.000280654,3
 WDNO_db2,WDNO,High,0,0.57548,0.000244657,3
 WDNO_db2,WDNO,High,2.30259,0.54525,0.000229321,3
+LatentFM_dcae_f32c64_v4.0,LatentFM$_{\div 64}$,Low,-2.30259,0.199007,0.0106038,3
+LatentFM_dcae_f32c64_v4.0,LatentFM$_{\div 64}$,Low,0,0.172981,0.00445543,3
+LatentFM_dcae_f32c64_v4.0,LatentFM$_{\div 64}$,Low,2.30259,0.184837,0.00165622,3
+LatentFM_dcae_f32c64_v4.0,LatentFM$_{\div 64}$,Mid,-2.30259,0.160453,0.00115755,3
+LatentFM_dcae_f32c64_v4.0,LatentFM$_{\div 64}$,Mid,0,0.159987,0.000177458,3
+LatentFM_dcae_f32c64_v4.0,LatentFM$_{\div 64}$,Mid,2.30259,0.156831,0.000194925,3
+LatentFM_dcae_f32c64_v4.0,LatentFM$_{\div 64}$,High,-2.30259,0.162863,0.00142227,3
+LatentFM_dcae_f32c64_v4.0,LatentFM$_{\div 64}$,High,0,0.150756,0.000631257,3
+LatentFM_dcae_f32c64_v4.0,LatentFM$_{\div 64}$,High,2.30259,0.132034,0.00015686,3

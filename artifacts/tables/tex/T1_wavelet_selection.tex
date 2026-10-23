@@ -1,6 +1,6 @@
 \begin{table}[ht]
 \centering
-\caption{Spectral Coherence RMSE averaged across \textit{Low}, \textit{Mid} and \textit{High} frequency bands and rollout horizons per PDE system. For each WFM variant, \textbf{bold} denotes the optimal wavelet representation used in all subsequent experiments. Mean\,$\pm$\,std over three inference seeds (42, 84, 168).}
+\caption{Spectral Coherence RMSE averaged across \textit{Low}, \textit{Mid} and \textit{High} frequency bands and rollout horizons per PDE system. For each WFM variant, \textbf{bold} denotes the optimal wavelet representation used in all subsequent experiments. LatentFM$_{\div 64}$ is evaluated on Rayleigh--B\'enard only. Mean\,$\pm$\,std over three inference seeds (42, 84, 168).}
 \label{tab:avg_sc_rmse_gen_wavelets}
 \begin{tabular}{lccc}
 \toprule
@@ -19,6 +19,7 @@ WFM-3 db6 & 0.153{\scriptsize$\,\pm\,$0.001} & 0.112{\scriptsize$\,\pm\,$<0.001}
 FM$_\text{pixel}$ & 0.153{\scriptsize$\,\pm\,$0.001} & 0.131{\scriptsize$\,\pm\,$0.001} & 0.244{\scriptsize$\,\pm\,$0.001} \\
 FM$_\text{fourier}$ & 0.387{\scriptsize$\,\pm\,$0.001} & 0.246{\scriptsize$\,\pm\,$0.001} & 0.324{\scriptsize$\,\pm\,$<0.001} \\
 WDNO & 0.271{\scriptsize$\,\pm\,$<0.001} & 0.467{\scriptsize$\,\pm\,$<0.001} & 0.304{\scriptsize$\,\pm\,$<0.001} \\
+LatentFM$_{\div 64}$ & -- & 0.162{\scriptsize$\,\pm\,$<0.001} & -- \\
 \bottomrule
 \end{tabular}
 \end{table}

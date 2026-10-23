@@ -44,3 +44,6 @@ WDNO_db2,WDNO,rayleigh_benard,65:196,2.30914,0.00305871,3
 WDNO_db2,WDNO,active_matter,01:16,0.746825,0.00160633,3
 WDNO_db2,WDNO,active_matter,17:32,0.890445,0.00157107,3
 WDNO_db2,WDNO,active_matter,33:77,1.05206,0.00192725,3
+LatentFM_dcae_f32c64_v4.0,LatentFM$_{\div 64}$,rayleigh_benard,01:32,0.251708,0.0033391,3
+LatentFM_dcae_f32c64_v4.0,LatentFM$_{\div 64}$,rayleigh_benard,33:64,0.574001,0.00823153,3
+LatentFM_dcae_f32c64_v4.0,LatentFM$_{\div 64}$,rayleigh_benard,65:196,0.913174,0.0363158,3

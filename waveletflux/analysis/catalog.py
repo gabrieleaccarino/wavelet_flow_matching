@@ -55,7 +55,10 @@ MODEL_REGISTRY.update({
     "FourierFlow_16modes_v4.0": dict(label=r"FM$_\text{fourier}$", group="generative", color=_rgb(143, 94, 106),  source="metrics"),
     "WDNO_db2":                 dict(label="WDNO",                 group="generative", color=_rgb(191, 134, 148), source="metrics",
                                      stats_key="WDNO_{pde}"),
-    "LatentFM_dcae_f32c64_v4.0": dict(label=r"LatentFM$_{\div 64}$", group="latent",   color=_rgb(120, 140, 190), source="metrics"),
+    # Latent-space FM baseline (rebuttal): DC-AE (spatial /32, 64 ch) of Rozet et al. 2025
+    # + flow matching in latent space. Trained and evaluated on Rayleigh-Benard only.
+    "LatentFM_dcae_f32c64_v4.0": dict(label=r"LatentFM$_{\div 64}$", group="generative", color=_rgb(120, 140, 190), source="metrics",
+                                      pdes=("rayleigh_benard",)),
     "WNO_3scales_db2":          dict(label="WNO",  group="deterministic", color=_rgb(176, 136, 84),  source="stats"),
     "FNO":                      dict(label="FNO",  group="deterministic", color=_rgb(208, 169, 110), source="stats"),
     "TFNO":                     dict(label="TFNO", group="deterministic", color=_rgb(236, 227, 163), source="stats"),
@@ -186,10 +189,12 @@ def load(models=None, pdes=PDES, source: str = "auto", verbose: bool = True):
     Returns (fields_df, global_df): per-field ML metrics, and the
     `_global_` physics-diagnostic rows (empty for stats files).
     """
-    models = list(models) if models is not None else ROWS_ALL + [LATENTFM]
+    models = list(models) if models is not None else ROWS_ALL
     frames, missing = [], []
     for pde in pdes:
         for model in models:
+            if pde not in MODEL_REGISTRY[model].get("pdes", PDES):
+                continue
             src = MODEL_REGISTRY[model]["source"] if source == "auto" else source
             fs = files_for(model, pde, src)
             if not fs:
@@ -212,8 +217,6 @@ def load(models=None, pdes=PDES, source: str = "auto", verbose: bool = True):
         print(f"loaded {len(full):,} rows from {full['source'].nunique()} files "
               f"({len(fields):,} per-field, {len(glob_):,} global)")
         for pde, model, src in missing:
-            if model == LATENTFM and pde != "rayleigh_benard":
-                continue
             print(f"  [missing] {PDE_SHORT[pde]:3s} {model} ({src})")
         bad = cov[cov.apply(lambda s: 0 not in s and sorted(s) != list(SEEDS))]
         for (pde, model), s in bad.items():
