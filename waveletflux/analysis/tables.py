@@ -235,7 +235,8 @@ def _fmt(v, s, rank):
         return "--"
     txt = f"{v:.{DEC}f}"
     if STD_IN_LATEX and s is not None and not pd.isna(s):
-        sd = f"{s:.{DEC}f}" if s >= 0.5 * 10 ** -DEC else "<" + f"{10 ** -DEC:.{DEC}f}"
+        # "<" must be in math mode: in text mode (OT1 encoding) it prints as an inverted "!"
+        sd = f"{s:.{DEC}f}" if s >= 0.5 * 10 ** -DEC else "$<$" + f"{10 ** -DEC:.{DEC}f}"
         txt += r"{\scriptsize$\,\pm\,$" + sd + "}"
     if rank == 1:
         return r"\textbf{" + txt + "}"

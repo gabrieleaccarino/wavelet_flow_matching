@@ -1,0 +1,13 @@
+\begin{table}[ht]
+\centering
+\caption{Optimal mother wavelet per WFM variant and PDE system, selected by lowest spectral coherence RMSE averaged across \textit{Low}, \textit{Mid}, and \textit{High} frequency bands and rollout horizons (Table~\ref{tab:avg_sc_rmse_gen_wavelets}). In parentheses: the selected wavelet's score, mean\,$\pm$\,std over three inference seeds (42, 84, 168); the selection is made on the seed mean.}
+\label{si-tab:optimal_wavelets}
+\begin{tabular}{lccc}
+\toprule
+ & Turbulent Radiative Layer 2D & Rayleigh--B\'{e}nard & Active Matter \\
+\midrule
+WFM 1-scale & $\mathrm{haar}$ (0.147{\scriptsize$\,\pm\,$$<$0.001}) & $\mathrm{db}4$ (0.121{\scriptsize$\,\pm\,$0.002}) & $\mathrm{haar}$ (0.241{\scriptsize$\,\pm\,$0.001}) \\
+WFM 3-scale & $\mathrm{haar}$ (0.149{\scriptsize$\,\pm\,$$<$0.001}) & $\mathrm{db}4$ (0.109{\scriptsize$\,\pm\,$0.001}) & $\mathrm{db}2$ (0.220{\scriptsize$\,\pm\,$$<$0.001}) \\
+\bottomrule
+\end{tabular}
+\end{table}

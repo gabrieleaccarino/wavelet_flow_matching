@@ -63,8 +63,39 @@ def t1_wavelet_selection(df):
         r"frequency bands and rollout horizons per PDE system. For each WFM variant, \textbf{bold} "
         r"denotes the optimal wavelet representation used in all subsequent experiments." + LF_NOTE + SEEDS_NOTE,
         "tab:avg_sc_rmse_gen_wavelets", C.GROUPS_GEN))
-    T.s10_table(sel[0], sel[1]).to_csv(T.TABLES_CSV / "S10_optimal_wavelets.csv", index=False)
+    s10 = T.s10_table(sel[0], sel[1])
+    s10.to_csv(T.TABLES_CSV / "S10_optimal_wavelets.csv", index=False)
+    (T.TABLES_TEX / "S10_optimal_wavelets.tex").write_text(latex_s10(s10))
+    if VERBOSE:
+        print("  wrote S10_optimal_wavelets")
     return sel
+
+
+S10_HEADERS = {"turbulent_radiative_layer_2D": "Turbulent Radiative Layer 2D",
+               "rayleigh_benard": r"Rayleigh--B\'{e}nard",
+               "active_matter": "Active Matter"}
+
+
+def _wavelet_tex(w):
+    return r"$\mathrm{haar}$" if w == "haar" else rf"$\mathrm{{db}}{w[2:]}$"
+
+
+def latex_s10(s10):
+    """Table S10 in the manuscript's layout: rows = WFM 1-/3-scale, columns =
+    PDEs, cell = selected wavelet (mean +- std over seeds)."""
+    body = [" & " + " & ".join(S10_HEADERS[p] for p in C.PDES) + r" \\", r"\midrule"]
+    for scale, name in (("1scale", "WFM 1-scale"), ("3scale", "WFM 3-scale")):
+        cells = [name]
+        for pde in C.PDES:
+            r = s10[(s10.pde == pde) & (s10.scale == scale)].iloc[0]
+            cells.append(f"{_wavelet_tex(r.wavelet)} ({T._fmt(r['mean'], r['std'], 99)})")
+        body.append(" & ".join(cells) + r" \\")
+    cap = (r"Optimal mother wavelet per WFM variant and PDE system, selected by lowest spectral "
+           r"coherence RMSE averaged across \textit{Low}, \textit{Mid}, and \textit{High} frequency "
+           r"bands and rollout horizons (Table~\ref{tab:avg_sc_rmse_gen_wavelets}). In parentheses: "
+           r"the selected wavelet's score, mean\,$\pm$\,std over three inference seeds (42, 84, 168); "
+           r"the selection is made on the seed mean.")
+    return T._env(cap, "si-tab:optimal_wavelets", "lccc", body)
 
 
 def t2_s19_s20_profiling():
