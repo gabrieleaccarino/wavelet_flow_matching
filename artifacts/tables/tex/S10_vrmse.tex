@@ -1,0 +1,33 @@
+\begin{table}[ht]
+\centering
+\caption{VRMSE across rollout horizons for all models and PDE systems. Deterministic baselines (WNO, FNO, TFNO) are single runs. LatentFM$_{\div 64}$ is evaluated on Rayleigh--B\'enard only. Mean over three inference seeds (42, 84, 168); the standard deviation across seeds is below 5\% of the mean for all entries except those marked $^{*}$.}
+\label{si-tab:appendix_vrmse}
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{l ccc ccc ccc}
+\toprule
+Rollout & \multicolumn{3}{c}{Turb. Rad. Layer 2D} & \multicolumn{3}{c}{Rayleigh--B\'{e}nard} & \multicolumn{3}{c}{Active Matter} \\
+\cmidrule(lr){2-4} \cmidrule(lr){5-7} \cmidrule(lr){8-10}
+ & 01:32 & 33:64 & 65:97 & 01:32 & 33:64 & 65:196 & 01:16 & 17:32 & 33:77 \\
+\midrule
+WFM-1 haar & \underline{0.544} & 0.791 & \underline{0.789} & 1.782 & 2.020 & 0.788 & 2.847 & 1.541 & 1.079 \\
+WFM-1 db2 & 0.550 & 0.750 & 0.850 & 1.333 & 1.844$^{*}$ & 0.791 & 5.652 & 2.930 & 1.622 \\
+WFM-1 db4 & 0.550 & \underline{0.730} & 0.811 & 1.689 & 2.271 & 0.802 & 14.227 & 5.574 & 2.488 \\
+WFM-1 db6 & \textbf{0.536} & \textbf{0.703} & \textbf{0.786} & 1.441 & 1.949 & 1.025 & 6.732 & 2.927 & 1.553 \\
+\midrule
+WFM-3 haar & 0.549 & 0.824 & 0.797 & 1.559 & 2.318 & 0.807 & \underline{0.848} & \underline{1.327} & \underline{1.022} \\
+WFM-3 db2 & 0.655 & 0.893 & 0.981 & 1.051 & 1.729 & \textbf{0.766} & 0.933 & 1.349 & 1.085 \\
+WFM-3 db4 & 0.586 & 0.759 & 0.803 & \underline{1.029}$^{*}$ & 1.869 & \underline{0.770} & 3.242 & 2.271 & 1.418 \\
+WFM-3 db6 & 0.591 & 0.879 & 0.831 & \textbf{0.755} & \underline{1.598} & 0.834 & 2.341 & 2.118 & 1.276 \\
+\midrule
+FM$_\text{pixel}$ & 0.574 & 0.891 & 0.830 & 1.319 & 1.962 & 0.821 & \textbf{0.580} & 1.380 & 1.028 \\
+FM$_\text{fourier}$ & 0.635 & 0.773 & 0.804 & 2.331 & \textbf{1.417} & 0.870 & 1.386 & \textbf{1.126} & \textbf{1.007} \\
+WDNO & 1.517 & 1.834 & 1.953 & 19.262 & 8.171 & 1.392 & 4.475 & 2.181 & 1.400 \\
+LatentFM$_{\div 64}$ & -- & -- & -- & 9.515 & 4.080 & 0.917 & -- & -- & -- \\
+\midrule
+WNO & inf & inf & -- & 44.226 & 24.463 & 2.452 & 10.669 & 4.321 & 2.002 \\
+FNO & 2.952 & 4.978 & 4.349 & 3.368 & 3.972 & inf & 1.682 & 3.227 & 1.727 \\
+TFNO & 2.300 & 6.534 & 6.387 & 102.678 & 31.842 & 2.965 & 4.443 & 2.968 & 1.525 \\
+\bottomrule
+\end{tabular}
+}
+\end{table}

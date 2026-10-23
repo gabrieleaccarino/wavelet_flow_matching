@@ -1,4 +1,4 @@
-"""Inference profiling (Tables 2, S19, S20) from ``experiments/<pde>/performance/*_perf.yaml``.
+"""Inference profiling (Tables 2, S18, S19) from ``experiments/<pde>/performance/*_perf.yaml``.
 
 Each YAML is written by the inference driver: wall_clock_s (max over ranks),
 total_steps_global, throughput_*, gpu_peak_mem_GiB (per rank). All models use
@@ -47,7 +47,7 @@ def load_profiles(pdes=C.PDES) -> pd.DataFrame:
 
 
 def selected(df: pd.DataFrame) -> pd.DataFrame:
-    """FM_pixel + the selected wavelet per PDE and scale (Table 2 / S19)."""
+    """FM_pixel + the selected wavelet per PDE and scale (Table 2 / S18)."""
     keep = []
     for pde, sel in C.BEST_WFM_PER_PDE.items():
         keep += [(pde, BASE), (pde, C.wfm_key("1scale", sel["1scale"])), (pde, C.wfm_key("3scale", sel["3scale"]))]

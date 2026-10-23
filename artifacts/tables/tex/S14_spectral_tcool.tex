@@ -1,0 +1,56 @@
+\begin{table}[ht]
+\centering
+\caption{Spectral coherence RMSE per $t_{\mathrm{cool}}$ and frequency band on TRL. Mean over three inference seeds (42, 84, 168); the standard deviation across seeds is below 5\% of the mean for all entries.}
+\label{tab:ablation_trl_spectral_tcool}
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{llccccccccc}
+\toprule
+Model & $t_{cool}$ & 0.03 & 0.06 & 0.1 & 0.18 & 0.32 & 0.56 & 1 & 1.78 & 3.16 \\
+\midrule
+\multirow{3}{*}{WFM-1 haar} & Low & 0.138 & \underline{0.139} & \underline{0.138} & 0.138 & \textbf{0.132} & 0.125 & 0.127 & 0.136 & 0.121 \\
+ & Mid & \underline{0.190} & \underline{0.194} & 0.189 & \underline{0.189} & \textbf{0.180} & 0.172 & \underline{0.157} & 0.155 & 0.150 \\
+ & High & \underline{0.138} & \underline{0.138} & \textbf{0.136} & \textbf{0.140} & \underline{0.147} & 0.147 & 0.133 & 0.120 & 0.106 \\
+\midrule
+\multirow{3}{*}{WFM-1 db2} & Low & 0.141 & \textbf{0.139} & 0.140 & 0.137 & 0.143 & 0.134 & 0.136 & 0.134 & 0.149 \\
+ & Mid & 0.192 & 0.195 & 0.189 & 0.193 & 0.189 & 0.179 & 0.170 & 0.163 & 0.164 \\
+ & High & 0.142 & 0.143 & 0.139 & 0.145 & 0.153 & 0.155 & 0.145 & 0.134 & 0.122 \\
+\midrule
+\multirow{3}{*}{WFM-1 db4} & Low & \textbf{0.136} & 0.141 & \textbf{0.134} & \textbf{0.134} & 0.136 & 0.130 & 0.127 & \textbf{0.129} & 0.123 \\
+ & Mid & \textbf{0.189} & \textbf{0.192} & \textbf{0.185} & \textbf{0.188} & 0.184 & 0.177 & 0.162 & 0.154 & 0.148 \\
+ & High & \textbf{0.136} & \textbf{0.138} & \underline{0.137} & 0.144 & 0.151 & 0.158 & 0.147 & 0.135 & 0.112 \\
+\midrule
+\multirow{3}{*}{WFM-1 db6} & Low & \underline{0.138} & 0.143 & 0.139 & \underline{0.136} & 0.136 & \textbf{0.124} & 0.128 & 0.134 & 0.120 \\
+ & Mid & 0.190 & 0.196 & 0.191 & 0.191 & 0.183 & 0.172 & 0.158 & \underline{0.151} & \underline{0.146} \\
+ & High & 0.139 & 0.140 & 0.141 & 0.147 & 0.154 & 0.160 & 0.145 & 0.131 & 0.112 \\
+\midrule
+\multirow{3}{*}{WFM-3 haar} & Low & 0.143 & 0.144 & 0.139 & 0.136 & \underline{0.133} & 0.127 & \underline{0.123} & \underline{0.132} & \textbf{0.118} \\
+ & Mid & 0.194 & 0.199 & \underline{0.188} & 0.190 & \underline{0.181} & \textbf{0.167} & \textbf{0.153} & \textbf{0.150} & \textbf{0.144} \\
+ & High & 0.152 & 0.152 & 0.148 & 0.148 & 0.157 & 0.152 & 0.135 & 0.123 & \underline{0.103} \\
+\midrule
+\multirow{3}{*}{WFM-3 db2} & Low & 0.150 & 0.146 & 0.145 & 0.148 & 0.141 & 0.136 & \textbf{0.123} & 0.141 & 0.123 \\
+ & Mid & 0.193 & 0.196 & 0.191 & 0.201 & 0.195 & 0.188 & 0.174 & 0.180 & 0.175 \\
+ & High & 0.152 & 0.151 & 0.146 & \underline{0.143} & \textbf{0.141} & \textbf{0.140} & \underline{0.127} & \underline{0.120} & 0.105 \\
+\midrule
+\multirow{3}{*}{WFM-3 db4} & Low & 0.151 & 0.146 & 0.141 & 0.144 & 0.146 & 0.137 & 0.132 & 0.140 & 0.131 \\
+ & Mid & 0.195 & 0.197 & 0.189 & 0.192 & 0.189 & 0.176 & 0.162 & 0.155 & 0.147 \\
+ & High & 0.149 & 0.152 & 0.150 & 0.154 & 0.159 & 0.157 & 0.141 & 0.129 & 0.109 \\
+\midrule
+\multirow{3}{*}{WFM-3 db6} & Low & 0.145 & 0.147 & 0.144 & 0.139 & 0.141 & \underline{0.125} & 0.132 & 0.136 & \underline{0.119} \\
+ & Mid & 0.193 & 0.198 & 0.188 & 0.191 & 0.181 & \underline{0.168} & 0.158 & 0.152 & 0.147 \\
+ & High & 0.148 & 0.150 & 0.151 & 0.156 & 0.170 & 0.164 & 0.144 & 0.134 & 0.112 \\
+\midrule
+\multirow{3}{*}{FM$_\text{pixel}$} & Low & 0.144 & 0.142 & 0.142 & 0.143 & 0.141 & 0.143 & 0.137 & 0.154 & 0.126 \\
+ & Mid & 0.193 & 0.199 & 0.191 & 0.196 & 0.186 & 0.187 & 0.169 & 0.163 & 0.151 \\
+ & High & 0.153 & 0.157 & 0.149 & 0.150 & 0.153 & \underline{0.142} & \textbf{0.126} & \textbf{0.113} & \textbf{0.098} \\
+\midrule
+\multirow{3}{*}{FM$_\text{fourier}$} & Low & 0.252 & 0.250 & 0.238 & 0.255 & 0.240 & 0.232 & 0.235 & 0.244 & 0.214 \\
+ & Mid & 0.680 & 0.674 & 0.677 & 0.682 & 0.686 & 0.689 & 0.694 & 0.688 & 0.705 \\
+ & High & 0.224 & 0.223 & 0.224 & 0.229 & 0.233 & 0.238 & 0.244 & 0.249 & 0.258 \\
+\midrule
+\multirow{3}{*}{WDNO} & Low & 0.204 & 0.203 & 0.194 & 0.205 & 0.195 & 0.192 & 0.195 & 0.215 & 0.190 \\
+ & Mid & 0.253 & 0.252 & 0.250 & 0.246 & 0.241 & 0.244 & 0.247 & 0.251 & 0.262 \\
+ & High & 0.359 & 0.363 & 0.355 & 0.363 & 0.367 & 0.370 & 0.376 & 0.378 & 0.373 \\
+\bottomrule
+\end{tabular}
+}
+\end{table}

@@ -1,0 +1,26 @@
+\begin{table}[ht]
+\centering
+\caption{CRPS per $t_{\mathrm{cool}}$ on TRL, averaged over rollout steps. Mean over three inference seeds (42, 84, 168); the standard deviation across seeds is below 5\% of the mean for all entries except those marked $^{*}$.}
+\label{tab:ablation_trl_crps_tcool}
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{lccccccccc}
+\toprule
+$t_{\mathrm{cool}}$ & 0.03 & 0.06 & 0.1 & 0.18 & 0.32 & 0.56 & 1 & 1.78 & 3.16 \\
+\midrule
+WFM-1 haar & 1.165 & 1.135 & 0.865$^{*}$ & 1.044 & 0.830$^{*}$ & 0.798 & 0.806$^{*}$ & 0.983 & 0.673 \\
+WFM-1 db2 & 1.112 & 1.078 & 0.878 & 1.057 & 0.880$^{*}$ & 0.779 & 0.853$^{*}$ & 0.976$^{*}$ & 1.002$^{*}$ \\
+WFM-1 db4 & 1.170 & 1.102 & 0.847$^{*}$ & 1.084 & 0.875 & 0.849 & 0.879$^{*}$ & 0.946 & 0.719 \\
+WFM-1 db6 & 1.076 & 1.074 & \underline{0.831} & 1.041 & 0.823 & 0.773 & 0.741 & \underline{0.943} & \underline{0.594}$^{*}$ \\
+\midrule
+WFM-3 haar & 1.107 & 1.117 & 0.868 & \underline{0.988}$^{*}$ & \textbf{0.773} & \underline{0.765}$^{*}$ & \textbf{0.675} & 0.961 & 0.595 \\
+WFM-3 db2 & 1.248 & 1.141 & 0.894 & 1.027 & 0.836 & 0.783$^{*}$ & 0.751$^{*}$ & 1.019 & 0.656 \\
+WFM-3 db4 & \textbf{1.048} & \textbf{1.006} & \textbf{0.817}$^{*}$ & \textbf{0.982} & \underline{0.817} & \textbf{0.749} & \underline{0.692} & \textbf{0.906} & 0.632 \\
+WFM-3 db6 & \underline{1.075} & \underline{1.034} & 0.882 & 1.000$^{*}$ & 0.863 & 0.850 & 0.770$^{*}$ & 0.969 & 0.617 \\
+\midrule
+FM$_\text{pixel}$ & 1.220 & 1.126 & 0.875$^{*}$ & 1.061 & 0.855$^{*}$ & 0.783 & 0.731 & 0.978 & \textbf{0.551}$^{*}$ \\
+FM$_\text{fourier}$ & 1.709 & 1.667 & 1.424 & 1.618 & 1.485 & 1.430 & 1.451 & 1.595 & 1.194 \\
+WDNO & 3.330 & 3.292 & 3.183 & 3.419 & 3.369 & 3.409 & 3.459 & 3.552 & 3.424 \\
+\bottomrule
+\end{tabular}
+}
+\end{table}

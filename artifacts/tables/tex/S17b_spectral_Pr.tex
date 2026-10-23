@@ -1,0 +1,60 @@
+\begin{table}[ht]
+\centering
+\caption{Spectral coherence RMSE per frequency band on Rayleigh--B\'enard vs $Pr$ (averaged over $Ra$). Mean over three inference seeds (42, 84, 168); the standard deviation across seeds is below 5\% of the mean for all entries except those marked $^{*}$.}
+\label{tab:ablation_rb_spectral_pr}
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{llccc}
+\toprule
+Model & $Pr$ & $10^{-1}$ & $1$ & $10^{1}$ \\
+\midrule
+\multirow{3}{*}{WFM-1 haar} & Low & 0.187 & 0.144 & 0.147 \\
+ & Mid & 0.158 & 0.164 & 0.136 \\
+ & High & 0.192 & 0.155 & 0.111 \\
+\midrule
+\multirow{3}{*}{WFM-1 db2} & Low & 0.180$^{*}$ & 0.145$^{*}$ & 0.145 \\
+ & Mid & 0.150 & 0.153 & 0.123 \\
+ & High & 0.182 & 0.136 & 0.087 \\
+\midrule
+\multirow{3}{*}{WFM-1 db4} & Low & 0.181$^{*}$ & 0.141 & 0.148 \\
+ & Mid & 0.138 & 0.133 & \underline{0.111} \\
+ & High & \underline{0.120} & \textbf{0.087} & \textbf{0.063} \\
+\midrule
+\multirow{3}{*}{WFM-1 db6} & Low & 0.200$^{*}$ & 0.210 & 0.217 \\
+ & Mid & 0.148 & 0.162 & 0.165 \\
+ & High & 0.129 & 0.150 & 0.091 \\
+\midrule
+\multirow{3}{*}{WFM-3 haar} & Low & 0.171 & 0.139 & 0.137 \\
+ & Mid & 0.155 & 0.159 & 0.136 \\
+ & High & 0.189 & 0.150 & 0.108 \\
+\midrule
+\multirow{3}{*}{WFM-3 db2} & Low & \textbf{0.160}$^{*}$ & 0.133 & \textbf{0.131} \\
+ & Mid & \underline{0.128} & 0.134 & 0.112 \\
+ & High & 0.122 & 0.096 & \underline{0.066} \\
+\midrule
+\multirow{3}{*}{WFM-3 db4} & Low & \underline{0.163} & \textbf{0.130} & \underline{0.134} \\
+ & Mid & \textbf{0.126} & \textbf{0.128} & \textbf{0.108} \\
+ & High & \textbf{0.112} & \underline{0.090} & 0.066 \\
+\midrule
+\multirow{3}{*}{WFM-3 db6} & Low & 0.172 & 0.137 & 0.139 \\
+ & Mid & 0.129 & \underline{0.132} & 0.111 \\
+ & High & 0.120 & 0.094 & 0.079 \\
+\midrule
+\multirow{3}{*}{FM$_\text{pixel}$} & Low & 0.169 & \underline{0.132} & 0.136 \\
+ & Mid & 0.153 & 0.160 & 0.133 \\
+ & High & 0.197 & 0.149 & 0.106 \\
+\midrule
+\multirow{3}{*}{FM$_\text{fourier}$} & Low & 0.334 & 0.307 & 0.290 \\
+ & Mid & 0.384 & 0.365 & 0.354 \\
+ & High & 0.123 & 0.123 & 0.116 \\
+\midrule
+\multirow{3}{*}{WDNO} & Low & 0.390 & 0.388 & 0.413 \\
+ & Mid & 0.477 & 0.498 & 0.505 \\
+ & High & 0.574 & 0.575 & 0.545 \\
+\midrule
+\multirow{3}{*}{LatentFM$_{\div 64}$} & Low & 0.199$^{*}$ & 0.173 & 0.185 \\
+ & Mid & 0.160 & 0.160 & 0.157 \\
+ & High & 0.163 & 0.151 & 0.132 \\
+\bottomrule
+\end{tabular}
+}
+\end{table}

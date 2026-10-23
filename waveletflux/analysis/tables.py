@@ -8,10 +8,10 @@ Deterministic baselines (FNO/TFNO/WNO) have a single run: mean only.
 
 Time averaging inside step 1 is table-specific and reproduces the paper:
   * TIME_AGG = "horizon" — mean within each rollout horizon, then mean of the
-    three horizons (horizon-balanced). Used by Table 1, S9, S13 (spectral
+    three horizons (horizon-balanced). Used by Table 1, S12 (spectral
     coherence "averaged across rollout").
   * TIME_AGG = "step"    — plain mean over all lead times. Used by the
-    physical-parameter breakdowns (Table 3, S14–S18).
+    physical-parameter breakdowns (Table 3, S13–S17).
 The two only differ on Rayleigh–Bénard, whose last horizon (65:196) is 4x
 longer than the first two.
 """
@@ -61,7 +61,7 @@ def best_view(df, keep=()):
 # builders — each takes ONE seed's rows and returns Model x columns
 # ===========================================================================
 def horizon_table(df, metric, models):
-    """VRMSE / CRPS per rollout horizon.  [Tables S11, S12]"""
+    """VRMSE / CRPS per rollout horizon.  [Tables S10, S11]"""
     parts = {}
     for pde in C.PDES:
         d = df[(df.pde == pde) & df.model.isin(models)]
@@ -73,7 +73,7 @@ def horizon_table(df, metric, models):
 
 
 def bands_table(df, models, time_agg="horizon"):
-    """Spectral coherence RMSE per frequency band.  [Tables S9, S13]"""
+    """Spectral coherence RMSE per frequency band.  [Table S12]"""
     parts = {}
     for pde in C.PDES:
         d = df[(df.pde == pde) & df.model.isin(models)]
@@ -99,7 +99,7 @@ def selection_table(df, models, time_agg="horizon"):
 
 
 def param_table(df, pde, param, models, metric="crps", time_agg="step"):
-    """Metric per physical-parameter value.  [Table 3a/3b, S14, S16, S17]"""
+    """Metric per physical-parameter value.  [Table 3a/3b, S13, S15, S16]"""
     d = df[(df.pde == pde) & df.model.isin(models)].dropna(subset=[param, metric])
     if d.empty:
         return None
@@ -108,7 +108,7 @@ def param_table(df, pde, param, models, metric="crps", time_agg="step"):
 
 
 def spectral_param_table(df, pde, param, models, time_agg="step"):
-    """Spectral coherence RMSE per band x parameter value.  [S15, S18]"""
+    """Spectral coherence RMSE per band x parameter value.  [S14, S17]"""
     d = df[(df.pde == pde) & df.model.isin(models)].dropna(subset=[param])
     if d.empty:
         return None
@@ -182,7 +182,7 @@ def _union(ixs):
 
 
 # ===========================================================================
-# wavelet selection  [Table 1 bold / Table S10]
+# wavelet selection  [Table 1 bold / Table S9]
 # ===========================================================================
 def select_wavelets(sel_mean: pd.DataFrame) -> dict:
     """(pde, scale) -> (model key, value): lowest band-averaged spectral RMSE."""
@@ -204,7 +204,7 @@ def check_selection(sel_mean) -> list[str]:
     return bad
 
 
-def s10_table(sel_mean, sel_std) -> pd.DataFrame:
+def s9_table(sel_mean, sel_std) -> pd.DataFrame:
     rows = []
     for (pde, scale), (key, val) in select_wavelets(sel_mean).items():
         rows.append(dict(pde=pde, scale=scale, wavelet=key.split("_")[2],
@@ -343,7 +343,7 @@ def latex_table(mean, std, caption, label, groups, corner="", top_labels=None,
 
 
 def latex_spectral_param(mean, std, caption, label, groups, param_label, param):
-    """Rows = (model, band) with \\multirow model names.  [S15, S18]"""
+    """Rows = (model, band) with \\multirow model names.  [S14, S17]"""
     params = list(dict.fromkeys(mean.columns.get_level_values(1)))
     fmt_p = C.PARAM_LABELS.get(param, lambda v: f"{v:g}")
     rows = [m for g in groups for m in g if m in mean.index]

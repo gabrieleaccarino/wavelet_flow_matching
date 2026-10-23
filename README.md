@@ -13,7 +13,7 @@ waveletflux/            package
     tables.py             table builders, across-seed mean ± std, LaTeX export
     physics.py            kinetic-energy diagnostic (rebuttal)
     ic_sensitivity.py     initial-condition perturbation study (rebuttal)
-    profiling.py          inference speed / memory (Tables 2, S19, S20)
+    profiling.py          inference speed / memory (Tables 2, S18, S19)
     paper_tables.py       one function per paper table: build, write tex/csv, return mean/std/n
     checks.py             rebuilds the submitted paper's tables (single run) cell by cell
 configs/<pde>/          v4.0 training configs + inference YAMLs (`*_seed.yaml` = 3-seed runs)
@@ -26,7 +26,7 @@ notebooks/
   03_qualitative_rollouts.ipynb  Figs 2a-b, S5          -> artifacts/figures/
   04_physics_consistency.ipynb   physics figures (rebuttal)
   05_cross_scale_coupling.ipynb  cross-scale sensitivity (needs GPU + checkpoint)
-  06_profiling_tables.ipynb      Tables 2, S19, S20 (interactive)
+  06_profiling_tables.ipynb      Tables 2, S18, S19 (interactive)
   07_architecture_figure.ipynb   Fig 1 panels
   examples/, data_prep/
 artifacts/              everything that goes into the paper (tracked in git)
@@ -53,8 +53,8 @@ Set `WAVELETFLUX_ROOT=/path/to/checkout` if `experiments/` lives elsewhere.
 
 **Aggregation.** Within a seed: mean over trajectories, fields and lead times;
 across seeds: mean ± sample std. Spectral coherence "averaged over the rollout"
-(Table 1, S9, S13) is horizon-balanced (mean of the three horizon means); the
-physical-parameter tables (Table 3, S14–S18) average over all lead times.
+(Table 1, S12) is horizon-balanced (mean of the three horizon means); the
+physical-parameter tables (Table 3, S13–S17) average over all lead times.
 Horizon bins are inclusive (e.g. RB: 1–32, 33–64, 65–196).
 
 ## Producing the metric files (cluster)

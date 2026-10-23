@@ -10,7 +10,7 @@ changes.
 
 Two quirks of the submission are reproduced explicitly here, and NOT carried
 into the camera-ready, which uses inclusive horizon bounds everywhere:
-  * Table 1 (and S9) were computed by the figures notebook, whose horizon bins
+  * Table 1 (and the submission's Table S9, since removed) were computed by the figures notebook, whose horizon bins
     use exclusive upper bounds (lead time 32 falls in "33:64"); rebuilt with
     those legacy bins, tolerance 1e-3.
   * The submission's FM_fourier is the 32-mode model (Table S4).
