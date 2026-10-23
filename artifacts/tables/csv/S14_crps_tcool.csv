@@ -1,0 +1,100 @@
+model,label,col0,mean,std,n_seeds
+WaveletFlow_1scale_haar_v4.0,WFM-1 haar,0.03,1.16488,0.0430836,3
+WaveletFlow_1scale_haar_v4.0,WFM-1 haar,0.06,1.1354,0.0566223,3
+WaveletFlow_1scale_haar_v4.0,WFM-1 haar,0.1,0.865196,0.0524583,3
+WaveletFlow_1scale_haar_v4.0,WFM-1 haar,0.18,1.04405,0.0281811,3
+WaveletFlow_1scale_haar_v4.0,WFM-1 haar,0.32,0.83046,0.0514803,3
+WaveletFlow_1scale_haar_v4.0,WFM-1 haar,0.56,0.798215,0.0302898,3
+WaveletFlow_1scale_haar_v4.0,WFM-1 haar,1,0.806435,0.0564362,3
+WaveletFlow_1scale_haar_v4.0,WFM-1 haar,1.78,0.983087,0.0361922,3
+WaveletFlow_1scale_haar_v4.0,WFM-1 haar,3.16,0.672505,0.0232337,3
+WaveletFlow_1scale_db2_v4.0,WFM-1 db2,0.03,1.11189,0.0306421,3
+WaveletFlow_1scale_db2_v4.0,WFM-1 db2,0.06,1.07762,0.0248059,3
+WaveletFlow_1scale_db2_v4.0,WFM-1 db2,0.1,0.878304,0.0418712,3
+WaveletFlow_1scale_db2_v4.0,WFM-1 db2,0.18,1.0568,0.0396988,3
+WaveletFlow_1scale_db2_v4.0,WFM-1 db2,0.32,0.879639,0.0653929,3
+WaveletFlow_1scale_db2_v4.0,WFM-1 db2,0.56,0.779094,0.0152038,3
+WaveletFlow_1scale_db2_v4.0,WFM-1 db2,1,0.853231,0.0527545,3
+WaveletFlow_1scale_db2_v4.0,WFM-1 db2,1.78,0.976342,0.0505939,3
+WaveletFlow_1scale_db2_v4.0,WFM-1 db2,3.16,1.00165,0.0606307,3
+WaveletFlow_1scale_db4_v4.0,WFM-1 db4,0.03,1.17002,0.0483683,3
+WaveletFlow_1scale_db4_v4.0,WFM-1 db4,0.06,1.10204,0.0438003,3
+WaveletFlow_1scale_db4_v4.0,WFM-1 db4,0.1,0.847289,0.0434799,3
+WaveletFlow_1scale_db4_v4.0,WFM-1 db4,0.18,1.08375,0.0521191,3
+WaveletFlow_1scale_db4_v4.0,WFM-1 db4,0.32,0.874516,0.00470174,3
+WaveletFlow_1scale_db4_v4.0,WFM-1 db4,0.56,0.849491,0.0193409,3
+WaveletFlow_1scale_db4_v4.0,WFM-1 db4,1,0.878999,0.0647834,3
+WaveletFlow_1scale_db4_v4.0,WFM-1 db4,1.78,0.94593,0.0381849,3
+WaveletFlow_1scale_db4_v4.0,WFM-1 db4,3.16,0.718813,0.0355958,3
+WaveletFlow_1scale_db6_v4.0,WFM-1 db6,0.03,1.07591,0.0233168,3
+WaveletFlow_1scale_db6_v4.0,WFM-1 db6,0.06,1.07382,0.0144735,3
+WaveletFlow_1scale_db6_v4.0,WFM-1 db6,0.1,0.830938,0.0205018,3
+WaveletFlow_1scale_db6_v4.0,WFM-1 db6,0.18,1.04109,0.0172418,3
+WaveletFlow_1scale_db6_v4.0,WFM-1 db6,0.32,0.823043,0.021198,3
+WaveletFlow_1scale_db6_v4.0,WFM-1 db6,0.56,0.772597,0.0340182,3
+WaveletFlow_1scale_db6_v4.0,WFM-1 db6,1,0.741309,0.0161891,3
+WaveletFlow_1scale_db6_v4.0,WFM-1 db6,1.78,0.943438,0.0180156,3
+WaveletFlow_1scale_db6_v4.0,WFM-1 db6,3.16,0.593691,0.0398156,3
+WaveletFlow_3scales_haar_v4.0,WFM-3 haar,0.03,1.10662,0.0117637,3
+WaveletFlow_3scales_haar_v4.0,WFM-3 haar,0.06,1.11718,0.0340764,3
+WaveletFlow_3scales_haar_v4.0,WFM-3 haar,0.1,0.86832,0.0186773,3
+WaveletFlow_3scales_haar_v4.0,WFM-3 haar,0.18,0.987839,0.0665496,3
+WaveletFlow_3scales_haar_v4.0,WFM-3 haar,0.32,0.773077,0.0204444,3
+WaveletFlow_3scales_haar_v4.0,WFM-3 haar,0.56,0.765016,0.0458068,3
+WaveletFlow_3scales_haar_v4.0,WFM-3 haar,1,0.674668,0.0259677,3
+WaveletFlow_3scales_haar_v4.0,WFM-3 haar,1.78,0.960613,0.0108756,3
+WaveletFlow_3scales_haar_v4.0,WFM-3 haar,3.16,0.59456,0.0244679,3
+WaveletFlow_3scales_db2_v4.0,WFM-3 db2,0.03,1.24776,0.0240967,3
+WaveletFlow_3scales_db2_v4.0,WFM-3 db2,0.06,1.14057,0.0438111,3
+WaveletFlow_3scales_db2_v4.0,WFM-3 db2,0.1,0.893919,0.0425301,3
+WaveletFlow_3scales_db2_v4.0,WFM-3 db2,0.18,1.02651,0.0249834,3
+WaveletFlow_3scales_db2_v4.0,WFM-3 db2,0.32,0.836045,0.0170751,3
+WaveletFlow_3scales_db2_v4.0,WFM-3 db2,0.56,0.783348,0.0407017,3
+WaveletFlow_3scales_db2_v4.0,WFM-3 db2,1,0.750859,0.0400636,3
+WaveletFlow_3scales_db2_v4.0,WFM-3 db2,1.78,1.0189,0.00846601,3
+WaveletFlow_3scales_db2_v4.0,WFM-3 db2,3.16,0.655966,0.0275967,3
+WaveletFlow_3scales_db4_v4.0,WFM-3 db4,0.03,1.04816,0.0191963,3
+WaveletFlow_3scales_db4_v4.0,WFM-3 db4,0.06,1.00603,0.0250316,3
+WaveletFlow_3scales_db4_v4.0,WFM-3 db4,0.1,0.817413,0.0417231,3
+WaveletFlow_3scales_db4_v4.0,WFM-3 db4,0.18,0.982065,0.0485936,3
+WaveletFlow_3scales_db4_v4.0,WFM-3 db4,0.32,0.817102,0.0329613,3
+WaveletFlow_3scales_db4_v4.0,WFM-3 db4,0.56,0.749062,0.0267011,3
+WaveletFlow_3scales_db4_v4.0,WFM-3 db4,1,0.692231,0.0278498,3
+WaveletFlow_3scales_db4_v4.0,WFM-3 db4,1.78,0.905957,0.00487436,3
+WaveletFlow_3scales_db4_v4.0,WFM-3 db4,3.16,0.631807,0.011089,3
+WaveletFlow_3scales_db6_v4.0,WFM-3 db6,0.03,1.07522,0.0177079,3
+WaveletFlow_3scales_db6_v4.0,WFM-3 db6,0.06,1.03372,0.0150336,3
+WaveletFlow_3scales_db6_v4.0,WFM-3 db6,0.1,0.882176,0.0382796,3
+WaveletFlow_3scales_db6_v4.0,WFM-3 db6,0.18,1.00044,0.0529395,3
+WaveletFlow_3scales_db6_v4.0,WFM-3 db6,0.32,0.863157,0.0385103,3
+WaveletFlow_3scales_db6_v4.0,WFM-3 db6,0.56,0.849542,0.02681,3
+WaveletFlow_3scales_db6_v4.0,WFM-3 db6,1,0.76961,0.0475545,3
+WaveletFlow_3scales_db6_v4.0,WFM-3 db6,1.78,0.969415,0.0383939,3
+WaveletFlow_3scales_db6_v4.0,WFM-3 db6,3.16,0.617416,0.00633508,3
+FM_data_space_v4.0,FM$_\text{pixel}$,0.03,1.22025,0.0400072,3
+FM_data_space_v4.0,FM$_\text{pixel}$,0.06,1.12552,0.0158631,3
+FM_data_space_v4.0,FM$_\text{pixel}$,0.1,0.874969,0.0447158,3
+FM_data_space_v4.0,FM$_\text{pixel}$,0.18,1.06072,0.0475185,3
+FM_data_space_v4.0,FM$_\text{pixel}$,0.32,0.854961,0.0461203,3
+FM_data_space_v4.0,FM$_\text{pixel}$,0.56,0.782524,0.00386492,3
+FM_data_space_v4.0,FM$_\text{pixel}$,1,0.731068,0.0121219,3
+FM_data_space_v4.0,FM$_\text{pixel}$,1.78,0.978306,0.021276,3
+FM_data_space_v4.0,FM$_\text{pixel}$,3.16,0.551125,0.0302788,3
+FourierFlow_16modes_v4.0,FM$_\text{fourier}$,0.03,1.70912,0.0311068,3
+FourierFlow_16modes_v4.0,FM$_\text{fourier}$,0.06,1.66726,0.0315229,3
+FourierFlow_16modes_v4.0,FM$_\text{fourier}$,0.1,1.42359,0.0064372,3
+FourierFlow_16modes_v4.0,FM$_\text{fourier}$,0.18,1.6181,0.0120886,3
+FourierFlow_16modes_v4.0,FM$_\text{fourier}$,0.32,1.48534,0.0188008,3
+FourierFlow_16modes_v4.0,FM$_\text{fourier}$,0.56,1.43012,0.0156468,3
+FourierFlow_16modes_v4.0,FM$_\text{fourier}$,1,1.4509,0.0137819,3
+FourierFlow_16modes_v4.0,FM$_\text{fourier}$,1.78,1.59549,0.0147471,3
+FourierFlow_16modes_v4.0,FM$_\text{fourier}$,3.16,1.19412,0.00317262,3
+WDNO_db2,WDNO,0.03,3.32981,0.00782664,3
+WDNO_db2,WDNO,0.06,3.29241,0.00708774,3
+WDNO_db2,WDNO,0.1,3.18289,0.00533468,3
+WDNO_db2,WDNO,0.18,3.4194,0.00463014,3
+WDNO_db2,WDNO,0.32,3.36851,0.0106664,3
+WDNO_db2,WDNO,0.56,3.40865,0.010382,3
+WDNO_db2,WDNO,1,3.45933,0.00961181,3
+WDNO_db2,WDNO,1.78,3.55214,0.0117976,3
+WDNO_db2,WDNO,3.16,3.424,0.0106362,3

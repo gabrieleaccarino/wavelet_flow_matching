@@ -1,0 +1,28 @@
+\begin{table}[ht]
+\centering
+\caption{CRPS across rollout horizons for all models and PDE systems. Mean\,$\pm$\,std over three inference seeds (42, 84, 168).}
+\label{tab:appendix_crps}
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{l ccc ccc ccc}
+\toprule
+Rollout & \multicolumn{3}{c}{Turb. Rad. Layer 2D} & \multicolumn{3}{c}{Rayleigh--B\'{e}nard} & \multicolumn{3}{c}{Active Matter} \\
+\cmidrule(lr){2-4} \cmidrule(lr){5-7} \cmidrule(lr){8-10}
+ & 01:32 & 33:64 & 65:97 & 01:32 & 33:64 & 65:196 & 01:16 & 17:32 & 33:77 \\
+\midrule
+WFM-1 haar & 0.492{\scriptsize$\,\pm\,$0.006} & 1.047{\scriptsize$\,\pm\,$0.033} & 1.218{\scriptsize$\,\pm\,$0.032} & 0.005{\scriptsize$\,\pm\,$<0.001} & 0.037{\scriptsize$\,\pm\,$<0.001} & 0.074{\scriptsize$\,\pm\,$0.003} & 0.119{\scriptsize$\,\pm\,$0.001} & 0.190{\scriptsize$\,\pm\,$0.001} & 0.198{\scriptsize$\,\pm\,$0.001} \\
+WFM-1 db2 & 0.447{\scriptsize$\,\pm\,$0.007} & 1.097{\scriptsize$\,\pm\,$0.008} & 1.316{\scriptsize$\,\pm\,$0.032} & 0.005{\scriptsize$\,\pm\,$<0.001} & 0.036{\scriptsize$\,\pm\,$<0.001} & \underline{0.073{\scriptsize$\,\pm\,$0.002}} & 0.173{\scriptsize$\,\pm\,$<0.001} & 0.239{\scriptsize$\,\pm\,$<0.001} & 0.261{\scriptsize$\,\pm\,$<0.001} \\
+WFM-1 db4 & 0.521{\scriptsize$\,\pm\,$0.006} & 1.052{\scriptsize$\,\pm\,$0.002} & 1.241{\scriptsize$\,\pm\,$0.021} & 0.007{\scriptsize$\,\pm\,$<0.001} & 0.041{\scriptsize$\,\pm\,$<0.001} & \underline{0.073{\scriptsize$\,\pm\,$0.003}} & 0.326{\scriptsize$\,\pm\,$<0.001} & 0.388{\scriptsize$\,\pm\,$<0.001} & 0.387{\scriptsize$\,\pm\,$<0.001} \\
+WFM-1 db6 & 0.451{\scriptsize$\,\pm\,$0.003} & \textbf{0.983{\scriptsize$\,\pm\,$0.017}} & 1.188{\scriptsize$\,\pm\,$0.008} & 0.005{\scriptsize$\,\pm\,$<0.001} & 0.040{\scriptsize$\,\pm\,$<0.001} & 0.090{\scriptsize$\,\pm\,$0.001} & 0.175{\scriptsize$\,\pm\,$<0.001} & 0.222{\scriptsize$\,\pm\,$<0.001} & 0.231{\scriptsize$\,\pm\,$<0.001} \\
+\midrule
+WFM-3 haar & \textbf{0.410{\scriptsize$\,\pm\,$0.003}} & 1.018{\scriptsize$\,\pm\,$0.011} & \underline{1.178{\scriptsize$\,\pm\,$0.030}} & \underline{0.004{\scriptsize$\,\pm\,$<0.001}} & 0.037{\scriptsize$\,\pm\,$<0.001} & 0.077{\scriptsize$\,\pm\,$0.004} & \underline{0.080{\scriptsize$\,\pm\,$<0.001}} & \underline{0.169{\scriptsize$\,\pm\,$0.003}} & \textbf{0.191{\scriptsize$\,\pm\,$0.001}} \\
+WFM-3 db2 & 0.465{\scriptsize$\,\pm\,$0.008} & 1.133{\scriptsize$\,\pm\,$0.006} & 1.179{\scriptsize$\,\pm\,$0.026} & \textbf{0.003{\scriptsize$\,\pm\,$<0.001}} & \underline{0.032{\scriptsize$\,\pm\,$<0.001}} & \textbf{0.069{\scriptsize$\,\pm\,$0.002}} & 0.087{\scriptsize$\,\pm\,$0.001} & 0.176{\scriptsize$\,\pm\,$0.003} & 0.196{\scriptsize$\,\pm\,$0.002} \\
+WFM-3 db4 & 0.427{\scriptsize$\,\pm\,$0.004} & \underline{0.984{\scriptsize$\,\pm\,$0.007}} & \textbf{1.130{\scriptsize$\,\pm\,$0.016}} & \underline{0.004{\scriptsize$\,\pm\,$<0.001}} & \underline{0.032{\scriptsize$\,\pm\,$<0.001}} & \textbf{0.069{\scriptsize$\,\pm\,$0.001}} & 0.109{\scriptsize$\,\pm\,$0.001} & 0.209{\scriptsize$\,\pm\,$0.001} & 0.239{\scriptsize$\,\pm\,$<0.001} \\
+WFM-3 db6 & 0.451{\scriptsize$\,\pm\,$0.006} & 1.026{\scriptsize$\,\pm\,$0.006} & 1.200{\scriptsize$\,\pm\,$0.015} & \underline{0.004{\scriptsize$\,\pm\,$<0.001}} & \textbf{0.031{\scriptsize$\,\pm\,$0.001}} & 0.079{\scriptsize$\,\pm\,$0.003} & 0.100{\scriptsize$\,\pm\,$0.001} & 0.197{\scriptsize$\,\pm\,$0.001} & 0.213{\scriptsize$\,\pm\,$0.001} \\
+\midrule
+FM$_\text{pixel}$ & \underline{0.418{\scriptsize$\,\pm\,$0.006}} & 1.088{\scriptsize$\,\pm\,$0.007} & 1.210{\scriptsize$\,\pm\,$0.017} & 0.005{\scriptsize$\,\pm\,$<0.001} & 0.036{\scriptsize$\,\pm\,$0.001} & 0.076{\scriptsize$\,\pm\,$0.005} & \textbf{0.059{\scriptsize$\,\pm\,$<0.001}} & \textbf{0.166{\scriptsize$\,\pm\,$0.001}} & \underline{0.194{\scriptsize$\,\pm\,$0.001}} \\
+FM$_\text{fourier}$ & 1.112{\scriptsize$\,\pm\,$0.003} & 1.632{\scriptsize$\,\pm\,$0.007} & 1.772{\scriptsize$\,\pm\,$0.011} & 0.013{\scriptsize$\,\pm\,$<0.001} & 0.040{\scriptsize$\,\pm\,$0.001} & 0.090{\scriptsize$\,\pm\,$0.001} & 0.197{\scriptsize$\,\pm\,$0.001} & 0.216{\scriptsize$\,\pm\,$0.002} & 0.211{\scriptsize$\,\pm\,$0.001} \\
+WDNO & 2.460{\scriptsize$\,\pm\,$0.002} & 3.374{\scriptsize$\,\pm\,$0.004} & 4.284{\scriptsize$\,\pm\,$0.013} & 0.050{\scriptsize$\,\pm\,$<0.001} & 0.102{\scriptsize$\,\pm\,$<0.001} & 0.138{\scriptsize$\,\pm\,$<0.001} & 0.218{\scriptsize$\,\pm\,$<0.001} & 0.245{\scriptsize$\,\pm\,$<0.001} & 0.266{\scriptsize$\,\pm\,$<0.001} \\
+\bottomrule
+\end{tabular}
+}
+\end{table}

@@ -1,0 +1,34 @@
+model,label,col0,mean,std,n_seeds
+WaveletFlow_1scale_haar_v4.0,WFM-1 haar,-2.30259,0.0909576,0.000908769,3
+WaveletFlow_1scale_haar_v4.0,WFM-1 haar,0,0.0503568,0.0041898,3
+WaveletFlow_1scale_haar_v4.0,WFM-1 haar,2.30259,0.0291626,0.000922352,3
+WaveletFlow_1scale_db2_v4.0,WFM-1 db2,-2.30259,0.0875809,0.00520061,3
+WaveletFlow_1scale_db2_v4.0,WFM-1 db2,0,0.0492291,0.00212525,3
+WaveletFlow_1scale_db2_v4.0,WFM-1 db2,2.30259,0.0297933,0.000545207,3
+WaveletFlow_1scale_db4_v4.0,WFM-1 db4,-2.30259,0.088377,0.00656981,3
+WaveletFlow_1scale_db4_v4.0,WFM-1 db4,0,0.0484805,0.00165472,3
+WaveletFlow_1scale_db4_v4.0,WFM-1 db4,2.30259,0.033599,0.000746388,3
+WaveletFlow_1scale_db6_v4.0,WFM-1 db6,-2.30259,0.0873797,0.00278226,3
+WaveletFlow_1scale_db6_v4.0,WFM-1 db6,0,0.0657085,0.00387237,3
+WaveletFlow_1scale_db6_v4.0,WFM-1 db6,2.30259,0.0506607,0.000944202,3
+WaveletFlow_3scales_haar_v4.0,WFM-3 haar,-2.30259,0.0918567,0.00669781,3
+WaveletFlow_3scales_haar_v4.0,WFM-3 haar,0,0.0502836,0.00203574,3
+WaveletFlow_3scales_haar_v4.0,WFM-3 haar,2.30259,0.0326095,0.000109402,3
+WaveletFlow_3scales_db2_v4.0,WFM-3 db2,-2.30259,0.0791651,0.0032126,3
+WaveletFlow_3scales_db2_v4.0,WFM-3 db2,0,0.0475413,0.000647708,3
+WaveletFlow_3scales_db2_v4.0,WFM-3 db2,2.30259,0.0311158,0.000603926,3
+WaveletFlow_3scales_db4_v4.0,WFM-3 db4,-2.30259,0.0785783,0.00509227,3
+WaveletFlow_3scales_db4_v4.0,WFM-3 db4,0,0.0509868,0.0040447,3
+WaveletFlow_3scales_db4_v4.0,WFM-3 db4,2.30259,0.0282068,0.000651616,3
+WaveletFlow_3scales_db6_v4.0,WFM-3 db6,-2.30259,0.0857039,0.00660231,3
+WaveletFlow_3scales_db6_v4.0,WFM-3 db6,0,0.0504598,0.00181007,3
+WaveletFlow_3scales_db6_v4.0,WFM-3 db6,2.30259,0.0400385,0.00138527,3
+FM_data_space_v4.0,FM$_\text{pixel}$,-2.30259,0.0876954,0.00804694,3
+FM_data_space_v4.0,FM$_\text{pixel}$,0,0.0538494,0.00127472,3
+FM_data_space_v4.0,FM$_\text{pixel}$,2.30259,0.0328927,0.00104368,3
+FourierFlow_16modes_v4.0,FM$_\text{fourier}$,-2.30259,0.111232,0.00109245,3
+FourierFlow_16modes_v4.0,FM$_\text{fourier}$,0,0.058443,0.00129098,3
+FourierFlow_16modes_v4.0,FM$_\text{fourier}$,2.30259,0.0381005,0.000776497,3
+WDNO_db2,WDNO,-2.30259,0.145876,0.000589629,3
+WDNO_db2,WDNO,0,0.111894,0.000255241,3
+WDNO_db2,WDNO,2.30259,0.0960455,0.00022789,3

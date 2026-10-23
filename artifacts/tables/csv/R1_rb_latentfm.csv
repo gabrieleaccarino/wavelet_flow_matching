@@ -1,0 +1,37 @@
+model,label,col0,col1,mean,std,n_seeds
+WFM_1scale_best,WFM 1-scale,Spectral coherence RMSE,Low,0.168353,0.00486968,3
+WFM_1scale_best,WFM 1-scale,Spectral coherence RMSE,Mid,0.118007,0.000893793,3
+WFM_1scale_best,WFM 1-scale,Spectral coherence RMSE,High,0.0768929,0.000180004,3
+WFM_1scale_best,WFM 1-scale,CRPS,01:32,0.00714891,3.27528e-05,3
+WFM_1scale_best,WFM 1-scale,CRPS,33:64,0.0405595,0.000337311,3
+WFM_1scale_best,WFM 1-scale,CRPS,65:196,0.0728017,0.00315537,3
+WFM_3scale_best,WFM 3-scale,Spectral coherence RMSE,Low,0.143072,0.00200175,3
+WFM_3scale_best,WFM 3-scale,Spectral coherence RMSE,Mid,0.108997,0.000857651,3
+WFM_3scale_best,WFM 3-scale,Spectral coherence RMSE,High,0.0752483,0.00060177,3
+WFM_3scale_best,WFM 3-scale,CRPS,01:32,0.00388679,5.04917e-05,3
+WFM_3scale_best,WFM 3-scale,CRPS,33:64,0.0317293,0.000259288,3
+WFM_3scale_best,WFM 3-scale,CRPS,65:196,0.0694549,0.001097,3
+FM_data_space_v4.0,FM$_\text{pixel}$,Spectral coherence RMSE,Low,0.148702,0.000694494,3
+FM_data_space_v4.0,FM$_\text{pixel}$,Spectral coherence RMSE,Mid,0.129334,0.000432357,3
+FM_data_space_v4.0,FM$_\text{pixel}$,Spectral coherence RMSE,High,0.114704,0.00128528,3
+FM_data_space_v4.0,FM$_\text{pixel}$,CRPS,01:32,0.0046732,4.60762e-05,3
+FM_data_space_v4.0,FM$_\text{pixel}$,CRPS,33:64,0.0363104,0.000826059,3
+FM_data_space_v4.0,FM$_\text{pixel}$,CRPS,65:196,0.0764023,0.00470576,3
+FourierFlow_16modes_v4.0,FM$_\text{fourier}$,Spectral coherence RMSE,Low,0.294166,0.00165284,3
+FourierFlow_16modes_v4.0,FM$_\text{fourier}$,Spectral coherence RMSE,Mid,0.331836,0.000441619,3
+FourierFlow_16modes_v4.0,FM$_\text{fourier}$,Spectral coherence RMSE,High,0.113285,5.04283e-05,3
+FourierFlow_16modes_v4.0,FM$_\text{fourier}$,CRPS,01:32,0.0127549,0.00011597,3
+FourierFlow_16modes_v4.0,FM$_\text{fourier}$,CRPS,33:64,0.0403819,0.00064969,3
+FourierFlow_16modes_v4.0,FM$_\text{fourier}$,CRPS,65:196,0.0899565,0.00134196,3
+WDNO_db2,WDNO,Spectral coherence RMSE,Low,0.392029,0.000662548,3
+WDNO_db2,WDNO,Spectral coherence RMSE,Mid,0.47353,0.00024235,3
+WDNO_db2,WDNO,Spectral coherence RMSE,High,0.535371,0.000111579,3
+WDNO_db2,WDNO,CRPS,01:32,0.0504921,2.91804e-06,3
+WDNO_db2,WDNO,CRPS,33:64,0.10223,0.000151006,3
+WDNO_db2,WDNO,CRPS,65:196,0.138097,0.000279727,3
+LatentFM_dcae_f32c64_v4.0,LatentFM$_{\div 64}$,Spectral coherence RMSE,Low,0.196385,0.00018415,3
+LatentFM_dcae_f32c64_v4.0,LatentFM$_{\div 64}$,Spectral coherence RMSE,Mid,0.159122,0.000327871,3
+LatentFM_dcae_f32c64_v4.0,LatentFM$_{\div 64}$,Spectral coherence RMSE,High,0.130752,0.000515092,3
+LatentFM_dcae_f32c64_v4.0,LatentFM$_{\div 64}$,CRPS,01:32,0.0255099,0.000128957,3
+LatentFM_dcae_f32c64_v4.0,LatentFM$_{\div 64}$,CRPS,33:64,0.0573995,0.000321874,3
+LatentFM_dcae_f32c64_v4.0,LatentFM$_{\div 64}$,CRPS,65:196,0.0881796,0.00424329,3

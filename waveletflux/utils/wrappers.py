@@ -26,12 +26,3 @@ class TFNOMPSSafeWrapper(nn.Module):
         return y.to(origin_device) # return to MPS / caller's device
 
 
-def make_mps_safe(model: nn.Module) -> nn.Module:
-    """
-    Convenience helper: wraps the model only when running on MPS.
-    On CUDA or CPU it returns the model unchanged.
-    """
-    if torch.backends.mps.is_available() and next(model.parameters()).device.type == "mps":
-        print("MPS detected — wrapping model with TFNOMPSSafeWrapper (FFT ops run on CPU).")
-        return TFNOMPSSafeWrapper(model)
-    return model

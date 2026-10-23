@@ -1,0 +1,56 @@
+\begin{table}[ht]
+\centering
+\caption{Spectral coherence RMSE per frequency band on Rayleigh--B\'enard vs $Pr$ (averaged over $Ra$). Mean\,$\pm$\,std over three inference seeds (42, 84, 168).}
+\label{tab:ablation_rb_spectral_pr}
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{llccc}
+\toprule
+Model & $Pr$ & $10^{-1}$ & $1$ & $10^{1}$ \\
+\midrule
+\multirow{3}{*}{WFM-1 haar} & Low & 0.187{\scriptsize$\,\pm\,$0.007} & 0.144{\scriptsize$\,\pm\,$0.003} & 0.147{\scriptsize$\,\pm\,$0.002} \\
+ & Mid & 0.158{\scriptsize$\,\pm\,$0.002} & 0.164{\scriptsize$\,\pm\,$<0.001} & 0.136{\scriptsize$\,\pm\,$<0.001} \\
+ & High & 0.192{\scriptsize$\,\pm\,$0.004} & 0.155{\scriptsize$\,\pm\,$0.001} & 0.111{\scriptsize$\,\pm\,$0.002} \\
+\midrule
+\multirow{3}{*}{WFM-1 db2} & Low & 0.180{\scriptsize$\,\pm\,$0.011} & 0.145{\scriptsize$\,\pm\,$0.008} & 0.145{\scriptsize$\,\pm\,$0.002} \\
+ & Mid & 0.150{\scriptsize$\,\pm\,$0.003} & 0.153{\scriptsize$\,\pm\,$0.001} & 0.123{\scriptsize$\,\pm\,$0.002} \\
+ & High & 0.182{\scriptsize$\,\pm\,$0.001} & 0.136{\scriptsize$\,\pm\,$0.004} & 0.087{\scriptsize$\,\pm\,$0.001} \\
+\midrule
+\multirow{3}{*}{WFM-1 db4} & Low & 0.181{\scriptsize$\,\pm\,$0.026} & 0.141{\scriptsize$\,\pm\,$0.006} & 0.148{\scriptsize$\,\pm\,$0.003} \\
+ & Mid & 0.138{\scriptsize$\,\pm\,$0.004} & 0.133{\scriptsize$\,\pm\,$0.002} & \underline{0.111{\scriptsize$\,\pm\,$<0.001}} \\
+ & High & \underline{0.120{\scriptsize$\,\pm\,$0.001}} & \textbf{0.087{\scriptsize$\,\pm\,$0.002}} & \textbf{0.063{\scriptsize$\,\pm\,$0.001}} \\
+\midrule
+\multirow{3}{*}{WFM-1 db6} & Low & 0.200{\scriptsize$\,\pm\,$0.013} & 0.210{\scriptsize$\,\pm\,$0.010} & 0.217{\scriptsize$\,\pm\,$0.007} \\
+ & Mid & 0.148{\scriptsize$\,\pm\,$0.005} & 0.162{\scriptsize$\,\pm\,$0.004} & 0.165{\scriptsize$\,\pm\,$0.002} \\
+ & High & 0.129{\scriptsize$\,\pm\,$0.006} & 0.150{\scriptsize$\,\pm\,$0.006} & 0.091{\scriptsize$\,\pm\,$0.004} \\
+\midrule
+\multirow{3}{*}{WFM-3 haar} & Low & 0.171{\scriptsize$\,\pm\,$0.001} & 0.139{\scriptsize$\,\pm\,$0.003} & 0.137{\scriptsize$\,\pm\,$0.001} \\
+ & Mid & 0.155{\scriptsize$\,\pm\,$0.003} & 0.159{\scriptsize$\,\pm\,$0.002} & 0.136{\scriptsize$\,\pm\,$0.002} \\
+ & High & 0.189{\scriptsize$\,\pm\,$0.004} & 0.150{\scriptsize$\,\pm\,$0.004} & 0.108{\scriptsize$\,\pm\,$0.002} \\
+\midrule
+\multirow{3}{*}{WFM-3 db2} & Low & \textbf{0.160{\scriptsize$\,\pm\,$0.014}} & 0.133{\scriptsize$\,\pm\,$0.006} & \textbf{0.131{\scriptsize$\,\pm\,$0.001}} \\
+ & Mid & \underline{0.128{\scriptsize$\,\pm\,$0.002}} & 0.134{\scriptsize$\,\pm\,$0.001} & 0.112{\scriptsize$\,\pm\,$0.002} \\
+ & High & 0.122{\scriptsize$\,\pm\,$0.002} & 0.096{\scriptsize$\,\pm\,$0.002} & \underline{0.066{\scriptsize$\,\pm\,$0.001}} \\
+\midrule
+\multirow{3}{*}{WFM-3 db4} & Low & \underline{0.163{\scriptsize$\,\pm\,$0.006}} & \textbf{0.130{\scriptsize$\,\pm\,$0.004}} & \underline{0.134{\scriptsize$\,\pm\,$<0.001}} \\
+ & Mid & \textbf{0.126{\scriptsize$\,\pm\,$0.001}} & \textbf{0.128{\scriptsize$\,\pm\,$0.002}} & \textbf{0.108{\scriptsize$\,\pm\,$0.001}} \\
+ & High & \textbf{0.112{\scriptsize$\,\pm\,$0.002}} & \underline{0.090{\scriptsize$\,\pm\,$0.001}} & \underline{0.066{\scriptsize$\,\pm\,$<0.001}} \\
+\midrule
+\multirow{3}{*}{WFM-3 db6} & Low & 0.172{\scriptsize$\,\pm\,$0.001} & 0.137{\scriptsize$\,\pm\,$0.003} & 0.139{\scriptsize$\,\pm\,$<0.001} \\
+ & Mid & 0.129{\scriptsize$\,\pm\,$0.001} & \underline{0.132{\scriptsize$\,\pm\,$0.001}} & \underline{0.111{\scriptsize$\,\pm\,$<0.001}} \\
+ & High & \underline{0.120{\scriptsize$\,\pm\,$0.003}} & 0.094{\scriptsize$\,\pm\,$0.001} & 0.079{\scriptsize$\,\pm\,$<0.001} \\
+\midrule
+\multirow{3}{*}{FM$_\text{pixel}$} & Low & 0.169{\scriptsize$\,\pm\,$0.004} & \underline{0.132{\scriptsize$\,\pm\,$0.002}} & 0.136{\scriptsize$\,\pm\,$0.002} \\
+ & Mid & 0.153{\scriptsize$\,\pm\,$0.001} & 0.160{\scriptsize$\,\pm\,$0.002} & 0.133{\scriptsize$\,\pm\,$0.001} \\
+ & High & 0.197{\scriptsize$\,\pm\,$0.001} & 0.149{\scriptsize$\,\pm\,$0.007} & 0.106{\scriptsize$\,\pm\,$0.001} \\
+\midrule
+\multirow{3}{*}{FM$_\text{fourier}$} & Low & 0.334{\scriptsize$\,\pm\,$0.004} & 0.307{\scriptsize$\,\pm\,$0.001} & 0.290{\scriptsize$\,\pm\,$0.004} \\
+ & Mid & 0.384{\scriptsize$\,\pm\,$0.001} & 0.365{\scriptsize$\,\pm\,$<0.001} & 0.354{\scriptsize$\,\pm\,$0.001} \\
+ & High & 0.123{\scriptsize$\,\pm\,$<0.001} & 0.123{\scriptsize$\,\pm\,$<0.001} & 0.116{\scriptsize$\,\pm\,$<0.001} \\
+\midrule
+\multirow{3}{*}{WDNO} & Low & 0.390{\scriptsize$\,\pm\,$0.003} & 0.388{\scriptsize$\,\pm\,$0.003} & 0.413{\scriptsize$\,\pm\,$0.001} \\
+ & Mid & 0.477{\scriptsize$\,\pm\,$<0.001} & 0.498{\scriptsize$\,\pm\,$<0.001} & 0.505{\scriptsize$\,\pm\,$0.001} \\
+ & High & 0.574{\scriptsize$\,\pm\,$<0.001} & 0.575{\scriptsize$\,\pm\,$<0.001} & 0.545{\scriptsize$\,\pm\,$<0.001} \\
+\bottomrule
+\end{tabular}
+}
+\end{table}

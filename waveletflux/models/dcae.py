@@ -475,7 +475,3 @@ def get_autoencoder(
     return AutoEncoder(encoder, decoder, saturation=saturation, noise=latent_noise)
 
 
-def compression_factor(hid_blocks: Sequence[int], stride: int = 2,
-                       patch_size: int = 1, spatial: int = 2) -> int:
-    r"""Spatial downsampling factor r = patch_size * stride^(len(hid_blocks)-1)."""
-    return int(patch_size * stride ** (len(hid_blocks) - 1)) ** 1

@@ -1,9 +1,15 @@
-__pycache__
-.tmp
-.bak
-experiments
-scripts/logs
-figures
-data
-performance
-notebooks/outputs
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+.DS_Store
+.tmp/
+
+# large / machine-specific (kept on disk, not in git)
+/experiments/
+/data/
+/figures/
+/performance/
+/scripts/logs/
+
+# archived by the camera-ready cleanup (review, then delete)
+/_to_delete/

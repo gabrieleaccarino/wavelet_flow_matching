@@ -1,0 +1,24 @@
+\begin{table}[ht]
+\centering
+\caption{CRPS per Prandtl number $Pr$ on Rayleigh--B\'enard, averaged over Rayleigh numbers. Mean\,$\pm$\,std over three inference seeds (42, 84, 168).}
+\label{tab:ablation_rb_crps_pr}
+\begin{tabular}{lccc}
+\toprule
+$Pr$ & $10^{-1}$ & $1$ & $10^{1}$ \\
+\midrule
+WFM-1 haar & 0.091{\scriptsize$\,\pm\,$0.001} & 0.050{\scriptsize$\,\pm\,$0.004} & \underline{0.029{\scriptsize$\,\pm\,$0.001}} \\
+WFM-1 db2 & 0.088{\scriptsize$\,\pm\,$0.005} & \underline{0.049{\scriptsize$\,\pm\,$0.002}} & 0.030{\scriptsize$\,\pm\,$0.001} \\
+WFM-1 db4 & 0.088{\scriptsize$\,\pm\,$0.007} & \textbf{0.048{\scriptsize$\,\pm\,$0.002}} & 0.034{\scriptsize$\,\pm\,$0.001} \\
+WFM-1 db6 & 0.087{\scriptsize$\,\pm\,$0.003} & 0.066{\scriptsize$\,\pm\,$0.004} & 0.051{\scriptsize$\,\pm\,$0.001} \\
+\midrule
+WFM-3 haar & 0.092{\scriptsize$\,\pm\,$0.007} & 0.050{\scriptsize$\,\pm\,$0.002} & 0.033{\scriptsize$\,\pm\,$<0.001} \\
+WFM-3 db2 & \textbf{0.079{\scriptsize$\,\pm\,$0.003}} & \textbf{0.048{\scriptsize$\,\pm\,$0.001}} & 0.031{\scriptsize$\,\pm\,$0.001} \\
+WFM-3 db4 & \textbf{0.079{\scriptsize$\,\pm\,$0.005}} & 0.051{\scriptsize$\,\pm\,$0.004} & \textbf{0.028{\scriptsize$\,\pm\,$0.001}} \\
+WFM-3 db6 & \underline{0.086{\scriptsize$\,\pm\,$0.007}} & 0.050{\scriptsize$\,\pm\,$0.002} & 0.040{\scriptsize$\,\pm\,$0.001} \\
+\midrule
+FM$_\text{pixel}$ & 0.088{\scriptsize$\,\pm\,$0.008} & 0.054{\scriptsize$\,\pm\,$0.001} & 0.033{\scriptsize$\,\pm\,$0.001} \\
+FM$_\text{fourier}$ & 0.111{\scriptsize$\,\pm\,$0.001} & 0.058{\scriptsize$\,\pm\,$0.001} & 0.038{\scriptsize$\,\pm\,$0.001} \\
+WDNO & 0.146{\scriptsize$\,\pm\,$0.001} & 0.112{\scriptsize$\,\pm\,$<0.001} & 0.096{\scriptsize$\,\pm\,$<0.001} \\
+\bottomrule
+\end{tabular}
+\end{table}

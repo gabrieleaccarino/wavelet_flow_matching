@@ -1,0 +1,24 @@
+\begin{table}[ht]
+\centering
+\caption{Spectral Coherence RMSE averaged across \textit{Low}, \textit{Mid} and \textit{High} frequency bands and rollout horizons per PDE system. For each WFM variant, \textbf{bold} denotes the optimal wavelet representation used in all subsequent experiments. Mean\,$\pm$\,std over three inference seeds (42, 84, 168).}
+\label{tab:avg_sc_rmse_gen_wavelets}
+\begin{tabular}{lccc}
+\toprule
+ & Turb. Rad. Layer 2D & Rayleigh--B\'{e}nard & Active Matter \\
+\midrule
+WFM-1 haar & \textbf{0.147{\scriptsize$\,\pm\,$<0.001}} & 0.140{\scriptsize$\,\pm\,$0.001} & \textbf{0.241{\scriptsize$\,\pm\,$0.001}} \\
+WFM-1 db2 & 0.154{\scriptsize$\,\pm\,$<0.001} & 0.132{\scriptsize$\,\pm\,$0.001} & 0.288{\scriptsize$\,\pm\,$<0.001} \\
+WFM-1 db4 & 0.149{\scriptsize$\,\pm\,$<0.001} & \textbf{0.121{\scriptsize$\,\pm\,$0.002}} & 0.303{\scriptsize$\,\pm\,$<0.001} \\
+WFM-1 db6 & 0.150{\scriptsize$\,\pm\,$<0.001} & 0.140{\scriptsize$\,\pm\,$0.002} & 0.290{\scriptsize$\,\pm\,$<0.001} \\
+\midrule
+WFM-3 haar & \textbf{0.149{\scriptsize$\,\pm\,$<0.001}} & 0.131{\scriptsize$\,\pm\,$0.001} & 0.247{\scriptsize$\,\pm\,$0.001} \\
+WFM-3 db2 & 0.154{\scriptsize$\,\pm\,$0.001} & 0.111{\scriptsize$\,\pm\,$0.001} & \textbf{0.220{\scriptsize$\,\pm\,$<0.001}} \\
+WFM-3 db4 & 0.154{\scriptsize$\,\pm\,$<0.001} & \textbf{0.109{\scriptsize$\,\pm\,$0.001}} & 0.249{\scriptsize$\,\pm\,$<0.001} \\
+WFM-3 db6 & 0.153{\scriptsize$\,\pm\,$0.001} & 0.112{\scriptsize$\,\pm\,$<0.001} & 0.238{\scriptsize$\,\pm\,$<0.001} \\
+\midrule
+FM$_\text{pixel}$ & 0.153{\scriptsize$\,\pm\,$0.001} & 0.131{\scriptsize$\,\pm\,$0.001} & 0.244{\scriptsize$\,\pm\,$0.001} \\
+FM$_\text{fourier}$ & 0.387{\scriptsize$\,\pm\,$0.001} & 0.246{\scriptsize$\,\pm\,$0.001} & 0.324{\scriptsize$\,\pm\,$<0.001} \\
+WDNO & 0.271{\scriptsize$\,\pm\,$<0.001} & 0.467{\scriptsize$\,\pm\,$<0.001} & 0.304{\scriptsize$\,\pm\,$<0.001} \\
+\bottomrule
+\end{tabular}
+\end{table}

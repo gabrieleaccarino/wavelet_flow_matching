@@ -540,21 +540,3 @@ def build_psd_df(
 # Utility: compute dataset-level normalisation statistics
 # ══════════════════════════════════════════════════════════════════════════════
 
-def compute_norm_stats(
-    truth: torch.Tensor,    # (N_TRAJ, STEPS, H, W, C)
-    Ti:    int = 0,         # skip context frames
-) -> tuple[torch.Tensor, torch.Tensor]:
-    """
-    Compute per-field dataset-level mean and std.
-
-    Uses unbiased std (Bessel-corrected) across trajectories, timesteps,
-    and spatial positions.
-
-    Returns
-    -------
-    norm_mean : (C,) tensor of per-field means
-    norm_std  : (C,) tensor of per-field stds  (clamped ≥ 1e-12)
-    """
-    data = truth[:, Ti:, ...]
-    flat = data.reshape(-1, data.shape[-1])   # (N_TRAJ * STEPS * H * W, C)
-    return flat.mean(dim=0), flat.std(dim=0, correction=1).clamp(min=1e-12)

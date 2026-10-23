@@ -1,0 +1,198 @@
+action,from,to,reason,git_tracked
+rename,notebooks/figures.ipynb,notebooks/02_figures.ipynb,"paper figures 3, S2-S4",True
+rename,notebooks/rollout_plots_and_gifs.ipynb,notebooks/03_qualitative_rollouts.ipynb,"Figs 2a/2b, S5",True
+rename,notebooks/NEW-physics_consistency_refactored-2.ipynb,notebooks/04_physics_consistency.ipynb,rebuttal physics figures,True
+rename,notebooks/NEW-rollout_wavelet_fm_cross_scale_dependency.ipynb,notebooks/05_cross_scale_coupling.ipynb,rebuttal cross-scale study,True
+rename,notebooks/performance_table_refactored.ipynb,notebooks/06_profiling_tables.ipynb,"Tables 2, S19, S20",True
+rename,notebooks/plot_for_architecture.ipynb,notebooks/07_architecture_figure.ipynb,Fig 1 panels,True
+rename,notebooks/rollout_wavelet_fm.ipynb,notebooks/examples/rollout_wavelet_fm.ipynb,inference example,True
+rename,notebooks/rollout_baselines.ipynb,notebooks/examples/rollout_baselines.ipynb,inference example,True
+rename,notebooks/the_well_data_gathering.ipynb,notebooks/data_prep/the_well_data_gathering.ipynb,data download,True
+rename,notebooks/mini_well.ipynb,notebooks/data_prep/mini_well.ipynb,data subset,True
+archive,notebooks/NEW-tables_definitive.ipynb,_to_delete/notebooks/NEW-tables_definitive.ipynb,replaced by scripts/reproduce_tables.py + 01_tables.ipynb,True
+archive,notebooks/tables.ipynb,_to_delete/notebooks/tables.ipynb,superseded table notebook,True
+archive,notebooks/tables_bak.ipynb,_to_delete/notebooks/tables_bak.ipynb,backup,True
+archive,notebooks/tables_refactored.ipynb,_to_delete/notebooks/tables_refactored.ipynb,superseded,True
+archive,notebooks/tables_refactored_bak.ipynb,_to_delete/notebooks/tables_refactored_bak.ipynb,backup,True
+archive,notebooks/figures_bak.ipynb,_to_delete/notebooks/figures_bak.ipynb,backup,True
+archive,notebooks/ablations.ipynb,_to_delete/notebooks/ablations.ipynb,ABLATION_* figs not in paper,True
+archive,notebooks/ablations_refactored.ipynb,_to_delete/notebooks/ablations_refactored.ipynb,ABLATION_* figs not in paper,True
+archive,notebooks/physics_consistency.ipynb,_to_delete/notebooks/physics_consistency.ipynb,superseded by 04,True
+archive,notebooks/physics_consistency_refactored.ipynb,_to_delete/notebooks/physics_consistency_refactored.ipynb,superseded by 04,True
+archive,notebooks/physics_consistency_refactored2.ipynb,_to_delete/notebooks/physics_consistency_refactored2.ipynb,superseded by 04,True
+archive,notebooks/physics_consistency_refactored_bak.ipynb,_to_delete/notebooks/physics_consistency_refactored_bak.ipynb,backup,True
+archive,notebooks/rollout_baselines_bak.ipynb,_to_delete/notebooks/rollout_baselines_bak.ipynb,backup,True
+archive,notebooks/rollout_evaluation_rayleigh_benard_BAK.ipynb,_to_delete/notebooks/rollout_evaluation_rayleigh_benard_BAK.ipynb,backup,True
+archive,notebooks/NEW-IC_perturbation_sensitivity_TRL-TO-REMOVE.ipynb,_to_delete/notebooks/NEW-IC_perturbation_sensitivity_TRL-TO-REMOVE.ipynb,marked to remove,True
+archive,notebooks/NEW-IC_perturbation_analysis.ipynb,_to_delete/notebooks/NEW-IC_perturbation_analysis.ipynb,replaced by waveletflux/analysis/ic_sensitivity.py,True
+archive,notebooks/performance_table.ipynb,_to_delete/notebooks/performance_table.ipynb,superseded by 06,True
+archive,notebooks/performance_table_ablation.ipynb,_to_delete/notebooks/performance_table_ablation.ipynb,superseded by 06,True
+archive,notebooks/rollout_evaluation.ipynb,_to_delete/notebooks/rollout_evaluation.ipynb,"exploratory, not in paper",True
+archive,notebooks/rollout_evaluation_active_matter.ipynb,_to_delete/notebooks/rollout_evaluation_active_matter.ipynb,exploratory,True
+archive,notebooks/rollout_evaluation_rayleigh_benard.ipynb,_to_delete/notebooks/rollout_evaluation_rayleigh_benard.ipynb,exploratory,True
+archive,notebooks/rollout_evaluation_turbulence.ipynb,_to_delete/notebooks/rollout_evaluation_turbulence.ipynb,exploratory,True
+archive,notebooks/plot_frames_turbulence.ipynb,_to_delete/notebooks/plot_frames_turbulence.ipynb,superseded by 03,True
+archive,notebooks/efficiency_analysis.ipynb,_to_delete/notebooks/efficiency_analysis.ipynb,panels not in paper,True
+archive,notebooks/inspect_loss.ipynb,_to_delete/notebooks/inspect_loss.ipynb,scratch,True
+archive,notebooks/metrics.ipynb,_to_delete/notebooks/metrics.ipynb,scratch,True
+archive,notebooks/rollout_latent_fm.ipynb,_to_delete/notebooks/rollout_latent_fm.ipynb,scratch,True
+archive,notebooks/test_eval_autoencoder.ipynb,_to_delete/notebooks/test_eval_autoencoder.ipynb,imports removed module,True
+archive,notebooks/test_planetswe.ipynb,_to_delete/notebooks/test_planetswe.ipynb,planetswe not in paper,True
+archive,notebooks/test_rayleigh_benard.ipynb,_to_delete/notebooks/test_rayleigh_benard.ipynb,dev scratch,True
+archive,notebooks/test_training_MPS.ipynb,_to_delete/notebooks/test_training_MPS.ipynb,imports removed modules,True
+archive,notebooks/test_training_fourierfm.ipynb,_to_delete/notebooks/test_training_fourierfm.ipynb,dev scratch,True
+archive,notebooks/test_training_latent.ipynb,_to_delete/notebooks/test_training_latent.ipynb,imports removed modules,True
+archive,notebooks/WDNO_db2_nens5_seed42_metrics.csv,_to_delete/notebooks/WDNO_db2_nens5_seed42_metrics.csv,split copy in experiments/*/metrics (max diff 5e-7),True
+archive,notebooks/WDNO_db2_nens5_seed84_metrics.csv,_to_delete/notebooks/WDNO_db2_nens5_seed84_metrics.csv,split copy in experiments/*/metrics,True
+archive,notebooks/WDNO_db2_nens5_seed168_metrics.csv,_to_delete/notebooks/WDNO_db2_nens5_seed168_metrics.csv,split copy in experiments/*/metrics,True
+archive,notebooks/outputs,_to_delete/notebooks/outputs,old table exports (flat spectral avg); replaced by artifacts/tables,False
+rename,notebooks/cross_scale_sensitivity_section.tex,artifacts/rebuttal/cross_scale_sensitivity_section.tex,rebuttal appendix draft,True
+rename,notebooks/cross_scale_sensitivity_section.md,artifacts/rebuttal/cross_scale_sensitivity_section.md,rebuttal appendix draft,True
+archive,waveletflux/inference_fourier_fm_bak.py,_to_delete/waveletflux/inference_fourier_fm_bak.py,backup,True
+archive,waveletflux/inference_wavelet_fm_bak.py,_to_delete/waveletflux/inference_wavelet_fm_bak.py,backup,True
+archive,waveletflux/train_latent_fm_old_bak.py,_to_delete/waveletflux/train_latent_fm_old_bak.py,backup,True
+archive,waveletflux/modules/latent_fm_old.py,_to_delete/waveletflux/modules/latent_fm_old.py,"old LatentFM, only used by *_old_bak",True
+archive,waveletflux/utils/eval_bak.py,_to_delete/waveletflux/utils/eval_bak.py,byte-identical to eval.py,True
+archive,waveletflux/utils/physics_report.py,_to_delete/waveletflux/utils/physics_report.py,unreferenced,True
+archive,waveletflux/utils/table_utils.py,_to_delete/waveletflux/utils/table_utils.py,replaced by waveletflux/analysis/,True
+archive,waveletflux/upload_on_hf.py,_to_delete/waveletflux/upload_on_hf.py,one-off HF upload,True
+archive,.bak,_to_delete/.bak,old backups,False
+archive,.bak_rebuttal,_to_delete/.bak_rebuttal,old backups,True
+rename,waveletflux/aggregate_ic_results.py,scripts/aggregate_ic_results.py,inference_ic_pert.pbs expects it here,True
+rename,waveletflux/utils/test_cross_scale_utils.py,tests/test_cross_scale_utils.py,tests out of the package,True
+archive,scripts/inference_.sh,_to_delete/scripts/inference_.sh,generic duplicate of per-PDE inference scripts,True
+archive,scripts/upload_hf.sh,_to_delete/scripts/upload_hf.sh,one-off,True
+archive,scripts/train_viscoelastic_instability.sh,_to_delete/scripts/train_viscoelastic_instability.sh,PDE not in paper,True
+archive,configs/active_matter/FM_data_space_active_matter_v1.0.toml,_to_delete/configs/active_matter/FM_data_space_active_matter_v1.0.toml,"pre-v4.0 / v4.1 config, not used for paper runs",True
+archive,configs/active_matter/WaveletFlow_active_matter_1scale_db2_v1.0.toml,_to_delete/configs/active_matter/WaveletFlow_active_matter_1scale_db2_v1.0.toml,"pre-v4.0 / v4.1 config, not used for paper runs",True
+archive,configs/active_matter/WaveletFlow_active_matter_3scales_db2_v4.1.toml,_to_delete/configs/active_matter/WaveletFlow_active_matter_3scales_db2_v4.1.toml,"pre-v4.0 / v4.1 config, not used for paper runs",True
+archive,configs/active_matter/WaveletFlow_active_matter_3scales_db2_v1.1.1.toml,_to_delete/configs/active_matter/WaveletFlow_active_matter_3scales_db2_v1.1.1.toml,"pre-v4.0 / v4.1 config, not used for paper runs",True
+archive,configs/active_matter/WaveletFlow_active_matter_3scales_db2_v1.0.toml,_to_delete/configs/active_matter/WaveletFlow_active_matter_3scales_db2_v1.0.toml,"pre-v4.0 / v4.1 config, not used for paper runs",True
+archive,configs/active_matter/FM_data_space_active_matter_v4.1.toml,_to_delete/configs/active_matter/FM_data_space_active_matter_v4.1.toml,"pre-v4.0 / v4.1 config, not used for paper runs",True
+archive,configs/active_matter/WaveletFlow_active_matter_1scale_db2_v4.1.toml,_to_delete/configs/active_matter/WaveletFlow_active_matter_1scale_db2_v4.1.toml,"pre-v4.0 / v4.1 config, not used for paper runs",True
+archive,configs/rayleigh_benard/WaveletFlow_rayleigh_benard_3scales_db2_v2.1.1.toml,_to_delete/configs/rayleigh_benard/WaveletFlow_rayleigh_benard_3scales_db2_v2.1.1.toml,"pre-v4.0 / v4.1 config, not used for paper runs",True
+archive,configs/rayleigh_benard/FM_data_space_rayleigh_benard_v1.0.toml,_to_delete/configs/rayleigh_benard/FM_data_space_rayleigh_benard_v1.0.toml,"pre-v4.0 / v4.1 config, not used for paper runs",True
+archive,configs/rayleigh_benard/WaveletFlow_rayleigh_benard_3scales_db2_v2.1.toml,_to_delete/configs/rayleigh_benard/WaveletFlow_rayleigh_benard_3scales_db2_v2.1.toml,"pre-v4.0 / v4.1 config, not used for paper runs",True
+archive,configs/rayleigh_benard/WaveletFlow_rayleigh_benard_3scales_db2_v2.0.toml,_to_delete/configs/rayleigh_benard/WaveletFlow_rayleigh_benard_3scales_db2_v2.0.toml,"pre-v4.0 / v4.1 config, not used for paper runs",True
+archive,configs/rayleigh_benard/WaveletFlow_rayleigh_benard_1scale_db2_v1.0.toml,_to_delete/configs/rayleigh_benard/WaveletFlow_rayleigh_benard_1scale_db2_v1.0.toml,"pre-v4.0 / v4.1 config, not used for paper runs",True
+archive,configs/rayleigh_benard/WaveletFlow_rayleigh_benard_3scales_db2_v1.0.toml,_to_delete/configs/rayleigh_benard/WaveletFlow_rayleigh_benard_3scales_db2_v1.0.toml,"pre-v4.0 / v4.1 config, not used for paper runs",True
+archive,configs/rayleigh_benard/FM_data_space_rayleigh_benard_v2.0.toml,_to_delete/configs/rayleigh_benard/FM_data_space_rayleigh_benard_v2.0.toml,"pre-v4.0 / v4.1 config, not used for paper runs",True
+archive,configs/rayleigh_benard/WaveletFlow_rayleigh_benard_3scales_db2_v3.0.toml,_to_delete/configs/rayleigh_benard/WaveletFlow_rayleigh_benard_3scales_db2_v3.0.toml,"pre-v4.0 / v4.1 config, not used for paper runs",True
+archive,configs/planetswe/WaveletFlow_planetswe_1scale_db2_v1.0.toml,_to_delete/configs/planetswe/WaveletFlow_planetswe_1scale_db2_v1.0.toml,"pre-v4.0 / v4.1 config, not used for paper runs",True
+archive,configs/planetswe/WaveletFlow_planetswe_3scales_db2_v1.0.toml,_to_delete/configs/planetswe/WaveletFlow_planetswe_3scales_db2_v1.0.toml,"pre-v4.0 / v4.1 config, not used for paper runs",True
+archive,configs/turbulent_radiative_layer_2D/FM_turbulent_radiative_layer_2D_data_space_v1.0.toml,_to_delete/configs/turbulent_radiative_layer_2D/FM_turbulent_radiative_layer_2D_data_space_v1.0.toml,"pre-v4.0 / v4.1 config, not used for paper runs",True
+archive,configs/turbulent_radiative_layer_2D/WaveletFlow_turbulent_radiative_layer_2D_1scale_db2_v4.1.toml,_to_delete/configs/turbulent_radiative_layer_2D/WaveletFlow_turbulent_radiative_layer_2D_1scale_db2_v4.1.toml,"pre-v4.0 / v4.1 config, not used for paper runs",True
+archive,configs/turbulent_radiative_layer_2D/WaveletFlow_turbulent_radiative_layer_2D_3scales_db2_v4.1.toml,_to_delete/configs/turbulent_radiative_layer_2D/WaveletFlow_turbulent_radiative_layer_2D_3scales_db2_v4.1.toml,"pre-v4.0 / v4.1 config, not used for paper runs",True
+archive,configs/turbulent_radiative_layer_2D/FM_turbulent_radiative_layer_2D_data_space_v4.1.toml,_to_delete/configs/turbulent_radiative_layer_2D/FM_turbulent_radiative_layer_2D_data_space_v4.1.toml,"pre-v4.0 / v4.1 config, not used for paper runs",True
+archive,configs/turbulent_radiative_layer_2D/WaveletFlow_turbulent_radiative_layer_2D_1scale_db2_v1.0.toml,_to_delete/configs/turbulent_radiative_layer_2D/WaveletFlow_turbulent_radiative_layer_2D_1scale_db2_v1.0.toml,"pre-v4.0 / v4.1 config, not used for paper runs",True
+archive,configs/turbulent_radiative_layer_2D/WaveletFlow_turbulent_radiative_layer_2D_3scales_db2_v1.0.toml,_to_delete/configs/turbulent_radiative_layer_2D/WaveletFlow_turbulent_radiative_layer_2D_3scales_db2_v1.0.toml,"pre-v4.0 / v4.1 config, not used for paper runs",True
+archive,configs/planetswe,_to_delete/configs/planetswe,PDE not in paper,True
+archive,configs/viscoelastic_instability,_to_delete/configs/viscoelastic_instability,PDE not in paper,True
+copy,figures/fig1_architecture.pdf,artifacts/figures/fig1_architecture.pdf,used in paper,False
+copy,figures/unet_diagram.pdf,artifacts/figures/unet_diagram.pdf,used in paper,False
+copy,figures/fig_qualitative_rayleigh_benard.pdf,artifacts/figures/fig_qualitative_rayleigh_benard.pdf,used in paper,False
+copy,figures/fig_qualitative_turbulent_radiative_layer_2D.pdf,artifacts/figures/fig_qualitative_turbulent_radiative_layer_2D.pdf,used in paper,False
+copy,figures/fig_qualitative_active_matter.pdf,artifacts/figures/fig_qualitative_active_matter.pdf,used in paper,False
+copy,figures/fig1A_bar_vrmse_det_new.pdf,artifacts/figures/fig1A_bar_vrmse_det_new.pdf,used in paper,False
+copy,figures/fig1B_bar_crps_gen_new.pdf,artifacts/figures/fig1B_bar_crps_gen_new.pdf,used in paper,False
+copy,figures/fig2_sc_rmse_bands_gen_new.pdf,artifacts/figures/fig2_sc_rmse_bands_gen_new.pdf,used in paper,False
+copy,figures/fig2A_appendix_new.pdf,artifacts/figures/fig2A_appendix_new.pdf,used in paper,False
+copy,figures/fig2B_appendix_new.pdf,artifacts/figures/fig2B_appendix_new.pdf,used in paper,False
+copy,figures/fig1_appendix_gen_new.pdf,artifacts/figures/fig1_appendix_gen_new.pdf,used in paper,False
+archive,figures/fig2_sc_rmse_bands.pdf,_to_delete/figures/fig2_sc_rmse_bands.pdf,not referenced by the paper,False
+archive,figures/ABLATION_vrmse_wavelets.pdf,_to_delete/figures/ABLATION_vrmse_wavelets.pdf,not referenced by the paper,False
+archive,figures/fig2B_appendix_new.pdf,_to_delete/figures/fig2B_appendix_new.pdf,used ones copied to artifacts/figures,False
+archive,figures/fig1A_bar_vrmse_det_new.pdf,_to_delete/figures/fig1A_bar_vrmse_det_new.pdf,used ones copied to artifacts/figures,False
+archive,figures/fig1A_bar_vrmse_det.pdf,_to_delete/figures/fig1A_bar_vrmse_det.pdf,not referenced by the paper,False
+archive,figures/fig1B_bar_crps_all_new.pdf,_to_delete/figures/fig1B_bar_crps_all_new.pdf,not referenced by the paper,False
+archive,figures/fig1A_bar_vrmse_all.pdf,_to_delete/figures/fig1A_bar_vrmse_all.pdf,not referenced by the paper,False
+archive,figures/fig2_sc_rmse_bands_gen_new.pdf,_to_delete/figures/fig2_sc_rmse_bands_gen_new.pdf,used ones copied to artifacts/figures,False
+archive,figures/fig2B_appendix.pdf,_to_delete/figures/fig2B_appendix.pdf,not referenced by the paper,False
+archive,figures/bak,_to_delete/figures/bak,not referenced by the paper,False
+archive,figures/fig1B_bar_crps_all.pdf,_to_delete/figures/fig1B_bar_crps_all.pdf,not referenced by the paper,False
+archive,figures/fig1_appendix_gen_new.pdf,_to_delete/figures/fig1_appendix_gen_new.pdf,used ones copied to artifacts/figures,False
+archive,figures/fig1_architecture.pdf,_to_delete/figures/fig1_architecture.pdf,used ones copied to artifacts/figures,False
+archive,figures/ABLATION_spectral_vrmse_crps_wavelets.pdf,_to_delete/figures/ABLATION_spectral_vrmse_crps_wavelets.pdf,not referenced by the paper,False
+archive,figures/fig_rollout_frames_rayleigh_benard.pdf,_to_delete/figures/fig_rollout_frames_rayleigh_benard.pdf,not referenced by the paper,False
+archive,figures/fig1B_bar_crps_gen_new_no_colorbar.pdf,_to_delete/figures/fig1B_bar_crps_gen_new_no_colorbar.pdf,not referenced by the paper,False
+archive,figures/ABLATION_spectral_coherence_rmse_wavelets.pdf,_to_delete/figures/ABLATION_spectral_coherence_rmse_wavelets.pdf,not referenced by the paper,False
+archive,figures/fig1_appendix_new.pdf,_to_delete/figures/fig1_appendix_new.pdf,not referenced by the paper,False
+archive,figures/fig2_appendix.pdf,_to_delete/figures/fig2_appendix.pdf,not referenced by the paper,False
+archive,figures/fig1A_bar_vrmse_all_new.pdf,_to_delete/figures/fig1A_bar_vrmse_all_new.pdf,not referenced by the paper,False
+archive,figures/fig_qualitative_rayleigh_benard.pdf,_to_delete/figures/fig_qualitative_rayleigh_benard.pdf,used ones copied to artifacts/figures,False
+archive,figures/fig2_appendix_new.pdf,_to_delete/figures/fig2_appendix_new.pdf,not referenced by the paper,False
+archive,figures/fig1_appendix.pdf,_to_delete/figures/fig1_appendix.pdf,not referenced by the paper,False
+archive,figures/fig_rollout_frames_turbulent_radiative_layer_2D.pdf,_to_delete/figures/fig_rollout_frames_turbulent_radiative_layer_2D.pdf,not referenced by the paper,False
+archive,figures/fig_rollout_frames_active_matter.pdf,_to_delete/figures/fig_rollout_frames_active_matter.pdf,not referenced by the paper,False
+archive,figures/unet_diagram.pdf,_to_delete/figures/unet_diagram.pdf,used ones copied to artifacts/figures,False
+archive,figures/fig1B_bar_crps_gen.pdf,_to_delete/figures/fig1B_bar_crps_gen.pdf,not referenced by the paper,False
+archive,figures/fig2A_appendix_new.pdf,_to_delete/figures/fig2A_appendix_new.pdf,used ones copied to artifacts/figures,False
+archive,figures/fig_qualitative_active_matter.pdf,_to_delete/figures/fig_qualitative_active_matter.pdf,used ones copied to artifacts/figures,False
+archive,figures/fig2A_appendix.pdf,_to_delete/figures/fig2A_appendix.pdf,not referenced by the paper,False
+archive,figures/fig_qualitative_turbulent_radiative_layer_2D.pdf,_to_delete/figures/fig_qualitative_turbulent_radiative_layer_2D.pdf,used ones copied to artifacts/figures,False
+archive,figures/fig1B_bar_crps_gen_new.pdf,_to_delete/figures/fig1B_bar_crps_gen_new.pdf,used ones copied to artifacts/figures,False
+archive,figures/.DS_Store,_to_delete/figures/.DS_Store,not referenced by the paper,False
+archive,experiments/active_matter/metrics/FM_data_space_v4.0_nsampling50_nens8_active_matter_psd.csv,_to_delete/experiments/active_matter/metrics/FM_data_space_v4.0_nsampling50_nens8_active_matter_psd.csv,"raw PSD dumps (29 GB), no longer read by any notebook",False
+archive,experiments/active_matter/metrics/TFNO_active_matter_psd.csv,_to_delete/experiments/active_matter/metrics/TFNO_active_matter_psd.csv,"raw PSD dumps (29 GB), no longer read by any notebook",False
+archive,experiments/active_matter/metrics/BAK_LAST_FNO_active_matter_psd.csv,_to_delete/experiments/active_matter/metrics/BAK_LAST_FNO_active_matter_psd.csv,"raw PSD dumps (29 GB), no longer read by any notebook",False
+archive,experiments/active_matter/metrics/WNO_1scale_db2_active_matter_psd.csv,_to_delete/experiments/active_matter/metrics/WNO_1scale_db2_active_matter_psd.csv,"raw PSD dumps (29 GB), no longer read by any notebook",False
+archive,experiments/active_matter/metrics/FM_data_space_v4.1_nsampling50_nens8_active_matter_psd.csv,_to_delete/experiments/active_matter/metrics/FM_data_space_v4.1_nsampling50_nens8_active_matter_psd.csv,"raw PSD dumps (29 GB), no longer read by any notebook",False
+archive,experiments/active_matter/metrics/BAK_LAST_FNO_active_matter_stats.csv,_to_delete/experiments/active_matter/metrics/BAK_LAST_FNO_active_matter_stats.csv,not in paper,False
+archive,experiments/active_matter/metrics/WaveletFlow_3scales_db2_v4.1_nsampling50_nens8_active_matter_psd.csv,_to_delete/experiments/active_matter/metrics/WaveletFlow_3scales_db2_v4.1_nsampling50_nens8_active_matter_psd.csv,"raw PSD dumps (29 GB), no longer read by any notebook",False
+archive,experiments/active_matter/metrics/BAK_LAST_TFNO_active_matter_stats.csv,_to_delete/experiments/active_matter/metrics/BAK_LAST_TFNO_active_matter_stats.csv,not in paper,False
+archive,experiments/active_matter/metrics/WaveletFlow_3scales_db2_v4.1_nsampling50_nens8_active_matter_stats.csv,_to_delete/experiments/active_matter/metrics/WaveletFlow_3scales_db2_v4.1_nsampling50_nens8_active_matter_stats.csv,"v4.1 runs, not in paper",False
+archive,experiments/active_matter/metrics/BAK_LAST_TFNO_active_matter_psd.csv,_to_delete/experiments/active_matter/metrics/BAK_LAST_TFNO_active_matter_psd.csv,"raw PSD dumps (29 GB), no longer read by any notebook",False
+archive,experiments/active_matter/metrics/WaveletFlow_3scales_db2_v4.0_nsampling50_nens8_active_matter_psd.csv,_to_delete/experiments/active_matter/metrics/WaveletFlow_3scales_db2_v4.0_nsampling50_nens8_active_matter_psd.csv,"raw PSD dumps (29 GB), no longer read by any notebook",False
+archive,experiments/active_matter/metrics/UNetConvNext_active_matter_psd.csv,_to_delete/experiments/active_matter/metrics/UNetConvNext_active_matter_psd.csv,"raw PSD dumps (29 GB), no longer read by any notebook",False
+archive,experiments/active_matter/metrics/UNetClassic_active_matter_stats.csv,_to_delete/experiments/active_matter/metrics/UNetClassic_active_matter_stats.csv,not in paper,False
+archive,experiments/active_matter/metrics/WDNO_active_matter_psd.csv,_to_delete/experiments/active_matter/metrics/WDNO_active_matter_psd.csv,"raw PSD dumps (29 GB), no longer read by any notebook",False
+archive,experiments/active_matter/metrics/FourierFlow_32modes_v4.0_nsampling50_nens8_active_matter_psd.csv,_to_delete/experiments/active_matter/metrics/FourierFlow_32modes_v4.0_nsampling50_nens8_active_matter_psd.csv,"raw PSD dumps (29 GB), no longer read by any notebook",False
+archive,experiments/active_matter/metrics/WaveletFlow_1scale_db2_v4.1_nsampling50_nens8_active_matter_stats.csv,_to_delete/experiments/active_matter/metrics/WaveletFlow_1scale_db2_v4.1_nsampling50_nens8_active_matter_stats.csv,"v4.1 runs, not in paper",False
+archive,experiments/active_matter/metrics/UNetClassic_active_matter_psd.csv,_to_delete/experiments/active_matter/metrics/UNetClassic_active_matter_psd.csv,"raw PSD dumps (29 GB), no longer read by any notebook",False
+archive,experiments/active_matter/metrics/WNO_1scale_db2_active_matter_stats.csv,_to_delete/experiments/active_matter/metrics/WNO_1scale_db2_active_matter_stats.csv,paper WNO uses 3 scales,False
+archive,experiments/active_matter/metrics/FM_data_space_v4.1_nsampling50_nens8_active_matter_stats.csv,_to_delete/experiments/active_matter/metrics/FM_data_space_v4.1_nsampling50_nens8_active_matter_stats.csv,"v4.1 runs, not in paper",False
+archive,experiments/active_matter/metrics/FourierFlow_16modes_v4.0_nsampling50_nens8_active_matter_psd.csv,_to_delete/experiments/active_matter/metrics/FourierFlow_16modes_v4.0_nsampling50_nens8_active_matter_psd.csv,"raw PSD dumps (29 GB), no longer read by any notebook",False
+archive,experiments/active_matter/metrics/FNO_active_matter_psd.csv,_to_delete/experiments/active_matter/metrics/FNO_active_matter_psd.csv,"raw PSD dumps (29 GB), no longer read by any notebook",False
+archive,experiments/active_matter/metrics/UNetConvNext_active_matter_stats.csv,_to_delete/experiments/active_matter/metrics/UNetConvNext_active_matter_stats.csv,not in paper,False
+archive,experiments/active_matter/metrics/WaveletFlow_1scale_db2_v4.1_nsampling50_nens8_active_matter_psd.csv,_to_delete/experiments/active_matter/metrics/WaveletFlow_1scale_db2_v4.1_nsampling50_nens8_active_matter_psd.csv,"raw PSD dumps (29 GB), no longer read by any notebook",False
+archive,experiments/active_matter/metrics/WNO_3scales_db2_active_matter_psd.csv,_to_delete/experiments/active_matter/metrics/WNO_3scales_db2_active_matter_psd.csv,"raw PSD dumps (29 GB), no longer read by any notebook",False
+archive,experiments/active_matter/metrics/WaveletFlow_1scale_db2_v4.0_nsampling50_nens8_active_matter_psd.csv,_to_delete/experiments/active_matter/metrics/WaveletFlow_1scale_db2_v4.0_nsampling50_nens8_active_matter_psd.csv,"raw PSD dumps (29 GB), no longer read by any notebook",False
+archive,experiments/rayleigh_benard/metrics/FourierFlow_32modes_v4.0_nsampling50_nens8_rayleigh_benard_psd.csv,_to_delete/experiments/rayleigh_benard/metrics/FourierFlow_32modes_v4.0_nsampling50_nens8_rayleigh_benard_psd.csv,"raw PSD dumps (29 GB), no longer read by any notebook",False
+archive,experiments/rayleigh_benard/metrics/UNetConvNext_rayleigh_benard_psd.csv,_to_delete/experiments/rayleigh_benard/metrics/UNetConvNext_rayleigh_benard_psd.csv,"raw PSD dumps (29 GB), no longer read by any notebook",False
+archive,experiments/rayleigh_benard/metrics/FM_data_space_v4.0_nsampling50_nens8_rayleigh_benard_psd.csv,_to_delete/experiments/rayleigh_benard/metrics/FM_data_space_v4.0_nsampling50_nens8_rayleigh_benard_psd.csv,"raw PSD dumps (29 GB), no longer read by any notebook",False
+archive,experiments/rayleigh_benard/metrics/WNO_1scale_db2_rayleigh_benard_psd.csv,_to_delete/experiments/rayleigh_benard/metrics/WNO_1scale_db2_rayleigh_benard_psd.csv,"raw PSD dumps (29 GB), no longer read by any notebook",False
+archive,experiments/rayleigh_benard/metrics/WDNO_rayleigh_benard_psd.csv,_to_delete/experiments/rayleigh_benard/metrics/WDNO_rayleigh_benard_psd.csv,"raw PSD dumps (29 GB), no longer read by any notebook",False
+archive,experiments/rayleigh_benard/metrics/WaveletFlow_1scale_db2_v4.0_nsampling50_nens8_rayleigh_benard_psd.csv,_to_delete/experiments/rayleigh_benard/metrics/WaveletFlow_1scale_db2_v4.0_nsampling50_nens8_rayleigh_benard_psd.csv,"raw PSD dumps (29 GB), no longer read by any notebook",False
+archive,experiments/rayleigh_benard/metrics/WNO_3scales_db2_rayleigh_benard_psd.csv,_to_delete/experiments/rayleigh_benard/metrics/WNO_3scales_db2_rayleigh_benard_psd.csv,"raw PSD dumps (29 GB), no longer read by any notebook",False
+archive,experiments/rayleigh_benard/metrics/UNetClassic_rayleigh_benard_stats.csv,_to_delete/experiments/rayleigh_benard/metrics/UNetClassic_rayleigh_benard_stats.csv,not in paper,False
+archive,experiments/rayleigh_benard/metrics/FourierFlow_16modes_v4.0_nsampling50_nens8_rayleigh_benard_psd.csv,_to_delete/experiments/rayleigh_benard/metrics/FourierFlow_16modes_v4.0_nsampling50_nens8_rayleigh_benard_psd.csv,"raw PSD dumps (29 GB), no longer read by any notebook",False
+archive,experiments/rayleigh_benard/metrics/UNetClassic_rayleigh_benard_psd.csv,_to_delete/experiments/rayleigh_benard/metrics/UNetClassic_rayleigh_benard_psd.csv,"raw PSD dumps (29 GB), no longer read by any notebook",False
+archive,experiments/rayleigh_benard/metrics/TFNO_rayleigh_benard_psd.csv,_to_delete/experiments/rayleigh_benard/metrics/TFNO_rayleigh_benard_psd.csv,"raw PSD dumps (29 GB), no longer read by any notebook",False
+archive,experiments/rayleigh_benard/metrics/WaveletFlow_3scales_db2_v4.0_nsampling50_nens8_rayleigh_benard_psd.csv,_to_delete/experiments/rayleigh_benard/metrics/WaveletFlow_3scales_db2_v4.0_nsampling50_nens8_rayleigh_benard_psd.csv,"raw PSD dumps (29 GB), no longer read by any notebook",False
+archive,experiments/rayleigh_benard/metrics/UNetConvNext_rayleigh_benard_stats.csv,_to_delete/experiments/rayleigh_benard/metrics/UNetConvNext_rayleigh_benard_stats.csv,not in paper,False
+archive,experiments/rayleigh_benard/metrics/FNO_rayleigh_benard_psd.csv,_to_delete/experiments/rayleigh_benard/metrics/FNO_rayleigh_benard_psd.csv,"raw PSD dumps (29 GB), no longer read by any notebook",False
+archive,experiments/rayleigh_benard/metrics/WNO_1scale_db2_rayleigh_benard_stats.csv,_to_delete/experiments/rayleigh_benard/metrics/WNO_1scale_db2_rayleigh_benard_stats.csv,paper WNO uses 3 scales,False
+archive,experiments/turbulent_radiative_layer_2D/metrics/FourierFlow_16modes_v4.0_nsampling50_nens8_turbulent_radiative_layer_2D_psd.csv,_to_delete/experiments/turbulent_radiative_layer_2D/metrics/FourierFlow_16modes_v4.0_nsampling50_nens8_turbulent_radiative_layer_2D_psd.csv,"raw PSD dumps (29 GB), no longer read by any notebook",False
+archive,experiments/turbulent_radiative_layer_2D/metrics/FNO_turbulent_radiative_layer_2D_psd.csv,_to_delete/experiments/turbulent_radiative_layer_2D/metrics/FNO_turbulent_radiative_layer_2D_psd.csv,"raw PSD dumps (29 GB), no longer read by any notebook",False
+archive,experiments/turbulent_radiative_layer_2D/metrics/TFNO_turbulent_radiative_layer_2D_psd.csv,_to_delete/experiments/turbulent_radiative_layer_2D/metrics/TFNO_turbulent_radiative_layer_2D_psd.csv,"raw PSD dumps (29 GB), no longer read by any notebook",False
+archive,experiments/turbulent_radiative_layer_2D/metrics/UNetClassic_turbulent_radiative_layer_2D_stats.csv,_to_delete/experiments/turbulent_radiative_layer_2D/metrics/UNetClassic_turbulent_radiative_layer_2D_stats.csv,not in paper,False
+archive,experiments/turbulent_radiative_layer_2D/metrics/FM_data_space_v4.1_nsampling50_nens8_turbulent_radiative_layer_2D_psd.csv,_to_delete/experiments/turbulent_radiative_layer_2D/metrics/FM_data_space_v4.1_nsampling50_nens8_turbulent_radiative_layer_2D_psd.csv,"raw PSD dumps (29 GB), no longer read by any notebook",False
+archive,experiments/turbulent_radiative_layer_2D/metrics/UNetConvNext_turbulent_radiative_layer_2D_stats.csv,_to_delete/experiments/turbulent_radiative_layer_2D/metrics/UNetConvNext_turbulent_radiative_layer_2D_stats.csv,not in paper,False
+archive,experiments/turbulent_radiative_layer_2D/metrics/WaveletFlow_1scale_db2_v4.1_nsampling50_nens8_turbulent_radiative_layer_2D_stats.csv,_to_delete/experiments/turbulent_radiative_layer_2D/metrics/WaveletFlow_1scale_db2_v4.1_nsampling50_nens8_turbulent_radiative_layer_2D_stats.csv,"v4.1 runs, not in paper",False
+archive,experiments/turbulent_radiative_layer_2D/metrics/UNetClassic_turbulent_radiative_layer_2D_psd.csv,_to_delete/experiments/turbulent_radiative_layer_2D/metrics/UNetClassic_turbulent_radiative_layer_2D_psd.csv,"raw PSD dumps (29 GB), no longer read by any notebook",False
+archive,experiments/turbulent_radiative_layer_2D/metrics/OLD,_to_delete/experiments/turbulent_radiative_layer_2D/metrics/OLD,v1.0 runs,False
+archive,experiments/turbulent_radiative_layer_2D/metrics/UNetConvNext_turbulent_radiative_layer_2D_psd.csv,_to_delete/experiments/turbulent_radiative_layer_2D/metrics/UNetConvNext_turbulent_radiative_layer_2D_psd.csv,"raw PSD dumps (29 GB), no longer read by any notebook",False
+archive,experiments/turbulent_radiative_layer_2D/metrics/FM_data_space_v4.0_nsampling50_nens8_turbulent_radiative_layer_2D_psd.csv,_to_delete/experiments/turbulent_radiative_layer_2D/metrics/FM_data_space_v4.0_nsampling50_nens8_turbulent_radiative_layer_2D_psd.csv,"raw PSD dumps (29 GB), no longer read by any notebook",False
+archive,experiments/turbulent_radiative_layer_2D/metrics/WaveletFlow_1scale_db2_v4.0_nsampling50_nens8_turbulent_radiative_layer_2D_psd.csv,_to_delete/experiments/turbulent_radiative_layer_2D/metrics/WaveletFlow_1scale_db2_v4.0_nsampling50_nens8_turbulent_radiative_layer_2D_psd.csv,"raw PSD dumps (29 GB), no longer read by any notebook",False
+archive,experiments/turbulent_radiative_layer_2D/metrics/WDNO_1scale_db2_turbulent_radiative_layer_2D_stats.csv,_to_delete/experiments/turbulent_radiative_layer_2D/metrics/WDNO_1scale_db2_turbulent_radiative_layer_2D_stats.csv,duplicate of WDNO_turbulent_radiative_layer_2D_stats.csv,False
+archive,experiments/turbulent_radiative_layer_2D/metrics/WNO_3scales_db2_turbulent_radiative_layer_2D_psd.csv,_to_delete/experiments/turbulent_radiative_layer_2D/metrics/WNO_3scales_db2_turbulent_radiative_layer_2D_psd.csv,"raw PSD dumps (29 GB), no longer read by any notebook",False
+archive,experiments/turbulent_radiative_layer_2D/metrics/WNO_1scale_db2_turbulent_radiative_layer_2D_psd.csv,_to_delete/experiments/turbulent_radiative_layer_2D/metrics/WNO_1scale_db2_turbulent_radiative_layer_2D_psd.csv,"raw PSD dumps (29 GB), no longer read by any notebook",False
+archive,experiments/turbulent_radiative_layer_2D/metrics/WDNO_1scale_db2_turbulent_radiative_layer_2D_psd.csv,_to_delete/experiments/turbulent_radiative_layer_2D/metrics/WDNO_1scale_db2_turbulent_radiative_layer_2D_psd.csv,"raw PSD dumps (29 GB), no longer read by any notebook",False
+archive,experiments/turbulent_radiative_layer_2D/metrics/FourierFlow_32modes_v4.0_nsampling50_nens8_turbulent_radiative_layer_2D_psd.csv,_to_delete/experiments/turbulent_radiative_layer_2D/metrics/FourierFlow_32modes_v4.0_nsampling50_nens8_turbulent_radiative_layer_2D_psd.csv,"raw PSD dumps (29 GB), no longer read by any notebook",False
+archive,experiments/turbulent_radiative_layer_2D/metrics/WaveletFlow_3scales_db2_v4.0_nsampling50_nens8_turbulent_radiative_layer_2D_psd.csv,_to_delete/experiments/turbulent_radiative_layer_2D/metrics/WaveletFlow_3scales_db2_v4.0_nsampling50_nens8_turbulent_radiative_layer_2D_psd.csv,"raw PSD dumps (29 GB), no longer read by any notebook",False
+archive,experiments/turbulent_radiative_layer_2D/metrics/WNO_1scale_db2_turbulent_radiative_layer_2D_stats.csv,_to_delete/experiments/turbulent_radiative_layer_2D/metrics/WNO_1scale_db2_turbulent_radiative_layer_2D_stats.csv,paper WNO uses 3 scales,False
+archive,experiments/turbulent_radiative_layer_2D/metrics/WaveletFlow_1scale_db2_v4.1_nsampling50_nens8_turbulent_radiative_layer_2D_psd.csv,_to_delete/experiments/turbulent_radiative_layer_2D/metrics/WaveletFlow_1scale_db2_v4.1_nsampling50_nens8_turbulent_radiative_layer_2D_psd.csv,"raw PSD dumps (29 GB), no longer read by any notebook",False
+archive,experiments/turbulent_radiative_layer_2D/metrics/WDNO_turbulent_radiative_layer_2D_psd.csv,_to_delete/experiments/turbulent_radiative_layer_2D/metrics/WDNO_turbulent_radiative_layer_2D_psd.csv,"raw PSD dumps (29 GB), no longer read by any notebook",False
+archive,experiments/turbulent_radiative_layer_2D/metrics/WaveletFlow_3scales_db2_v4.1_nsampling50_nens8_turbulent_radiative_layer_2D_stats.csv,_to_delete/experiments/turbulent_radiative_layer_2D/metrics/WaveletFlow_3scales_db2_v4.1_nsampling50_nens8_turbulent_radiative_layer_2D_stats.csv,"v4.1 runs, not in paper",False
+archive,experiments/turbulent_radiative_layer_2D/metrics/WaveletFlow_3scales_db2_v4.1_nsampling50_nens8_turbulent_radiative_layer_2D_psd.csv,_to_delete/experiments/turbulent_radiative_layer_2D/metrics/WaveletFlow_3scales_db2_v4.1_nsampling50_nens8_turbulent_radiative_layer_2D_psd.csv,"raw PSD dumps (29 GB), no longer read by any notebook",False
+archive,experiments/turbulent_radiative_layer_2D/metrics/FM_data_space_v4.1_nsampling50_nens8_turbulent_radiative_layer_2D_stats.csv,_to_delete/experiments/turbulent_radiative_layer_2D/metrics/FM_data_space_v4.1_nsampling50_nens8_turbulent_radiative_layer_2D_stats.csv,"v4.1 runs, not in paper",False
