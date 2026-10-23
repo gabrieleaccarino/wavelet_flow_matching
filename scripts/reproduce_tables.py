@@ -18,8 +18,15 @@ from waveletflux.analysis import paper_tables as P
 if __name__ == "__main__":
     import argparse
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    ap.add_argument("--mean-only", action="store_true",
-                    help="LaTeX cells show the seed mean only (no +- std); same as SHOW_STD=False")
+    ap.add_argument("--mean-only", nargs="*", metavar="TABLE",
+                    help="seed mean only (no +- std). Without names: every table. With names: just "
+                         "those, e.g. --mean-only T3_crps_tcool_main T3_crps_Ra_main S15_spectral_tcool")
     args = ap.parse_args()
-    summ = P.build_all(show_std=not args.mean_only)
+    if args.mean_only is None:
+        show = True
+    elif len(args.mean_only) == 0:
+        show = False
+    else:
+        show = {name: False for name in args.mean_only}
+    summ = P.build_all(show_std=show)
     print("\nrelative std across seeds (%):\n", summ.to_string())

@@ -13,6 +13,8 @@ byte-identical artifacts.
 """
 from __future__ import annotations
 
+import contextlib
+
 import numpy as np
 import pandas as pd
 
@@ -24,9 +26,26 @@ from .physics import ke_table
 from .profiling import load_profiles, selected
 
 def set_show_std(show: bool) -> None:
-    """True: cells read "mean +- std" over seeds; False: mean over seeds only.
+    """Default for every table: True -> cells read "mean +- std" over seeds,
+    False -> mean over seeds only. Each table function also takes its own
+    ``show_std`` argument, which overrides this default for that table only.
     Captions follow automatically. CSVs always keep mean, std and n_seeds."""
-    T.STD_IN_LATEX = bool(show)
+    global DEFAULT_SHOW_STD
+    DEFAULT_SHOW_STD = bool(show)
+
+
+DEFAULT_SHOW_STD = True
+
+
+@contextlib.contextmanager
+def _std(show):
+    """Temporarily set the +- std switch for one table (None = DEFAULT_SHOW_STD)."""
+    saved = T.STD_IN_LATEX
+    T.STD_IN_LATEX = DEFAULT_SHOW_STD if show is None else bool(show)
+    try:
+        yield
+    finally:
+        T.STD_IN_LATEX = saved
 
 
 def seeds_note() -> str:
@@ -61,21 +80,24 @@ def load_all(verbose=True):
 # ---------------------------------------------------------------------------
 # Main text
 # ---------------------------------------------------------------------------
-def t1_wavelet_selection(df):
-    """Table 1 (+ S10 csv): band- and horizon-averaged spectral coherence RMSE."""
+def t1_wavelet_selection(df, show_std=None, show_std_s10=None):
+    """Table 1 and Table S10: band- and horizon-averaged spectral coherence RMSE.
+    show_std: Table 1 cells; show_std_s10: S10 cells (defaults to show_std)."""
     sel = T.across_seeds(T.selection_table, df, models=C.ROWS_GEN, time_agg="horizon")
     bad = T.check_selection(sel[0])
     if bad:
         raise ValueError("wavelet selection changed: " + "; ".join(bad))
-    _emit("T1_wavelet_selection", sel, T.latex_selection(
-        sel[0], sel[1],
-        r"Spectral Coherence RMSE averaged across \textit{Low}, \textit{Mid} and \textit{High} "
-        r"frequency bands and rollout horizons per PDE system. For each WFM variant, \textbf{bold} "
-        r"denotes the optimal wavelet representation used in all subsequent experiments." + LF_NOTE + seeds_note(),
-        "tab:avg_sc_rmse_gen_wavelets", C.GROUPS_GEN))
+    with _std(show_std):
+        _emit("T1_wavelet_selection", sel, T.latex_selection(
+            sel[0], sel[1],
+            r"Spectral Coherence RMSE averaged across \textit{Low}, \textit{Mid} and \textit{High} "
+            r"frequency bands and rollout horizons per PDE system. For each WFM variant, \textbf{bold} "
+            r"denotes the optimal wavelet representation used in all subsequent experiments." + LF_NOTE + seeds_note(),
+            "tab:avg_sc_rmse_gen_wavelets", C.GROUPS_GEN))
     s10 = T.s10_table(sel[0], sel[1])
     s10.to_csv(T.TABLES_CSV / "S10_optimal_wavelets.csv", index=False)
-    (T.TABLES_TEX / "S10_optimal_wavelets.tex").write_text(latex_s10(s10))
+    with _std(show_std if show_std_s10 is None else show_std_s10):
+        (T.TABLES_TEX / "S10_optimal_wavelets.tex").write_text(latex_s10(s10))
     if VERBOSE:
         print("  wrote S10_optimal_wavelets")
     return sel
@@ -133,27 +155,30 @@ def t2_s19_s20_profiling():
 # ---------------------------------------------------------------------------
 # Appendix: horizons and bands
 # ---------------------------------------------------------------------------
-def s11_vrmse(df):
-    r = T.across_seeds(T.horizon_table, df, metric="vrmse", models=C.ROWS_ALL)
-    return _emit("S11_vrmse", r, T.latex_table(
-        *r[:2], "VRMSE across rollout horizons for all models and PDE systems." + DET_NOTE + LF_NOTE + seeds_note(),
-        "si-tab:appendix_vrmse", C.GROUPS_ALL, corner="Rollout", top_labels=C.PDE_LABELS, resize=True))
+def s11_vrmse(df, show_std=None):
+    with _std(show_std):
+        r = T.across_seeds(T.horizon_table, df, metric="vrmse", models=C.ROWS_ALL)
+        return _emit("S11_vrmse", r, T.latex_table(
+            *r[:2], "VRMSE across rollout horizons for all models and PDE systems." + DET_NOTE + LF_NOTE + seeds_note(),
+            "si-tab:appendix_vrmse", C.GROUPS_ALL, corner="Rollout", top_labels=C.PDE_LABELS, resize=True))
 
 
-def s12_crps(df):
-    r = T.across_seeds(T.horizon_table, df, metric="crps", models=C.ROWS_GEN)
-    return _emit("S12_crps", r, T.latex_table(
-        *r[:2], "CRPS across rollout horizons for all models and PDE systems." + LF_NOTE + seeds_note(),
-        "tab:appendix_crps", C.GROUPS_GEN, corner="Rollout", top_labels=C.PDE_LABELS, resize=True))
+def s12_crps(df, show_std=None):
+    with _std(show_std):
+        r = T.across_seeds(T.horizon_table, df, metric="crps", models=C.ROWS_GEN)
+        return _emit("S12_crps", r, T.latex_table(
+            *r[:2], "CRPS across rollout horizons for all models and PDE systems." + LF_NOTE + seeds_note(),
+            "tab:appendix_crps", C.GROUPS_GEN, corner="Rollout", top_labels=C.PDE_LABELS, resize=True))
 
 
-def s13_spectral_bands(df):
-    r = T.across_seeds(T.bands_table, df, models=C.ROWS_GEN, time_agg="horizon")
-    return _emit("S13_spectral_bands", r, T.latex_table(
-        *r[:2], r"Spectral coherence RMSE across \textit{Low}, \textit{Mid}, and \textit{High} "
-        r"frequency bands for all models and PDE systems, averaged over rollout horizons." + LF_NOTE + seeds_note(),
-        "tab:appendix_spectral", C.GROUPS_GEN, corner="Frequency Bands",
-        top_labels=C.PDE_LABELS, resize=True))
+def s13_spectral_bands(df, show_std=None):
+    with _std(show_std):
+        r = T.across_seeds(T.bands_table, df, models=C.ROWS_GEN, time_agg="horizon")
+        return _emit("S13_spectral_bands", r, T.latex_table(
+            *r[:2], r"Spectral coherence RMSE across \textit{Low}, \textit{Mid}, and \textit{High} "
+            r"frequency bands for all models and PDE systems, averaged over rollout horizons." + LF_NOTE + seeds_note(),
+            "tab:appendix_spectral", C.GROUPS_GEN, corner="Frequency Bands",
+            top_labels=C.PDE_LABELS, resize=True))
 
 
 # ---------------------------------------------------------------------------
@@ -172,33 +197,36 @@ _PARAM = {
 }
 
 
-def _crps_param(df, name):
+def _crps_param(df, name, show_std=None, show_std_main=None):
     pde, param, lab, cap, corner, lab3, name3 = _PARAM[name]
     r = T.across_seeds(T.param_table, df, pde=pde, param=param, models=C.ROWS_GEN, time_agg="step")
     fmt = C.PARAM_LABELS[param]
-    _emit(name, r, T.latex_table(*r[:2], cap + seeds_note(), lab, C.GROUPS_GEN, corner=corner,
-                                 sub_labels=fmt, resize=param == "tcool"))
+    with _std(show_std):
+        _emit(name, r, T.latex_table(*r[:2], cap + seeds_note(), lab, C.GROUPS_GEN, corner=corner,
+                                     sub_labels=fmt, resize=param == "tcool"))
     if name3:                                   # main-text Table 3 subtable: first three values
         m, s, n = r
         cols = list(m.columns)[:3]
         sub = (m[cols], s[cols], n[cols])
-        _emit(name3, sub, T.latex_table(*sub[:2], cap + seeds_note(), lab3, C.GROUPS_GEN,
-                                        corner=corner, sub_labels=fmt))
+        with _std(show_std if show_std_main is None else show_std_main):
+            _emit(name3, sub, T.latex_table(*sub[:2], cap + seeds_note(), lab3, C.GROUPS_GEN,
+                                            corner=corner, sub_labels=fmt))
     return r
 
 
-def s14_crps_tcool(df):
-    """S14, and Table 3a (its first three t_cool values)."""
-    return _crps_param(df, "S14_crps_tcool")
+def s14_crps_tcool(df, show_std=None, show_std_main=None):
+    """S14 (show_std), and Table 3a = its first three t_cool values (show_std_main,
+    defaults to show_std)."""
+    return _crps_param(df, "S14_crps_tcool", show_std, show_std_main)
 
 
-def s16_crps_ra(df):
-    """S16, and Table 3b."""
-    return _crps_param(df, "S16_crps_Ra")
+def s16_crps_ra(df, show_std=None, show_std_main=None):
+    """S16 (show_std), and Table 3b (show_std_main, defaults to show_std)."""
+    return _crps_param(df, "S16_crps_Ra", show_std, show_std_main)
 
 
-def s17_crps_pr(df):
-    return _crps_param(df, "S17_crps_Pr")
+def s17_crps_pr(df, show_std=None):
+    return _crps_param(df, "S17_crps_Pr", show_std)
 
 
 _SPEC = {
@@ -217,64 +245,70 @@ def _spectral_param(df, name):
     return _emit(name, r, T.latex_spectral_param(*r[:2], cap + seeds_note(), lab, C.GROUPS_GEN, plab, param))
 
 
-def s15_spectral_tcool(df):
-    return _spectral_param(df, "S15_spectral_tcool")
+def s15_spectral_tcool(df, show_std=None):
+    with _std(show_std):
+        return _spectral_param(df, "S15_spectral_tcool")
 
 
-def s18a_spectral_ra(df):
-    return _spectral_param(df, "S18a_spectral_Ra")
+def s18a_spectral_ra(df, show_std=None):
+    with _std(show_std):
+        return _spectral_param(df, "S18a_spectral_Ra")
 
 
-def s18b_spectral_pr(df):
-    return _spectral_param(df, "S18b_spectral_Pr")
+def s18b_spectral_pr(df, show_std=None):
+    with _std(show_std):
+        return _spectral_param(df, "S18b_spectral_Pr")
 
 
 # ---------------------------------------------------------------------------
 # Rebuttal additions
 # ---------------------------------------------------------------------------
-def r1_rb_latentfm(df):
+def r1_rb_latentfm(df, show_std=None):
     """RB summary as shown in the rebuttal (selected wavelets + generative baselines).
     Optional: LatentFM is now also a row of every table with an RB column."""
-    rows = C.ROWS_BEST_GEN
-    r = T.across_seeds(T.rb_summary_table, T.best_view(df, keep=C.GEN_MODELS), models=rows)
-    return _emit("R1_rb_latentfm", r, T.latex_table(
-        *r[:2], r"Rayleigh--B\'enard: spectral coherence RMSE per band (averaged over rollout horizons) "
-        r"and CRPS per rollout horizon, including the latent-space baseline LatentFM$_{\div 64}$ "
-        r"(autoencoder of~\citet{rozet2025})." + seeds_note(),
-        "tab:rb_latentfm", [C.BEST, C.GEN_MODELS], corner="Model", resize=True))
+    with _std(show_std):
+        rows = C.ROWS_BEST_GEN
+        r = T.across_seeds(T.rb_summary_table, T.best_view(df, keep=C.GEN_MODELS), models=rows)
+        return _emit("R1_rb_latentfm", r, T.latex_table(
+            *r[:2], r"Rayleigh--B\'enard: spectral coherence RMSE per band (averaged over rollout horizons) "
+            r"and CRPS per rollout horizon, including the latent-space baseline LatentFM$_{\div 64}$ "
+            r"(autoencoder of~\citet{rozet2025})." + seeds_note(),
+            "tab:rb_latentfm", [C.BEST, C.GEN_MODELS], corner="Model", resize=True))
 
 
-def r2_ke_mae(gdf):
+def r2_ke_mae(gdf, show_std=None):
     """Kinetic-energy relative MAE per horizon (uses the _global_ rows)."""
-    r = ke_table(T.best_view(gdf, keep=C.GEN_MODELS), C.ROWS_BEST_GEN)
-    return _emit("R2_ke_mae", r, T.latex_table(
-        *r[:2], r"Kinetic-energy relative MAE across rollout horizons (error normalised by the "
-        r"trajectory time-mean of the true kinetic energy)." + seeds_note(),
-        "tab:ke_mae", C.GROUPS_BEST_GEN, corner="Rollout", top_labels=C.PDE_LABELS, resize=True))
+    with _std(show_std):
+        r = ke_table(T.best_view(gdf, keep=C.GEN_MODELS), C.ROWS_BEST_GEN)
+        return _emit("R2_ke_mae", r, T.latex_table(
+            *r[:2], r"Kinetic-energy relative MAE across rollout horizons (error normalised by the "
+            r"trajectory time-mean of the true kinetic energy)." + seeds_note(),
+            "tab:ke_mae", C.GROUPS_BEST_GEN, corner="Rollout", top_labels=C.PDE_LABELS, resize=True))
 
 
-def r3_ic_perturbation():
+def r3_ic_perturbation(show_std=None):
     """TRL, WFM 3-scale haar under IC noise: CRPS per horizon and spectral per band."""
-    ic = ic_tables(load_ic())
-    out = {}
-    for key, lab, cap in [("crps", "tab:ic_pert_crps", "CRPS across rollout horizons"),
-                          ("spectral", "tab:ic_pert_spectral", "Spectral coherence RMSE across bands")]:
-        m, s = ic[key]
-        n = pd.DataFrame(np.broadcast_to(ic["n_seeds"].to_numpy()[:, None], m.shape).astype(float),
-                         index=m.index, columns=m.columns)
-        m.index = [f"$\\eta={e:g}$" for e in m.index]
-        s.index = m.index
-        n.index = m.index
-        T.save(f"R3_ic_{key}", m, s, n)
-        tex = T.latex_table(m, s, f"TRL, WFM 3-scale (haar): {cap} under Gaussian perturbations of the "
-                            r"initial conditions with standard deviation $\eta\,\sigma_c$."
-                            + seeds_note(), lab, [list(m.index)],
-                            corner="IC noise", rank=False)
-        (T.TABLES_TEX / f"R3_ic_{key}.tex").write_text(tex)
-        if VERBOSE:
-            print(f"  wrote R3_ic_{key}")
-        out[key] = (m, s, n)
-    return out
+    with _std(show_std):
+        ic = ic_tables(load_ic())
+        out = {}
+        for key, lab, cap in [("crps", "tab:ic_pert_crps", "CRPS across rollout horizons"),
+                              ("spectral", "tab:ic_pert_spectral", "Spectral coherence RMSE across bands")]:
+            m, s = ic[key]
+            n = pd.DataFrame(np.broadcast_to(ic["n_seeds"].to_numpy()[:, None], m.shape).astype(float),
+                             index=m.index, columns=m.columns)
+            m.index = [f"$\\eta={e:g}$" for e in m.index]
+            s.index = m.index
+            n.index = m.index
+            T.save(f"R3_ic_{key}", m, s, n)
+            tex = T.latex_table(m, s, f"TRL, WFM 3-scale (haar): {cap} under Gaussian perturbations of the "
+                                r"initial conditions with standard deviation $\eta\,\sigma_c$."
+                                + seeds_note(), lab, [list(m.index)],
+                                corner="IC noise", rank=False)
+            (T.TABLES_TEX / f"R3_ic_{key}.tex").write_text(tex)
+            if VERBOSE:
+                print(f"  wrote R3_ic_{key}")
+            out[key] = (m, s, n)
+        return out
 
 
 # ---------------------------------------------------------------------------
@@ -299,21 +333,24 @@ def write_seed_spread():
 
 def build_all(verbose=True, show_std=True):
     """Build every table in paper order; returns the seed-spread summary.
-    show_std=False writes the seed mean only (see set_show_std)."""
-    set_show_std(show_std)
+
+    show_std: True/False for every table, or a dict {table name: bool} using the
+    output names (e.g. {"T3_crps_tcool_main": False, "S15_spectral_tcool": False});
+    tables not in the dict use True."""
+    f = (lambda n: show_std.get(n, True)) if isinstance(show_std, dict) else (lambda n: bool(show_std))
     df, gdf = load_all(verbose)
-    t1_wavelet_selection(df)
-    s11_vrmse(df)
-    s12_crps(df)
-    s13_spectral_bands(df)
-    s14_crps_tcool(df)
-    s16_crps_ra(df)
-    s17_crps_pr(df)
-    s15_spectral_tcool(df)
-    s18a_spectral_ra(df)
-    s18b_spectral_pr(df)
-    r1_rb_latentfm(df)
-    r2_ke_mae(gdf)
-    r3_ic_perturbation()
+    t1_wavelet_selection(df, f("T1_wavelet_selection"), f("S10_optimal_wavelets"))
+    s11_vrmse(df, f("S11_vrmse"))
+    s12_crps(df, f("S12_crps"))
+    s13_spectral_bands(df, f("S13_spectral_bands"))
+    s14_crps_tcool(df, f("S14_crps_tcool"), f("T3_crps_tcool_main"))
+    s16_crps_ra(df, f("S16_crps_Ra"), f("T3_crps_Ra_main"))
+    s17_crps_pr(df, f("S17_crps_Pr"))
+    s15_spectral_tcool(df, f("S15_spectral_tcool"))
+    s18a_spectral_ra(df, f("S18a_spectral_Ra"))
+    s18b_spectral_pr(df, f("S18b_spectral_Pr"))
+    r1_rb_latentfm(df, f("R1_rb_latentfm"))
+    r2_ke_mae(gdf, f("R2_ke_mae"))
+    r3_ic_perturbation(f("R3_ic"))
     t2_s19_s20_profiling()
     return write_seed_spread()
