@@ -14,12 +14,14 @@ waveletflux/            package
     physics.py            kinetic-energy diagnostic (rebuttal)
     ic_sensitivity.py     initial-condition perturbation study (rebuttal)
     profiling.py          inference speed / memory (Tables 2, S19, S20)
+    paper_tables.py       one function per paper table: build, write tex/csv, return mean/std/n
+    checks.py             rebuilds the submitted paper's tables (single run) cell by cell
 configs/<pde>/          v4.0 training configs + inference YAMLs (`*_seed.yaml` = 3-seed runs)
 scripts/                PBS job scripts + analysis entry points
-  reproduce_tables.py     ALL tables -> artifacts/tables/{tex,csv}
-  check_paper_reproduction.py   rebuilds the submitted paper's tables (single run) cell by cell
+  reproduce_tables.py     headless equivalent of notebooks/01_tables.ipynb
+  check_paper_reproduction.py   CLI for analysis/checks.py
 notebooks/
-  01_tables.ipynb             viewer over waveletflux.analysis
+  01_tables.ipynb             builds + writes every table -> artifacts/tables/
   02_figures.ipynb            Figs 3a-c, S2-S4          -> artifacts/figures/
   03_qualitative_rollouts.ipynb  Figs 2a-b, S5          -> artifacts/figures/
   04_physics_consistency.ipynb   physics figures (rebuttal)
@@ -33,6 +35,11 @@ experiments/<pde>/      (not in git) ckpts/, metrics/, performance/
 ```
 
 ## Reproducing the tables
+
+Run `notebooks/01_tables.ipynb` top to bottom: one cell per paper table, each
+writing `artifacts/tables/tex/<name>.tex` and `csv/<name>.csv`; the last
+section checks the builders against the submitted paper. Headless equivalent
+(same functions, byte-identical output):
 
 ```bash
 python scripts/reproduce_tables.py          # ~10 s, needs numpy, pandas, pyyaml
