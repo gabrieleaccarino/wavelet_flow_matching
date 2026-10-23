@@ -21,6 +21,9 @@ if __name__ == "__main__":
     ap.add_argument("--mean-only", nargs="*", metavar="TABLE",
                     help="seed mean only (no +- std). Without names: every table. With names: just "
                          "those, e.g. --mean-only T3_crps_tcool_main T3_crps_Ra_main S15_spectral_tcool")
+    ap.add_argument("--std-threshold", type=float, default=None,
+                    help="one bound for every mean-only caption (default: per-table "
+                         "RECOMMENDED_STD_THRESHOLD in waveletflux/analysis/paper_tables.py)")
     args = ap.parse_args()
     if args.mean_only is None:
         show = True
@@ -28,5 +31,5 @@ if __name__ == "__main__":
         show = False
     else:
         show = {name: False for name in args.mean_only}
-    summ = P.build_all(show_std=show)
+    summ = P.build_all(show_std=show, std_threshold=args.std_threshold)
     print("\nrelative std across seeds (%):\n", summ.to_string())

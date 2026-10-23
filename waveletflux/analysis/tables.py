@@ -230,6 +230,28 @@ def spread_report(name, mean, std, n):
 # ===========================================================================
 # LaTeX
 # ===========================================================================
+# Mean-only mode (STD_IN_LATEX = False): cells whose across-seed std exceeds
+# STD_THRESHOLD get STD_MARK, and the caption states the bound (see std_note).
+STD_THRESHOLD = 0.05
+STD_MARK = r"$^{\dagger}$"
+
+
+def exceeds(s) -> bool:
+    """True if a std value breaks the mean-only bound (single runs never do)."""
+    return s is not None and not pd.isna(s) and float(s) > STD_THRESHOLD
+
+
+def any_exceeds(*stds) -> bool:
+    """True if any cell of the given std frames/series/scalars breaks the bound."""
+    for x in stds:
+        if x is None:
+            continue
+        arr = np.asarray(x.to_numpy() if hasattr(x, "to_numpy") else x, dtype=float).ravel()
+        if np.any(arr[~np.isnan(arr)] > STD_THRESHOLD):
+            return True
+    return False
+
+
 def _fmt(v, s, rank):
     if pd.isna(v):
         return "--"
@@ -239,9 +261,11 @@ def _fmt(v, s, rank):
         sd = f"{s:.{DEC}f}" if s >= 0.5 * 10 ** -DEC else "$<$" + f"{10 ** -DEC:.{DEC}f}"
         txt += r"{\scriptsize$\,\pm\,$" + sd + "}"
     if rank == 1:
-        return r"\textbf{" + txt + "}"
-    if rank == 2:
-        return r"\underline{" + txt + "}"
+        txt = r"\textbf{" + txt + "}"
+    elif rank == 2:
+        txt = r"\underline{" + txt + "}"
+    if not STD_IN_LATEX and exceeds(s):
+        txt += STD_MARK
     return txt
 
 
