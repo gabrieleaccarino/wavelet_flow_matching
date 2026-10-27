@@ -1,109 +1,109 @@
 model,label,col0,col1,mean,std,n_seeds
-WaveletFlow_1scale_haar_v4.0,WFM-1 haar,Low,13.8155,0.174334,0.00168183,3
-WaveletFlow_1scale_haar_v4.0,WFM-1 haar,Low,18.4207,0.165998,0.007753,3
-WaveletFlow_1scale_haar_v4.0,WFM-1 haar,Low,23.0259,0.138194,0.00297393,3
-WaveletFlow_1scale_haar_v4.0,WFM-1 haar,Mid,13.8155,0.189261,0.00150367,3
-WaveletFlow_1scale_haar_v4.0,WFM-1 haar,Mid,18.4207,0.135358,0.00138987,3
-WaveletFlow_1scale_haar_v4.0,WFM-1 haar,Mid,23.0259,0.132613,0.000207048,3
-WaveletFlow_1scale_haar_v4.0,WFM-1 haar,High,13.8155,0.109941,0.00161631,3
-WaveletFlow_1scale_haar_v4.0,WFM-1 haar,High,18.4207,0.185539,0.0054691,3
-WaveletFlow_1scale_haar_v4.0,WFM-1 haar,High,23.0259,0.162798,0.0013481,3
-WaveletFlow_1scale_db2_v4.0,WFM-1 db2,Low,13.8155,0.15377,0.00757857,3
-WaveletFlow_1scale_db2_v4.0,WFM-1 db2,Low,18.4207,0.175609,0.00770423,3
-WaveletFlow_1scale_db2_v4.0,WFM-1 db2,Low,23.0259,0.139688,0.00129069,3
-WaveletFlow_1scale_db2_v4.0,WFM-1 db2,Mid,13.8155,0.160537,0.00173245,3
-WaveletFlow_1scale_db2_v4.0,WFM-1 db2,Mid,18.4207,0.13226,0.00130978,3
-WaveletFlow_1scale_db2_v4.0,WFM-1 db2,Mid,23.0259,0.133594,0.000377457,3
-WaveletFlow_1scale_db2_v4.0,WFM-1 db2,High,13.8155,0.0915357,0.00108502,3
-WaveletFlow_1scale_db2_v4.0,WFM-1 db2,High,18.4207,0.16311,0.00371633,3
-WaveletFlow_1scale_db2_v4.0,WFM-1 db2,High,23.0259,0.149729,0.00133232,3
-WaveletFlow_1scale_db4_v4.0,WFM-1 db4,Low,13.8155,0.160465,0.0211212,3
-WaveletFlow_1scale_db4_v4.0,WFM-1 db4,Low,18.4207,0.169142,0.00606511,3
-WaveletFlow_1scale_db4_v4.0,WFM-1 db4,Low,23.0259,0.139889,0.00270105,3
-WaveletFlow_1scale_db4_v4.0,WFM-1 db4,Mid,13.8155,0.120992,0.00591255,3
-WaveletFlow_1scale_db4_v4.0,WFM-1 db4,Mid,18.4207,0.129951,0.000509954,3
-WaveletFlow_1scale_db4_v4.0,WFM-1 db4,Mid,23.0259,0.130729,0.000231962,3
-WaveletFlow_1scale_db4_v4.0,WFM-1 db4,High,13.8155,0.0486893,0.00204529,3
-WaveletFlow_1scale_db4_v4.0,WFM-1 db4,High,18.4207,0.101809,0.000824625,3
-WaveletFlow_1scale_db4_v4.0,WFM-1 db4,High,23.0259,0.119793,0.000586872,3
-WaveletFlow_1scale_db6_v4.0,WFM-1 db6,Low,13.8155,0.198763,0.00244794,3
-WaveletFlow_1scale_db6_v4.0,WFM-1 db6,Low,18.4207,0.218757,0.00846552,3
-WaveletFlow_1scale_db6_v4.0,WFM-1 db6,Low,23.0259,0.209806,0.00913371,3
-WaveletFlow_1scale_db6_v4.0,WFM-1 db6,Mid,13.8155,0.159834,0.00062072,3
-WaveletFlow_1scale_db6_v4.0,WFM-1 db6,Mid,18.4207,0.138222,0.00427822,3
-WaveletFlow_1scale_db6_v4.0,WFM-1 db6,Mid,23.0259,0.177923,0.00423542,3
-WaveletFlow_1scale_db6_v4.0,WFM-1 db6,High,13.8155,0.0656881,0.00306945,3
-WaveletFlow_1scale_db6_v4.0,WFM-1 db6,High,18.4207,0.12121,0.00642998,3
-WaveletFlow_1scale_db6_v4.0,WFM-1 db6,High,23.0259,0.18309,0.00540809,3
-WaveletFlow_3scales_haar_v4.0,WFM-3 haar,Low,13.8155,0.153932,0.00498025,3
-WaveletFlow_3scales_haar_v4.0,WFM-3 haar,Low,18.4207,0.16328,0.00469339,3
-WaveletFlow_3scales_haar_v4.0,WFM-3 haar,Low,23.0259,0.130367,0.00155499,3
-WaveletFlow_3scales_haar_v4.0,WFM-3 haar,Mid,13.8155,0.188205,0.00384383,3
-WaveletFlow_3scales_haar_v4.0,WFM-3 haar,Mid,18.4207,0.132557,0.000831848,3
-WaveletFlow_3scales_haar_v4.0,WFM-3 haar,Mid,23.0259,0.129151,0.000451281,3
-WaveletFlow_3scales_haar_v4.0,WFM-3 haar,High,13.8155,0.109781,0.00295837,3
-WaveletFlow_3scales_haar_v4.0,WFM-3 haar,High,18.4207,0.180886,0.00211944,3
-WaveletFlow_3scales_haar_v4.0,WFM-3 haar,High,23.0259,0.15586,0.00220239,3
-WaveletFlow_3scales_db2_v4.0,WFM-3 db2,Low,13.8155,0.137692,0.00290409,3
-WaveletFlow_3scales_db2_v4.0,WFM-3 db2,Low,18.4207,0.159377,0.0130117,3
-WaveletFlow_3scales_db2_v4.0,WFM-3 db2,Low,23.0259,0.127043,0.000795346,3
-WaveletFlow_3scales_db2_v4.0,WFM-3 db2,Mid,13.8155,0.130077,0.00418673,3
-WaveletFlow_3scales_db2_v4.0,WFM-3 db2,Mid,18.4207,0.119698,0.000772787,3
-WaveletFlow_3scales_db2_v4.0,WFM-3 db2,Mid,23.0259,0.124802,0.000218903,3
-WaveletFlow_3scales_db2_v4.0,WFM-3 db2,High,13.8155,0.0597912,0.00238996,3
-WaveletFlow_3scales_db2_v4.0,WFM-3 db2,High,18.4207,0.104403,0.00154768,3
-WaveletFlow_3scales_db2_v4.0,WFM-3 db2,High,23.0259,0.119741,0.000354455,3
-WaveletFlow_3scales_db4_v4.0,WFM-3 db4,Low,13.8155,0.1373,0.0101474,3
-WaveletFlow_3scales_db4_v4.0,WFM-3 db4,Low,18.4207,0.160035,0.0062764,3
-WaveletFlow_3scales_db4_v4.0,WFM-3 db4,Low,23.0259,0.129664,0.00371545,3
-WaveletFlow_3scales_db4_v4.0,WFM-3 db4,Mid,13.8155,0.118338,0.00480561,3
-WaveletFlow_3scales_db4_v4.0,WFM-3 db4,Mid,18.4207,0.118895,0.00069786,3
-WaveletFlow_3scales_db4_v4.0,WFM-3 db4,Mid,23.0259,0.125093,0.000327559,3
-WaveletFlow_3scales_db4_v4.0,WFM-3 db4,High,13.8155,0.0519861,0.0017795,3
-WaveletFlow_3scales_db4_v4.0,WFM-3 db4,High,18.4207,0.0970204,0.00266468,3
-WaveletFlow_3scales_db4_v4.0,WFM-3 db4,High,23.0259,0.119813,0.000763171,3
-WaveletFlow_3scales_db6_v4.0,WFM-3 db6,Low,13.8155,0.145164,0.00669489,3
-WaveletFlow_3scales_db6_v4.0,WFM-3 db6,Low,18.4207,0.165644,0.00244709,3
-WaveletFlow_3scales_db6_v4.0,WFM-3 db6,Low,23.0259,0.137744,0.00176707,3
-WaveletFlow_3scales_db6_v4.0,WFM-3 db6,Mid,13.8155,0.122015,0.00238802,3
-WaveletFlow_3scales_db6_v4.0,WFM-3 db6,Mid,18.4207,0.120132,0.000294267,3
-WaveletFlow_3scales_db6_v4.0,WFM-3 db6,Mid,23.0259,0.130281,0.000565906,3
-WaveletFlow_3scales_db6_v4.0,WFM-3 db6,High,13.8155,0.0661396,0.00206807,3
-WaveletFlow_3scales_db6_v4.0,WFM-3 db6,High,18.4207,0.0994264,0.0014102,3
-WaveletFlow_3scales_db6_v4.0,WFM-3 db6,High,23.0259,0.12715,0.000578136,3
-FM_data_space_v4.0,FM$_\text{pixel}$,Low,13.8155,0.154902,0.00215602,3
-FM_data_space_v4.0,FM$_\text{pixel}$,Low,18.4207,0.149872,0.00193976,3
-FM_data_space_v4.0,FM$_\text{pixel}$,Low,23.0259,0.131282,0.000452104,3
-FM_data_space_v4.0,FM$_\text{pixel}$,Mid,13.8155,0.188359,0.00151754,3
-FM_data_space_v4.0,FM$_\text{pixel}$,Mid,18.4207,0.129902,0.00184172,3
-FM_data_space_v4.0,FM$_\text{pixel}$,Mid,23.0259,0.128036,0.000267552,3
-FM_data_space_v4.0,FM$_\text{pixel}$,High,13.8155,0.112434,0.000647636,3
-FM_data_space_v4.0,FM$_\text{pixel}$,High,18.4207,0.182622,0.00596202,3
-FM_data_space_v4.0,FM$_\text{pixel}$,High,23.0259,0.156361,0.00272909,3
-FourierFlow_32modes_v4.0,FM$_\text{fourier}$,Low,13.8155,0.346963,0.00267041,3
-FourierFlow_32modes_v4.0,FM$_\text{fourier}$,Low,18.4207,0.321079,0.00453675,3
-FourierFlow_32modes_v4.0,FM$_\text{fourier}$,Low,23.0259,0.29861,0.00158358,3
-FourierFlow_32modes_v4.0,FM$_\text{fourier}$,Mid,13.8155,0.253256,0.000947422,3
-FourierFlow_32modes_v4.0,FM$_\text{fourier}$,Mid,18.4207,0.307844,0.00104653,3
-FourierFlow_32modes_v4.0,FM$_\text{fourier}$,Mid,23.0259,0.314492,0.000340107,3
-FourierFlow_32modes_v4.0,FM$_\text{fourier}$,High,13.8155,0.137158,0.000642652,3
-FourierFlow_32modes_v4.0,FM$_\text{fourier}$,High,18.4207,0.261943,0.000175086,3
-FourierFlow_32modes_v4.0,FM$_\text{fourier}$,High,23.0259,0.296013,3.89765e-05,3
-WDNO_db2,WDNO,Low,13.8155,0.426353,0.00260072,3
-WDNO_db2,WDNO,Low,18.4207,0.402288,0.00143101,3
-WDNO_db2,WDNO,Low,23.0259,0.362771,0.00121994,3
-WDNO_db2,WDNO,Mid,13.8155,0.54861,0.000393321,3
-WDNO_db2,WDNO,Mid,18.4207,0.484085,0.000122035,3
-WDNO_db2,WDNO,Mid,23.0259,0.447549,0.000726815,3
-WDNO_db2,WDNO,High,13.8155,0.584959,0.000125566,3
-WDNO_db2,WDNO,High,18.4207,0.580629,0.000308188,3
-WDNO_db2,WDNO,High,23.0259,0.528885,0.000183848,3
-LatentFM_dcae_f32c64_v4.0,LatentFM$_{\div 64}$,Low,13.8155,0.206208,0.00489522,3
-LatentFM_dcae_f32c64_v4.0,LatentFM$_{\div 64}$,Low,18.4207,0.183305,0.00333751,3
-LatentFM_dcae_f32c64_v4.0,LatentFM$_{\div 64}$,Low,23.0259,0.167311,0.00224351,3
-LatentFM_dcae_f32c64_v4.0,LatentFM$_{\div 64}$,Mid,13.8155,0.17746,0.0012293,3
-LatentFM_dcae_f32c64_v4.0,LatentFM$_{\div 64}$,Mid,18.4207,0.148713,0.000424415,3
-LatentFM_dcae_f32c64_v4.0,LatentFM$_{\div 64}$,Mid,23.0259,0.151097,0.00025837,3
-LatentFM_dcae_f32c64_v4.0,LatentFM$_{\div 64}$,High,13.8155,0.111147,0.00116392,3
-LatentFM_dcae_f32c64_v4.0,LatentFM$_{\div 64}$,High,18.4207,0.138622,0.000963499,3
-LatentFM_dcae_f32c64_v4.0,LatentFM$_{\div 64}$,High,23.0259,0.195884,6.06139e-05,3
+WFM_1scale_haar,WFM-1 haar,Low,13.8155,0.174334,0.00168183,3
+WFM_1scale_haar,WFM-1 haar,Low,18.4207,0.165998,0.007753,3
+WFM_1scale_haar,WFM-1 haar,Low,23.0259,0.138194,0.00297393,3
+WFM_1scale_haar,WFM-1 haar,Mid,13.8155,0.189261,0.00150367,3
+WFM_1scale_haar,WFM-1 haar,Mid,18.4207,0.135358,0.00138987,3
+WFM_1scale_haar,WFM-1 haar,Mid,23.0259,0.132613,0.000207048,3
+WFM_1scale_haar,WFM-1 haar,High,13.8155,0.109941,0.00161631,3
+WFM_1scale_haar,WFM-1 haar,High,18.4207,0.185539,0.0054691,3
+WFM_1scale_haar,WFM-1 haar,High,23.0259,0.162798,0.0013481,3
+WFM_1scale_db2,WFM-1 db2,Low,13.8155,0.15377,0.00757857,3
+WFM_1scale_db2,WFM-1 db2,Low,18.4207,0.175609,0.00770423,3
+WFM_1scale_db2,WFM-1 db2,Low,23.0259,0.139688,0.00129069,3
+WFM_1scale_db2,WFM-1 db2,Mid,13.8155,0.160537,0.00173245,3
+WFM_1scale_db2,WFM-1 db2,Mid,18.4207,0.13226,0.00130978,3
+WFM_1scale_db2,WFM-1 db2,Mid,23.0259,0.133594,0.000377457,3
+WFM_1scale_db2,WFM-1 db2,High,13.8155,0.0915357,0.00108502,3
+WFM_1scale_db2,WFM-1 db2,High,18.4207,0.16311,0.00371633,3
+WFM_1scale_db2,WFM-1 db2,High,23.0259,0.149729,0.00133232,3
+WFM_1scale_db4,WFM-1 db4,Low,13.8155,0.160465,0.0211212,3
+WFM_1scale_db4,WFM-1 db4,Low,18.4207,0.169142,0.00606511,3
+WFM_1scale_db4,WFM-1 db4,Low,23.0259,0.139889,0.00270105,3
+WFM_1scale_db4,WFM-1 db4,Mid,13.8155,0.120992,0.00591255,3
+WFM_1scale_db4,WFM-1 db4,Mid,18.4207,0.129951,0.000509954,3
+WFM_1scale_db4,WFM-1 db4,Mid,23.0259,0.130729,0.000231962,3
+WFM_1scale_db4,WFM-1 db4,High,13.8155,0.0486893,0.00204529,3
+WFM_1scale_db4,WFM-1 db4,High,18.4207,0.101809,0.000824625,3
+WFM_1scale_db4,WFM-1 db4,High,23.0259,0.119793,0.000586872,3
+WFM_1scale_db6,WFM-1 db6,Low,13.8155,0.198763,0.00244794,3
+WFM_1scale_db6,WFM-1 db6,Low,18.4207,0.218757,0.00846552,3
+WFM_1scale_db6,WFM-1 db6,Low,23.0259,0.209806,0.00913371,3
+WFM_1scale_db6,WFM-1 db6,Mid,13.8155,0.159834,0.00062072,3
+WFM_1scale_db6,WFM-1 db6,Mid,18.4207,0.138222,0.00427822,3
+WFM_1scale_db6,WFM-1 db6,Mid,23.0259,0.177923,0.00423542,3
+WFM_1scale_db6,WFM-1 db6,High,13.8155,0.0656881,0.00306945,3
+WFM_1scale_db6,WFM-1 db6,High,18.4207,0.12121,0.00642998,3
+WFM_1scale_db6,WFM-1 db6,High,23.0259,0.18309,0.00540809,3
+WFM_3scale_haar,WFM-3 haar,Low,13.8155,0.153932,0.00498025,3
+WFM_3scale_haar,WFM-3 haar,Low,18.4207,0.16328,0.00469339,3
+WFM_3scale_haar,WFM-3 haar,Low,23.0259,0.130367,0.00155499,3
+WFM_3scale_haar,WFM-3 haar,Mid,13.8155,0.188205,0.00384383,3
+WFM_3scale_haar,WFM-3 haar,Mid,18.4207,0.132557,0.000831848,3
+WFM_3scale_haar,WFM-3 haar,Mid,23.0259,0.129151,0.000451281,3
+WFM_3scale_haar,WFM-3 haar,High,13.8155,0.109781,0.00295837,3
+WFM_3scale_haar,WFM-3 haar,High,18.4207,0.180886,0.00211944,3
+WFM_3scale_haar,WFM-3 haar,High,23.0259,0.15586,0.00220239,3
+WFM_3scale_db2,WFM-3 db2,Low,13.8155,0.137692,0.00290409,3
+WFM_3scale_db2,WFM-3 db2,Low,18.4207,0.159377,0.0130117,3
+WFM_3scale_db2,WFM-3 db2,Low,23.0259,0.127043,0.000795346,3
+WFM_3scale_db2,WFM-3 db2,Mid,13.8155,0.130077,0.00418673,3
+WFM_3scale_db2,WFM-3 db2,Mid,18.4207,0.119698,0.000772787,3
+WFM_3scale_db2,WFM-3 db2,Mid,23.0259,0.124802,0.000218903,3
+WFM_3scale_db2,WFM-3 db2,High,13.8155,0.0597912,0.00238996,3
+WFM_3scale_db2,WFM-3 db2,High,18.4207,0.104403,0.00154768,3
+WFM_3scale_db2,WFM-3 db2,High,23.0259,0.119741,0.000354455,3
+WFM_3scale_db4,WFM-3 db4,Low,13.8155,0.1373,0.0101474,3
+WFM_3scale_db4,WFM-3 db4,Low,18.4207,0.160035,0.0062764,3
+WFM_3scale_db4,WFM-3 db4,Low,23.0259,0.129664,0.00371545,3
+WFM_3scale_db4,WFM-3 db4,Mid,13.8155,0.118338,0.00480561,3
+WFM_3scale_db4,WFM-3 db4,Mid,18.4207,0.118895,0.00069786,3
+WFM_3scale_db4,WFM-3 db4,Mid,23.0259,0.125093,0.000327559,3
+WFM_3scale_db4,WFM-3 db4,High,13.8155,0.0519861,0.0017795,3
+WFM_3scale_db4,WFM-3 db4,High,18.4207,0.0970204,0.00266468,3
+WFM_3scale_db4,WFM-3 db4,High,23.0259,0.119813,0.000763171,3
+WFM_3scale_db6,WFM-3 db6,Low,13.8155,0.145164,0.00669489,3
+WFM_3scale_db6,WFM-3 db6,Low,18.4207,0.165644,0.00244709,3
+WFM_3scale_db6,WFM-3 db6,Low,23.0259,0.137744,0.00176707,3
+WFM_3scale_db6,WFM-3 db6,Mid,13.8155,0.122015,0.00238802,3
+WFM_3scale_db6,WFM-3 db6,Mid,18.4207,0.120132,0.000294267,3
+WFM_3scale_db6,WFM-3 db6,Mid,23.0259,0.130281,0.000565906,3
+WFM_3scale_db6,WFM-3 db6,High,13.8155,0.0661396,0.00206807,3
+WFM_3scale_db6,WFM-3 db6,High,18.4207,0.0994264,0.0014102,3
+WFM_3scale_db6,WFM-3 db6,High,23.0259,0.12715,0.000578136,3
+FM_pixel,FM$_\text{pixel}$,Low,13.8155,0.154902,0.00215602,3
+FM_pixel,FM$_\text{pixel}$,Low,18.4207,0.149872,0.00193976,3
+FM_pixel,FM$_\text{pixel}$,Low,23.0259,0.131282,0.000452104,3
+FM_pixel,FM$_\text{pixel}$,Mid,13.8155,0.188359,0.00151754,3
+FM_pixel,FM$_\text{pixel}$,Mid,18.4207,0.129902,0.00184172,3
+FM_pixel,FM$_\text{pixel}$,Mid,23.0259,0.128036,0.000267552,3
+FM_pixel,FM$_\text{pixel}$,High,13.8155,0.112434,0.000647636,3
+FM_pixel,FM$_\text{pixel}$,High,18.4207,0.182622,0.00596202,3
+FM_pixel,FM$_\text{pixel}$,High,23.0259,0.156361,0.00272909,3
+FM_fourier,FM$_\text{fourier}$,Low,13.8155,0.346963,0.00267041,3
+FM_fourier,FM$_\text{fourier}$,Low,18.4207,0.321079,0.00453675,3
+FM_fourier,FM$_\text{fourier}$,Low,23.0259,0.29861,0.00158358,3
+FM_fourier,FM$_\text{fourier}$,Mid,13.8155,0.253256,0.000947422,3
+FM_fourier,FM$_\text{fourier}$,Mid,18.4207,0.307844,0.00104653,3
+FM_fourier,FM$_\text{fourier}$,Mid,23.0259,0.314492,0.000340107,3
+FM_fourier,FM$_\text{fourier}$,High,13.8155,0.137158,0.000642652,3
+FM_fourier,FM$_\text{fourier}$,High,18.4207,0.261943,0.000175086,3
+FM_fourier,FM$_\text{fourier}$,High,23.0259,0.296013,3.89765e-05,3
+WDNO,WDNO,Low,13.8155,0.426353,0.00260072,3
+WDNO,WDNO,Low,18.4207,0.402288,0.00143101,3
+WDNO,WDNO,Low,23.0259,0.362771,0.00121994,3
+WDNO,WDNO,Mid,13.8155,0.54861,0.000393321,3
+WDNO,WDNO,Mid,18.4207,0.484085,0.000122035,3
+WDNO,WDNO,Mid,23.0259,0.447549,0.000726815,3
+WDNO,WDNO,High,13.8155,0.584959,0.000125566,3
+WDNO,WDNO,High,18.4207,0.580629,0.000308188,3
+WDNO,WDNO,High,23.0259,0.528885,0.000183848,3
+LatentFM,LatentFM$_{\div 64}$,Low,13.8155,0.206208,0.00489522,3
+LatentFM,LatentFM$_{\div 64}$,Low,18.4207,0.183305,0.00333751,3
+LatentFM,LatentFM$_{\div 64}$,Low,23.0259,0.167311,0.00224351,3
+LatentFM,LatentFM$_{\div 64}$,Mid,13.8155,0.17746,0.0012293,3
+LatentFM,LatentFM$_{\div 64}$,Mid,18.4207,0.148713,0.000424415,3
+LatentFM,LatentFM$_{\div 64}$,Mid,23.0259,0.151097,0.00025837,3
+LatentFM,LatentFM$_{\div 64}$,High,13.8155,0.111147,0.00116392,3
+LatentFM,LatentFM$_{\div 64}$,High,18.4207,0.138622,0.000963499,3
+LatentFM,LatentFM$_{\div 64}$,High,23.0259,0.195884,6.06139e-05,3

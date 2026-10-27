@@ -1,34 +1,34 @@
 model,label,col0,mean,std,n_seeds
-WaveletFlow_1scale_haar_v4.0,WFM-1 haar,0.03,1.16488,0.0430836,3
-WaveletFlow_1scale_haar_v4.0,WFM-1 haar,0.06,1.1354,0.0566223,3
-WaveletFlow_1scale_haar_v4.0,WFM-1 haar,0.1,0.865196,0.0524583,3
-WaveletFlow_1scale_db2_v4.0,WFM-1 db2,0.03,1.11189,0.0306421,3
-WaveletFlow_1scale_db2_v4.0,WFM-1 db2,0.06,1.07762,0.0248059,3
-WaveletFlow_1scale_db2_v4.0,WFM-1 db2,0.1,0.878304,0.0418712,3
-WaveletFlow_1scale_db4_v4.0,WFM-1 db4,0.03,1.17002,0.0483683,3
-WaveletFlow_1scale_db4_v4.0,WFM-1 db4,0.06,1.10204,0.0438003,3
-WaveletFlow_1scale_db4_v4.0,WFM-1 db4,0.1,0.847289,0.0434799,3
-WaveletFlow_1scale_db6_v4.0,WFM-1 db6,0.03,1.07591,0.0233168,3
-WaveletFlow_1scale_db6_v4.0,WFM-1 db6,0.06,1.07382,0.0144735,3
-WaveletFlow_1scale_db6_v4.0,WFM-1 db6,0.1,0.830938,0.0205018,3
-WaveletFlow_3scales_haar_v4.0,WFM-3 haar,0.03,1.10662,0.0117637,3
-WaveletFlow_3scales_haar_v4.0,WFM-3 haar,0.06,1.11718,0.0340764,3
-WaveletFlow_3scales_haar_v4.0,WFM-3 haar,0.1,0.86832,0.0186773,3
-WaveletFlow_3scales_db2_v4.0,WFM-3 db2,0.03,1.24776,0.0240967,3
-WaveletFlow_3scales_db2_v4.0,WFM-3 db2,0.06,1.14057,0.0438111,3
-WaveletFlow_3scales_db2_v4.0,WFM-3 db2,0.1,0.893919,0.0425301,3
-WaveletFlow_3scales_db4_v4.0,WFM-3 db4,0.03,1.04816,0.0191963,3
-WaveletFlow_3scales_db4_v4.0,WFM-3 db4,0.06,1.00603,0.0250316,3
-WaveletFlow_3scales_db4_v4.0,WFM-3 db4,0.1,0.817413,0.0417231,3
-WaveletFlow_3scales_db6_v4.0,WFM-3 db6,0.03,1.07522,0.0177079,3
-WaveletFlow_3scales_db6_v4.0,WFM-3 db6,0.06,1.03372,0.0150336,3
-WaveletFlow_3scales_db6_v4.0,WFM-3 db6,0.1,0.882176,0.0382796,3
-FM_data_space_v4.0,FM$_\text{pixel}$,0.03,1.22025,0.0400072,3
-FM_data_space_v4.0,FM$_\text{pixel}$,0.06,1.12552,0.0158631,3
-FM_data_space_v4.0,FM$_\text{pixel}$,0.1,0.874969,0.0447158,3
-FourierFlow_32modes_v4.0,FM$_\text{fourier}$,0.03,1.4387,0.00853482,3
-FourierFlow_32modes_v4.0,FM$_\text{fourier}$,0.06,1.42413,0.0130625,3
-FourierFlow_32modes_v4.0,FM$_\text{fourier}$,0.1,1.19474,0.0059533,3
-WDNO_db2,WDNO,0.03,3.32981,0.00782664,3
-WDNO_db2,WDNO,0.06,3.29241,0.00708774,3
-WDNO_db2,WDNO,0.1,3.18289,0.00533468,3
+WFM_1scale_haar,WFM-1 haar,0.03,1.16488,0.0430836,3
+WFM_1scale_haar,WFM-1 haar,0.06,1.1354,0.0566223,3
+WFM_1scale_haar,WFM-1 haar,0.1,0.865196,0.0524583,3
+WFM_1scale_db2,WFM-1 db2,0.03,1.11189,0.0306421,3
+WFM_1scale_db2,WFM-1 db2,0.06,1.07762,0.0248059,3
+WFM_1scale_db2,WFM-1 db2,0.1,0.878304,0.0418712,3
+WFM_1scale_db4,WFM-1 db4,0.03,1.17002,0.0483683,3
+WFM_1scale_db4,WFM-1 db4,0.06,1.10204,0.0438003,3
+WFM_1scale_db4,WFM-1 db4,0.1,0.847289,0.0434799,3
+WFM_1scale_db6,WFM-1 db6,0.03,1.07591,0.0233168,3
+WFM_1scale_db6,WFM-1 db6,0.06,1.07382,0.0144735,3
+WFM_1scale_db6,WFM-1 db6,0.1,0.830938,0.0205018,3
+WFM_3scale_haar,WFM-3 haar,0.03,1.10662,0.0117637,3
+WFM_3scale_haar,WFM-3 haar,0.06,1.11718,0.0340764,3
+WFM_3scale_haar,WFM-3 haar,0.1,0.86832,0.0186773,3
+WFM_3scale_db2,WFM-3 db2,0.03,1.24776,0.0240967,3
+WFM_3scale_db2,WFM-3 db2,0.06,1.14057,0.0438111,3
+WFM_3scale_db2,WFM-3 db2,0.1,0.893919,0.0425301,3
+WFM_3scale_db4,WFM-3 db4,0.03,1.04816,0.0191963,3
+WFM_3scale_db4,WFM-3 db4,0.06,1.00603,0.0250316,3
+WFM_3scale_db4,WFM-3 db4,0.1,0.817413,0.0417231,3
+WFM_3scale_db6,WFM-3 db6,0.03,1.07522,0.0177079,3
+WFM_3scale_db6,WFM-3 db6,0.06,1.03372,0.0150336,3
+WFM_3scale_db6,WFM-3 db6,0.1,0.882176,0.0382796,3
+FM_pixel,FM$_\text{pixel}$,0.03,1.22025,0.0400072,3
+FM_pixel,FM$_\text{pixel}$,0.06,1.12552,0.0158631,3
+FM_pixel,FM$_\text{pixel}$,0.1,0.874969,0.0447158,3
+FM_fourier,FM$_\text{fourier}$,0.03,1.4387,0.00853482,3
+FM_fourier,FM$_\text{fourier}$,0.06,1.42413,0.0130625,3
+FM_fourier,FM$_\text{fourier}$,0.1,1.19474,0.0059533,3
+WDNO,WDNO,0.03,3.32981,0.00782664,3
+WDNO,WDNO,0.06,3.29241,0.00708774,3
+WDNO,WDNO,0.1,3.18289,0.00533468,3

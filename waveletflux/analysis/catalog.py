@@ -3,16 +3,20 @@
 Every results table and analysis in the paper is built from the per-run metric
 CSVs in ``experiments/<pde>/metrics/``:
 
-* ``<model>_..._seed<S>_<pde>_metrics.csv`` — one file per inference seed
+* ``<MODEL>_<pde>_seed<S>_metrics.csv`` — one file per inference seed
   (42, 84, 168). Used for every model that has seeds: all WFM variants and all
   generative baselines (FM_pixel, FM_fourier, WDNO, LatentFM).
-* ``<model>_<pde>_stats.csv`` — single run. Used only for the deterministic
+* ``<MODEL>_<pde>_stats.csv`` — single run. Used only for the deterministic
   baselines (FNO, TFNO, WNO), which are deterministic at inference time and
   were trained once, and for the paper-reproduction check.
 
 Rows with ``field == "_global_"`` hold the field-independent physics
 diagnostics (kinetic energy etc.); the per-field ML metrics (CRPS, VRMSE,
 spectral coherence) are NaN there. ``load()`` keeps them separate.
+
+MODEL is the name used in the paper (WFM_1scale_haar, FM_pixel, FM_fourier,
+WDNO, LatentFM, WNO, FNO, TFNO, ...). Raw inference outputs are converted to
+this scheme by ``scripts/rename_to_paper_names.py``.
 """
 from __future__ import annotations
 
@@ -38,9 +42,8 @@ WAVELETS = ("haar", "db2", "db4", "db6")
 
 
 def wfm_key(scale: str, wavelet: str) -> str:
-    """Model key for a WFM variant, e.g. wfm_key('3scale', 'db2')."""
-    stem = "1scale" if scale.startswith("1") else "3scales"
-    return f"WaveletFlow_{stem}_{wavelet}_v4.0"
+    """Model key for a WFM variant, e.g. wfm_key('3scale', 'db2') -> 'WFM_3scale_db2'."""
+    return f"WFM_{'1' if scale.startswith('1') else '3'}scale_{wavelet}"
 
 
 MODEL_REGISTRY: dict[str, dict] = {}
@@ -51,24 +54,23 @@ for _w in WAVELETS:
     MODEL_REGISTRY[wfm_key("3scale", _w)] = dict(
         label=f"WFM-3 {_w}", group="wfm-3scale", color=_rgb(117, 176, 138), source="metrics")
 MODEL_REGISTRY.update({
-    "FM_data_space_v4.0":       dict(label=r"FM$_\text{pixel}$",   group="generative", color=_rgb(176, 176, 176), source="metrics"),
-    "FourierFlow_32modes_v4.0": dict(label=r"FM$_\text{fourier}$", group="generative", color=_rgb(143, 94, 106),  source="metrics"),
-    "WDNO_db2":                 dict(label="WDNO",                 group="generative", color=_rgb(191, 134, 148), source="metrics",
-                                     stats_key="WDNO_{pde}"),
-    # Latent-space FM baseline (rebuttal): DC-AE (spatial /32, 64 ch) of Rozet et al. 2025
+    "FM_pixel":   dict(label=r"FM$_\text{pixel}$",   group="generative", color=_rgb(176, 176, 176), source="metrics"),
+    "FM_fourier": dict(label=r"FM$_\text{fourier}$", group="generative", color=_rgb(143, 94, 106),  source="metrics"),  # 32 modes
+    "WDNO":       dict(label="WDNO",                 group="generative", color=_rgb(191, 134, 148), source="metrics"),  # db2, 5 samples
+    # Latent-space FM baseline (rebuttal): DC-AE f32c64 of Rozet et al. 2025
     # + flow matching in latent space. Trained and evaluated on Rayleigh-Benard only.
-    "LatentFM_dcae_f32c64_v4.0": dict(label=r"LatentFM$_{\div 64}$", group="generative", color=_rgb(120, 140, 190), source="metrics",
-                                      pdes=("rayleigh_benard",)),
-    "WNO_3scales_db2":          dict(label="WNO",  group="deterministic", color=_rgb(176, 136, 84),  source="stats"),
-    "FNO":                      dict(label="FNO",  group="deterministic", color=_rgb(208, 169, 110), source="stats"),
-    "TFNO":                     dict(label="TFNO", group="deterministic", color=_rgb(236, 227, 163), source="stats"),
+    "LatentFM":   dict(label=r"LatentFM$_{\div 64}$", group="generative", color=_rgb(120, 140, 190), source="metrics",
+                       pdes=("rayleigh_benard",)),
+    "WNO":        dict(label="WNO",  group="deterministic", color=_rgb(176, 136, 84),  source="stats"),
+    "FNO":        dict(label="FNO",  group="deterministic", color=_rgb(208, 169, 110), source="stats"),
+    "TFNO":       dict(label="TFNO", group="deterministic", color=_rgb(236, 227, 163), source="stats"),
 })
 
 # Synthetic "selected wavelet" rows (one per WFM scale; per-PDE wavelet below).
 WFM1_BEST, WFM3_BEST = "WFM_1scale_best", "WFM_3scale_best"
 MODEL_REGISTRY[WFM1_BEST] = dict(label="WFM 1-scale", group="wfm-best", color=_rgb(98, 124, 107), source=None)
 MODEL_REGISTRY[WFM3_BEST] = dict(label="WFM 3-scale", group="wfm-best", color=_rgb(117, 176, 138), source=None)
-LATENTFM = "LatentFM_dcae_f32c64_v4.0"
+LATENTFM = "LatentFM"
 
 LABELS = {m: d["label"] for m, d in MODEL_REGISTRY.items()}
 COLORS = {m: d["color"] for m, d in MODEL_REGISTRY.items()}
@@ -147,14 +149,11 @@ _SEED_RX = re.compile(r"seed[_\-]?(\d+)", re.I)
 
 
 def files_for(model: str, pde: str, suffix: str) -> list[Path]:
-    """Metric files for one (model, pde). Matches ``{model}*_{suffix}.csv`` and
-    excludes the IC-perturbation runs (``_ic0p``)."""
-    stem = MODEL_REGISTRY.get(model, {}).get("stats_key", model) if suffix == "stats" else model
-    if "{pde}" in stem:   # exact single-run file name
-        pat = str(metrics_dir(pde) / (stem.format(pde=pde) + f"_{suffix}.csv"))
-    else:
-        pat = str(metrics_dir(pde) / f"{stem}*_{suffix}.csv")
-    return [Path(f) for f in sorted(glob.glob(pat)) if "_ic0p" not in f]
+    """Metric files for one (model, pde): ``<model>_<pde>_seed<S>_metrics.csv``
+    (suffix "metrics") or ``<model>_<pde>_stats.csv`` (suffix "stats").
+    IC-perturbation runs (``_ic<eta>_``) are not matched."""
+    pat = f"{model}_{pde}_seed*_metrics.csv" if suffix == "metrics" else f"{model}_{pde}_stats.csv"
+    return [Path(f) for f in sorted(glob.glob(str(metrics_dir(pde) / pat)))]
 
 
 def _read(fp: Path, model: str, pde: str) -> pd.DataFrame:

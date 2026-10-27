@@ -1,103 +1,103 @@
 model,label,col0,col1,mean,std,n_seeds
-WaveletFlow_1scale_haar_v4.0,WFM-1 haar,turbulent_radiative_layer_2D,01:32,0.492047,0.00622009,3
-WaveletFlow_1scale_haar_v4.0,WFM-1 haar,turbulent_radiative_layer_2D,33:64,1.04719,0.0333866,3
-WaveletFlow_1scale_haar_v4.0,WFM-1 haar,turbulent_radiative_layer_2D,65:97,1.21825,0.0323081,3
-WaveletFlow_1scale_haar_v4.0,WFM-1 haar,rayleigh_benard,01:32,0.0049304,3.54394e-05,3
-WaveletFlow_1scale_haar_v4.0,WFM-1 haar,rayleigh_benard,33:64,0.0367374,0.000434176,3
-WaveletFlow_1scale_haar_v4.0,WFM-1 haar,rayleigh_benard,65:196,0.0742763,0.00290063,3
-WaveletFlow_1scale_haar_v4.0,WFM-1 haar,active_matter,01:16,0.118537,0.000691501,3
-WaveletFlow_1scale_haar_v4.0,WFM-1 haar,active_matter,17:32,0.190079,0.00102891,3
-WaveletFlow_1scale_haar_v4.0,WFM-1 haar,active_matter,33:77,0.198037,0.000728993,3
-WaveletFlow_1scale_db2_v4.0,WFM-1 db2,turbulent_radiative_layer_2D,01:32,0.447401,0.00692178,3
-WaveletFlow_1scale_db2_v4.0,WFM-1 db2,turbulent_radiative_layer_2D,33:64,1.09675,0.00769904,3
-WaveletFlow_1scale_db2_v4.0,WFM-1 db2,turbulent_radiative_layer_2D,65:97,1.31615,0.0323835,3
-WaveletFlow_1scale_db2_v4.0,WFM-1 db2,rayleigh_benard,01:32,0.0051077,8.35756e-05,3
-WaveletFlow_1scale_db2_v4.0,WFM-1 db2,rayleigh_benard,33:64,0.0355891,0.000463229,3
-WaveletFlow_1scale_db2_v4.0,WFM-1 db2,rayleigh_benard,65:196,0.0725943,0.00236526,3
-WaveletFlow_1scale_db2_v4.0,WFM-1 db2,active_matter,01:16,0.173189,0.000273703,3
-WaveletFlow_1scale_db2_v4.0,WFM-1 db2,active_matter,17:32,0.239475,0.000199204,3
-WaveletFlow_1scale_db2_v4.0,WFM-1 db2,active_matter,33:77,0.260635,0.000460077,3
-WaveletFlow_1scale_db4_v4.0,WFM-1 db4,turbulent_radiative_layer_2D,01:32,0.521267,0.00616625,3
-WaveletFlow_1scale_db4_v4.0,WFM-1 db4,turbulent_radiative_layer_2D,33:64,1.05204,0.00240251,3
-WaveletFlow_1scale_db4_v4.0,WFM-1 db4,turbulent_radiative_layer_2D,65:97,1.24094,0.0209493,3
-WaveletFlow_1scale_db4_v4.0,WFM-1 db4,rayleigh_benard,01:32,0.00714891,3.27528e-05,3
-WaveletFlow_1scale_db4_v4.0,WFM-1 db4,rayleigh_benard,33:64,0.0405595,0.000337311,3
-WaveletFlow_1scale_db4_v4.0,WFM-1 db4,rayleigh_benard,65:196,0.0728017,0.00315537,3
-WaveletFlow_1scale_db4_v4.0,WFM-1 db4,active_matter,01:16,0.326171,1.09342e-05,3
-WaveletFlow_1scale_db4_v4.0,WFM-1 db4,active_matter,17:32,0.387685,0.000234213,3
-WaveletFlow_1scale_db4_v4.0,WFM-1 db4,active_matter,33:77,0.38748,1.91861e-05,3
-WaveletFlow_1scale_db6_v4.0,WFM-1 db6,turbulent_radiative_layer_2D,01:32,0.451339,0.00255432,3
-WaveletFlow_1scale_db6_v4.0,WFM-1 db6,turbulent_radiative_layer_2D,33:64,0.982801,0.0168627,3
-WaveletFlow_1scale_db6_v4.0,WFM-1 db6,turbulent_radiative_layer_2D,65:97,1.18809,0.00792007,3
-WaveletFlow_1scale_db6_v4.0,WFM-1 db6,rayleigh_benard,01:32,0.00517307,1.53641e-05,3
-WaveletFlow_1scale_db6_v4.0,WFM-1 db6,rayleigh_benard,33:64,0.0401054,0.000126781,3
-WaveletFlow_1scale_db6_v4.0,WFM-1 db6,rayleigh_benard,65:196,0.0898688,0.00132064,3
-WaveletFlow_1scale_db6_v4.0,WFM-1 db6,active_matter,01:16,0.175466,0.000127688,3
-WaveletFlow_1scale_db6_v4.0,WFM-1 db6,active_matter,17:32,0.221849,0.000116966,3
-WaveletFlow_1scale_db6_v4.0,WFM-1 db6,active_matter,33:77,0.23123,0.000489415,3
-WaveletFlow_3scales_haar_v4.0,WFM-3 haar,turbulent_radiative_layer_2D,01:32,0.410094,0.00331091,3
-WaveletFlow_3scales_haar_v4.0,WFM-3 haar,turbulent_radiative_layer_2D,33:64,1.01817,0.0108168,3
-WaveletFlow_3scales_haar_v4.0,WFM-3 haar,turbulent_radiative_layer_2D,65:97,1.17813,0.0296942,3
-WaveletFlow_3scales_haar_v4.0,WFM-3 haar,rayleigh_benard,01:32,0.0040644,5.14784e-05,3
-WaveletFlow_3scales_haar_v4.0,WFM-3 haar,rayleigh_benard,33:64,0.0365821,0.000357916,3
-WaveletFlow_3scales_haar_v4.0,WFM-3 haar,rayleigh_benard,65:196,0.0766386,0.0037523,3
-WaveletFlow_3scales_haar_v4.0,WFM-3 haar,active_matter,01:16,0.0796063,0.000236175,3
-WaveletFlow_3scales_haar_v4.0,WFM-3 haar,active_matter,17:32,0.169484,0.00330837,3
-WaveletFlow_3scales_haar_v4.0,WFM-3 haar,active_matter,33:77,0.191391,0.000583953,3
-WaveletFlow_3scales_db2_v4.0,WFM-3 db2,turbulent_radiative_layer_2D,01:32,0.464869,0.00783907,3
-WaveletFlow_3scales_db2_v4.0,WFM-3 db2,turbulent_radiative_layer_2D,33:64,1.13264,0.00608058,3
-WaveletFlow_3scales_db2_v4.0,WFM-3 db2,turbulent_radiative_layer_2D,65:97,1.17927,0.0255546,3
-WaveletFlow_3scales_db2_v4.0,WFM-3 db2,rayleigh_benard,01:32,0.00349471,2.3929e-05,3
-WaveletFlow_3scales_db2_v4.0,WFM-3 db2,rayleigh_benard,33:64,0.0322224,0.000312327,3
-WaveletFlow_3scales_db2_v4.0,WFM-3 db2,rayleigh_benard,65:196,0.0694553,0.00157989,3
-WaveletFlow_3scales_db2_v4.0,WFM-3 db2,active_matter,01:16,0.0868663,0.000948359,3
-WaveletFlow_3scales_db2_v4.0,WFM-3 db2,active_matter,17:32,0.17615,0.00299636,3
-WaveletFlow_3scales_db2_v4.0,WFM-3 db2,active_matter,33:77,0.195809,0.00207574,3
-WaveletFlow_3scales_db4_v4.0,WFM-3 db4,turbulent_radiative_layer_2D,01:32,0.426765,0.00412818,3
-WaveletFlow_3scales_db4_v4.0,WFM-3 db4,turbulent_radiative_layer_2D,33:64,0.984116,0.0072418,3
-WaveletFlow_3scales_db4_v4.0,WFM-3 db4,turbulent_radiative_layer_2D,65:97,1.1303,0.0163736,3
-WaveletFlow_3scales_db4_v4.0,WFM-3 db4,rayleigh_benard,01:32,0.00388679,5.04917e-05,3
-WaveletFlow_3scales_db4_v4.0,WFM-3 db4,rayleigh_benard,33:64,0.0317293,0.000259288,3
-WaveletFlow_3scales_db4_v4.0,WFM-3 db4,rayleigh_benard,65:196,0.0694549,0.001097,3
-WaveletFlow_3scales_db4_v4.0,WFM-3 db4,active_matter,01:16,0.108846,0.00143145,3
-WaveletFlow_3scales_db4_v4.0,WFM-3 db4,active_matter,17:32,0.209063,0.000855117,3
-WaveletFlow_3scales_db4_v4.0,WFM-3 db4,active_matter,33:77,0.23934,6.48318e-05,3
-WaveletFlow_3scales_db6_v4.0,WFM-3 db6,turbulent_radiative_layer_2D,01:32,0.450617,0.00577356,3
-WaveletFlow_3scales_db6_v4.0,WFM-3 db6,turbulent_radiative_layer_2D,33:64,1.0263,0.0064502,3
-WaveletFlow_3scales_db6_v4.0,WFM-3 db6,turbulent_radiative_layer_2D,65:97,1.20046,0.0150363,3
-WaveletFlow_3scales_db6_v4.0,WFM-3 db6,rayleigh_benard,01:32,0.00417087,1.15129e-05,3
-WaveletFlow_3scales_db6_v4.0,WFM-3 db6,rayleigh_benard,33:64,0.031433,0.000553223,3
-WaveletFlow_3scales_db6_v4.0,WFM-3 db6,rayleigh_benard,65:196,0.0785799,0.00347629,3
-WaveletFlow_3scales_db6_v4.0,WFM-3 db6,active_matter,01:16,0.100286,0.00133389,3
-WaveletFlow_3scales_db6_v4.0,WFM-3 db6,active_matter,17:32,0.196625,0.000546793,3
-WaveletFlow_3scales_db6_v4.0,WFM-3 db6,active_matter,33:77,0.212893,0.000952248,3
-FM_data_space_v4.0,FM$_\text{pixel}$,turbulent_radiative_layer_2D,01:32,0.418064,0.00635933,3
-FM_data_space_v4.0,FM$_\text{pixel}$,turbulent_radiative_layer_2D,33:64,1.0885,0.00658893,3
-FM_data_space_v4.0,FM$_\text{pixel}$,turbulent_radiative_layer_2D,65:97,1.21049,0.0172103,3
-FM_data_space_v4.0,FM$_\text{pixel}$,rayleigh_benard,01:32,0.0046732,4.60762e-05,3
-FM_data_space_v4.0,FM$_\text{pixel}$,rayleigh_benard,33:64,0.0363104,0.000826059,3
-FM_data_space_v4.0,FM$_\text{pixel}$,rayleigh_benard,65:196,0.0764023,0.00470576,3
-FM_data_space_v4.0,FM$_\text{pixel}$,active_matter,01:16,0.0593059,0.00045409,3
-FM_data_space_v4.0,FM$_\text{pixel}$,active_matter,17:32,0.165915,0.000538817,3
-FM_data_space_v4.0,FM$_\text{pixel}$,active_matter,33:77,0.194389,0.000506245,3
-FourierFlow_32modes_v4.0,FM$_\text{fourier}$,turbulent_radiative_layer_2D,01:32,0.857038,0.00137003,3
-FourierFlow_32modes_v4.0,FM$_\text{fourier}$,turbulent_radiative_layer_2D,33:64,1.41792,0.00199962,3
-FourierFlow_32modes_v4.0,FM$_\text{fourier}$,turbulent_radiative_layer_2D,65:97,1.55957,0.0108544,3
-FourierFlow_32modes_v4.0,FM$_\text{fourier}$,rayleigh_benard,01:32,0.00900187,5.49597e-05,3
-FourierFlow_32modes_v4.0,FM$_\text{fourier}$,rayleigh_benard,33:64,0.0381035,0.0001227,3
-FourierFlow_32modes_v4.0,FM$_\text{fourier}$,rayleigh_benard,65:196,0.0957307,0.000373425,3
-FourierFlow_32modes_v4.0,FM$_\text{fourier}$,active_matter,01:16,0.185099,0.000513202,3
-FourierFlow_32modes_v4.0,FM$_\text{fourier}$,active_matter,17:32,0.227481,0.00221623,3
-FourierFlow_32modes_v4.0,FM$_\text{fourier}$,active_matter,33:77,0.218275,0.00102467,3
-WDNO_db2,WDNO,turbulent_radiative_layer_2D,01:32,2.46023,0.00179826,3
-WDNO_db2,WDNO,turbulent_radiative_layer_2D,33:64,3.3738,0.00363462,3
-WDNO_db2,WDNO,turbulent_radiative_layer_2D,65:97,4.28351,0.0129984,3
-WDNO_db2,WDNO,rayleigh_benard,01:32,0.0504921,2.91804e-06,3
-WDNO_db2,WDNO,rayleigh_benard,33:64,0.10223,0.000151006,3
-WDNO_db2,WDNO,rayleigh_benard,65:196,0.138097,0.000279727,3
-WDNO_db2,WDNO,active_matter,01:16,0.217606,5.8865e-05,3
-WDNO_db2,WDNO,active_matter,17:32,0.245231,3.23917e-05,3
-WDNO_db2,WDNO,active_matter,33:77,0.266163,2.6011e-05,3
-LatentFM_dcae_f32c64_v4.0,LatentFM$_{\div 64}$,rayleigh_benard,01:32,0.0255099,0.000128957,3
-LatentFM_dcae_f32c64_v4.0,LatentFM$_{\div 64}$,rayleigh_benard,33:64,0.0573995,0.000321874,3
-LatentFM_dcae_f32c64_v4.0,LatentFM$_{\div 64}$,rayleigh_benard,65:196,0.0881796,0.00424329,3
+WFM_1scale_haar,WFM-1 haar,turbulent_radiative_layer_2D,01:32,0.492047,0.00622009,3
+WFM_1scale_haar,WFM-1 haar,turbulent_radiative_layer_2D,33:64,1.04719,0.0333866,3
+WFM_1scale_haar,WFM-1 haar,turbulent_radiative_layer_2D,65:97,1.21825,0.0323081,3
+WFM_1scale_haar,WFM-1 haar,rayleigh_benard,01:32,0.0049304,3.54394e-05,3
+WFM_1scale_haar,WFM-1 haar,rayleigh_benard,33:64,0.0367374,0.000434176,3
+WFM_1scale_haar,WFM-1 haar,rayleigh_benard,65:196,0.0742763,0.00290063,3
+WFM_1scale_haar,WFM-1 haar,active_matter,01:16,0.118537,0.000691501,3
+WFM_1scale_haar,WFM-1 haar,active_matter,17:32,0.190079,0.00102891,3
+WFM_1scale_haar,WFM-1 haar,active_matter,33:77,0.198037,0.000728993,3
+WFM_1scale_db2,WFM-1 db2,turbulent_radiative_layer_2D,01:32,0.447401,0.00692178,3
+WFM_1scale_db2,WFM-1 db2,turbulent_radiative_layer_2D,33:64,1.09675,0.00769904,3
+WFM_1scale_db2,WFM-1 db2,turbulent_radiative_layer_2D,65:97,1.31615,0.0323835,3
+WFM_1scale_db2,WFM-1 db2,rayleigh_benard,01:32,0.0051077,8.35756e-05,3
+WFM_1scale_db2,WFM-1 db2,rayleigh_benard,33:64,0.0355891,0.000463229,3
+WFM_1scale_db2,WFM-1 db2,rayleigh_benard,65:196,0.0725943,0.00236526,3
+WFM_1scale_db2,WFM-1 db2,active_matter,01:16,0.173189,0.000273703,3
+WFM_1scale_db2,WFM-1 db2,active_matter,17:32,0.239475,0.000199204,3
+WFM_1scale_db2,WFM-1 db2,active_matter,33:77,0.260635,0.000460077,3
+WFM_1scale_db4,WFM-1 db4,turbulent_radiative_layer_2D,01:32,0.521267,0.00616625,3
+WFM_1scale_db4,WFM-1 db4,turbulent_radiative_layer_2D,33:64,1.05204,0.00240251,3
+WFM_1scale_db4,WFM-1 db4,turbulent_radiative_layer_2D,65:97,1.24094,0.0209493,3
+WFM_1scale_db4,WFM-1 db4,rayleigh_benard,01:32,0.00714891,3.27528e-05,3
+WFM_1scale_db4,WFM-1 db4,rayleigh_benard,33:64,0.0405595,0.000337311,3
+WFM_1scale_db4,WFM-1 db4,rayleigh_benard,65:196,0.0728017,0.00315537,3
+WFM_1scale_db4,WFM-1 db4,active_matter,01:16,0.326171,1.09342e-05,3
+WFM_1scale_db4,WFM-1 db4,active_matter,17:32,0.387685,0.000234213,3
+WFM_1scale_db4,WFM-1 db4,active_matter,33:77,0.38748,1.91861e-05,3
+WFM_1scale_db6,WFM-1 db6,turbulent_radiative_layer_2D,01:32,0.451339,0.00255432,3
+WFM_1scale_db6,WFM-1 db6,turbulent_radiative_layer_2D,33:64,0.982801,0.0168627,3
+WFM_1scale_db6,WFM-1 db6,turbulent_radiative_layer_2D,65:97,1.18809,0.00792007,3
+WFM_1scale_db6,WFM-1 db6,rayleigh_benard,01:32,0.00517307,1.53641e-05,3
+WFM_1scale_db6,WFM-1 db6,rayleigh_benard,33:64,0.0401054,0.000126781,3
+WFM_1scale_db6,WFM-1 db6,rayleigh_benard,65:196,0.0898688,0.00132064,3
+WFM_1scale_db6,WFM-1 db6,active_matter,01:16,0.175466,0.000127688,3
+WFM_1scale_db6,WFM-1 db6,active_matter,17:32,0.221849,0.000116966,3
+WFM_1scale_db6,WFM-1 db6,active_matter,33:77,0.23123,0.000489415,3
+WFM_3scale_haar,WFM-3 haar,turbulent_radiative_layer_2D,01:32,0.410094,0.00331091,3
+WFM_3scale_haar,WFM-3 haar,turbulent_radiative_layer_2D,33:64,1.01817,0.0108168,3
+WFM_3scale_haar,WFM-3 haar,turbulent_radiative_layer_2D,65:97,1.17813,0.0296942,3
+WFM_3scale_haar,WFM-3 haar,rayleigh_benard,01:32,0.0040644,5.14784e-05,3
+WFM_3scale_haar,WFM-3 haar,rayleigh_benard,33:64,0.0365821,0.000357916,3
+WFM_3scale_haar,WFM-3 haar,rayleigh_benard,65:196,0.0766386,0.0037523,3
+WFM_3scale_haar,WFM-3 haar,active_matter,01:16,0.0796063,0.000236175,3
+WFM_3scale_haar,WFM-3 haar,active_matter,17:32,0.169484,0.00330837,3
+WFM_3scale_haar,WFM-3 haar,active_matter,33:77,0.191391,0.000583953,3
+WFM_3scale_db2,WFM-3 db2,turbulent_radiative_layer_2D,01:32,0.464869,0.00783907,3
+WFM_3scale_db2,WFM-3 db2,turbulent_radiative_layer_2D,33:64,1.13264,0.00608058,3
+WFM_3scale_db2,WFM-3 db2,turbulent_radiative_layer_2D,65:97,1.17927,0.0255546,3
+WFM_3scale_db2,WFM-3 db2,rayleigh_benard,01:32,0.00349471,2.3929e-05,3
+WFM_3scale_db2,WFM-3 db2,rayleigh_benard,33:64,0.0322224,0.000312327,3
+WFM_3scale_db2,WFM-3 db2,rayleigh_benard,65:196,0.0694553,0.00157989,3
+WFM_3scale_db2,WFM-3 db2,active_matter,01:16,0.0868663,0.000948359,3
+WFM_3scale_db2,WFM-3 db2,active_matter,17:32,0.17615,0.00299636,3
+WFM_3scale_db2,WFM-3 db2,active_matter,33:77,0.195809,0.00207574,3
+WFM_3scale_db4,WFM-3 db4,turbulent_radiative_layer_2D,01:32,0.426765,0.00412818,3
+WFM_3scale_db4,WFM-3 db4,turbulent_radiative_layer_2D,33:64,0.984116,0.0072418,3
+WFM_3scale_db4,WFM-3 db4,turbulent_radiative_layer_2D,65:97,1.1303,0.0163736,3
+WFM_3scale_db4,WFM-3 db4,rayleigh_benard,01:32,0.00388679,5.04917e-05,3
+WFM_3scale_db4,WFM-3 db4,rayleigh_benard,33:64,0.0317293,0.000259288,3
+WFM_3scale_db4,WFM-3 db4,rayleigh_benard,65:196,0.0694549,0.001097,3
+WFM_3scale_db4,WFM-3 db4,active_matter,01:16,0.108846,0.00143145,3
+WFM_3scale_db4,WFM-3 db4,active_matter,17:32,0.209063,0.000855117,3
+WFM_3scale_db4,WFM-3 db4,active_matter,33:77,0.23934,6.48318e-05,3
+WFM_3scale_db6,WFM-3 db6,turbulent_radiative_layer_2D,01:32,0.450617,0.00577356,3
+WFM_3scale_db6,WFM-3 db6,turbulent_radiative_layer_2D,33:64,1.0263,0.0064502,3
+WFM_3scale_db6,WFM-3 db6,turbulent_radiative_layer_2D,65:97,1.20046,0.0150363,3
+WFM_3scale_db6,WFM-3 db6,rayleigh_benard,01:32,0.00417087,1.15129e-05,3
+WFM_3scale_db6,WFM-3 db6,rayleigh_benard,33:64,0.031433,0.000553223,3
+WFM_3scale_db6,WFM-3 db6,rayleigh_benard,65:196,0.0785799,0.00347629,3
+WFM_3scale_db6,WFM-3 db6,active_matter,01:16,0.100286,0.00133389,3
+WFM_3scale_db6,WFM-3 db6,active_matter,17:32,0.196625,0.000546793,3
+WFM_3scale_db6,WFM-3 db6,active_matter,33:77,0.212893,0.000952248,3
+FM_pixel,FM$_\text{pixel}$,turbulent_radiative_layer_2D,01:32,0.418064,0.00635933,3
+FM_pixel,FM$_\text{pixel}$,turbulent_radiative_layer_2D,33:64,1.0885,0.00658893,3
+FM_pixel,FM$_\text{pixel}$,turbulent_radiative_layer_2D,65:97,1.21049,0.0172103,3
+FM_pixel,FM$_\text{pixel}$,rayleigh_benard,01:32,0.0046732,4.60762e-05,3
+FM_pixel,FM$_\text{pixel}$,rayleigh_benard,33:64,0.0363104,0.000826059,3
+FM_pixel,FM$_\text{pixel}$,rayleigh_benard,65:196,0.0764023,0.00470576,3
+FM_pixel,FM$_\text{pixel}$,active_matter,01:16,0.0593059,0.00045409,3
+FM_pixel,FM$_\text{pixel}$,active_matter,17:32,0.165915,0.000538817,3
+FM_pixel,FM$_\text{pixel}$,active_matter,33:77,0.194389,0.000506245,3
+FM_fourier,FM$_\text{fourier}$,turbulent_radiative_layer_2D,01:32,0.857038,0.00137003,3
+FM_fourier,FM$_\text{fourier}$,turbulent_radiative_layer_2D,33:64,1.41792,0.00199962,3
+FM_fourier,FM$_\text{fourier}$,turbulent_radiative_layer_2D,65:97,1.55957,0.0108544,3
+FM_fourier,FM$_\text{fourier}$,rayleigh_benard,01:32,0.00900187,5.49597e-05,3
+FM_fourier,FM$_\text{fourier}$,rayleigh_benard,33:64,0.0381035,0.0001227,3
+FM_fourier,FM$_\text{fourier}$,rayleigh_benard,65:196,0.0957307,0.000373425,3
+FM_fourier,FM$_\text{fourier}$,active_matter,01:16,0.185099,0.000513202,3
+FM_fourier,FM$_\text{fourier}$,active_matter,17:32,0.227481,0.00221623,3
+FM_fourier,FM$_\text{fourier}$,active_matter,33:77,0.218275,0.00102467,3
+WDNO,WDNO,turbulent_radiative_layer_2D,01:32,2.46023,0.00179826,3
+WDNO,WDNO,turbulent_radiative_layer_2D,33:64,3.3738,0.00363462,3
+WDNO,WDNO,turbulent_radiative_layer_2D,65:97,4.28351,0.0129984,3
+WDNO,WDNO,rayleigh_benard,01:32,0.0504921,2.91804e-06,3
+WDNO,WDNO,rayleigh_benard,33:64,0.10223,0.000151006,3
+WDNO,WDNO,rayleigh_benard,65:196,0.138097,0.000279727,3
+WDNO,WDNO,active_matter,01:16,0.217606,5.8865e-05,3
+WDNO,WDNO,active_matter,17:32,0.245231,3.23917e-05,3
+WDNO,WDNO,active_matter,33:77,0.266163,2.6011e-05,3
+LatentFM,LatentFM$_{\div 64}$,rayleigh_benard,01:32,0.0255099,0.000128957,3
+LatentFM,LatentFM$_{\div 64}$,rayleigh_benard,33:64,0.0573995,0.000321874,3
+LatentFM,LatentFM$_{\div 64}$,rayleigh_benard,65:196,0.0881796,0.00424329,3

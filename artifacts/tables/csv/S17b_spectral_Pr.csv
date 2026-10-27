@@ -1,109 +1,109 @@
 model,label,col0,col1,mean,std,n_seeds
-WaveletFlow_1scale_haar_v4.0,WFM-1 haar,Low,-2.30259,0.187233,0.00732385,3
-WaveletFlow_1scale_haar_v4.0,WFM-1 haar,Low,0,0.144002,0.00348662,3
-WaveletFlow_1scale_haar_v4.0,WFM-1 haar,Low,2.30259,0.147292,0.00175092,3
-WaveletFlow_1scale_haar_v4.0,WFM-1 haar,Mid,-2.30259,0.158091,0.00204581,3
-WaveletFlow_1scale_haar_v4.0,WFM-1 haar,Mid,0,0.163582,0.000208839,3
-WaveletFlow_1scale_haar_v4.0,WFM-1 haar,Mid,2.30259,0.135559,0.000141016,3
-WaveletFlow_1scale_haar_v4.0,WFM-1 haar,High,-2.30259,0.192479,0.00351868,3
-WaveletFlow_1scale_haar_v4.0,WFM-1 haar,High,0,0.154521,0.000917241,3
-WaveletFlow_1scale_haar_v4.0,WFM-1 haar,High,2.30259,0.111277,0.00176103,3
-WaveletFlow_1scale_db2_v4.0,WFM-1 db2,Low,-2.30259,0.179642,0.0112859,3
-WaveletFlow_1scale_db2_v4.0,WFM-1 db2,Low,0,0.144777,0.00792503,3
-WaveletFlow_1scale_db2_v4.0,WFM-1 db2,Low,2.30259,0.144647,0.00151663,3
-WaveletFlow_1scale_db2_v4.0,WFM-1 db2,Mid,-2.30259,0.150308,0.00284012,3
-WaveletFlow_1scale_db2_v4.0,WFM-1 db2,Mid,0,0.153314,0.000994711,3
-WaveletFlow_1scale_db2_v4.0,WFM-1 db2,Mid,2.30259,0.122768,0.00164602,3
-WaveletFlow_1scale_db2_v4.0,WFM-1 db2,High,-2.30259,0.181768,0.00121093,3
-WaveletFlow_1scale_db2_v4.0,WFM-1 db2,High,0,0.135667,0.00425287,3
-WaveletFlow_1scale_db2_v4.0,WFM-1 db2,High,2.30259,0.0869403,0.00125467,3
-WaveletFlow_1scale_db4_v4.0,WFM-1 db4,Low,-2.30259,0.180813,0.0261354,3
-WaveletFlow_1scale_db4_v4.0,WFM-1 db4,Low,0,0.141151,0.0057715,3
-WaveletFlow_1scale_db4_v4.0,WFM-1 db4,Low,2.30259,0.147531,0.00283732,3
-WaveletFlow_1scale_db4_v4.0,WFM-1 db4,Mid,-2.30259,0.137879,0.00395806,3
-WaveletFlow_1scale_db4_v4.0,WFM-1 db4,Mid,0,0.133197,0.00215728,3
-WaveletFlow_1scale_db4_v4.0,WFM-1 db4,Mid,2.30259,0.110596,0.000430454,3
-WaveletFlow_1scale_db4_v4.0,WFM-1 db4,High,-2.30259,0.119609,0.00146676,3
-WaveletFlow_1scale_db4_v4.0,WFM-1 db4,High,0,0.087261,0.00182476,3
-WaveletFlow_1scale_db4_v4.0,WFM-1 db4,High,2.30259,0.0634216,0.000502389,3
-WaveletFlow_1scale_db6_v4.0,WFM-1 db6,Low,-2.30259,0.200406,0.0127647,3
-WaveletFlow_1scale_db6_v4.0,WFM-1 db6,Low,0,0.210393,0.00960414,3
-WaveletFlow_1scale_db6_v4.0,WFM-1 db6,Low,2.30259,0.216527,0.00659373,3
-WaveletFlow_1scale_db6_v4.0,WFM-1 db6,Mid,-2.30259,0.148378,0.00494518,3
-WaveletFlow_1scale_db6_v4.0,WFM-1 db6,Mid,0,0.162174,0.00352491,3
-WaveletFlow_1scale_db6_v4.0,WFM-1 db6,Mid,2.30259,0.165428,0.00218163,3
-WaveletFlow_1scale_db6_v4.0,WFM-1 db6,High,-2.30259,0.128953,0.00638545,3
-WaveletFlow_1scale_db6_v4.0,WFM-1 db6,High,0,0.149985,0.00612324,3
-WaveletFlow_1scale_db6_v4.0,WFM-1 db6,High,2.30259,0.0910505,0.00355787,3
-WaveletFlow_3scales_haar_v4.0,WFM-3 haar,Low,-2.30259,0.171473,0.0013981,3
-WaveletFlow_3scales_haar_v4.0,WFM-3 haar,Low,0,0.139371,0.00334034,3
-WaveletFlow_3scales_haar_v4.0,WFM-3 haar,Low,2.30259,0.136735,0.000971046,3
-WaveletFlow_3scales_haar_v4.0,WFM-3 haar,Mid,-2.30259,0.154706,0.00294927,3
-WaveletFlow_3scales_haar_v4.0,WFM-3 haar,Mid,0,0.158983,0.00173373,3
-WaveletFlow_3scales_haar_v4.0,WFM-3 haar,Mid,2.30259,0.136224,0.00158433,3
-WaveletFlow_3scales_haar_v4.0,WFM-3 haar,High,-2.30259,0.188962,0.00375807,3
-WaveletFlow_3scales_haar_v4.0,WFM-3 haar,High,0,0.149829,0.00376191,3
-WaveletFlow_3scales_haar_v4.0,WFM-3 haar,High,2.30259,0.107736,0.0018414,3
-WaveletFlow_3scales_db2_v4.0,WFM-3 db2,Low,-2.30259,0.159646,0.01367,3
-WaveletFlow_3scales_db2_v4.0,WFM-3 db2,Low,0,0.132967,0.00620827,3
-WaveletFlow_3scales_db2_v4.0,WFM-3 db2,Low,2.30259,0.131499,0.00148311,3
-WaveletFlow_3scales_db2_v4.0,WFM-3 db2,Mid,-2.30259,0.12823,0.00239305,3
-WaveletFlow_3scales_db2_v4.0,WFM-3 db2,Mid,0,0.134123,0.000551929,3
-WaveletFlow_3scales_db2_v4.0,WFM-3 db2,Mid,2.30259,0.112224,0.00192548,3
-WaveletFlow_3scales_db2_v4.0,WFM-3 db2,High,-2.30259,0.122135,0.00199631,3
-WaveletFlow_3scales_db2_v4.0,WFM-3 db2,High,0,0.0956865,0.00151976,3
-WaveletFlow_3scales_db2_v4.0,WFM-3 db2,High,2.30259,0.0661144,0.000576923,3
-WaveletFlow_3scales_db4_v4.0,WFM-3 db4,Low,-2.30259,0.163245,0.00636286,3
-WaveletFlow_3scales_db4_v4.0,WFM-3 db4,Low,0,0.13008,0.00425071,3
-WaveletFlow_3scales_db4_v4.0,WFM-3 db4,Low,2.30259,0.133674,0.000398649,3
-WaveletFlow_3scales_db4_v4.0,WFM-3 db4,Mid,-2.30259,0.126071,0.00102812,3
-WaveletFlow_3scales_db4_v4.0,WFM-3 db4,Mid,0,0.128456,0.00249006,3
-WaveletFlow_3scales_db4_v4.0,WFM-3 db4,Mid,2.30259,0.107799,0.00134466,3
-WaveletFlow_3scales_db4_v4.0,WFM-3 db4,High,-2.30259,0.112349,0.00221815,3
-WaveletFlow_3scales_db4_v4.0,WFM-3 db4,High,0,0.090345,0.00130842,3
-WaveletFlow_3scales_db4_v4.0,WFM-3 db4,High,2.30259,0.0661248,0.000456169,3
-WaveletFlow_3scales_db6_v4.0,WFM-3 db6,Low,-2.30259,0.172294,0.00120028,3
-WaveletFlow_3scales_db6_v4.0,WFM-3 db6,Low,0,0.137111,0.00287461,3
-WaveletFlow_3scales_db6_v4.0,WFM-3 db6,Low,2.30259,0.139147,0.000442853,3
-WaveletFlow_3scales_db6_v4.0,WFM-3 db6,Mid,-2.30259,0.129302,0.0011837,3
-WaveletFlow_3scales_db6_v4.0,WFM-3 db6,Mid,0,0.131845,0.00115544,3
-WaveletFlow_3scales_db6_v4.0,WFM-3 db6,Mid,2.30259,0.111281,0.000397963,3
-WaveletFlow_3scales_db6_v4.0,WFM-3 db6,High,-2.30259,0.119672,0.00251207,3
-WaveletFlow_3scales_db6_v4.0,WFM-3 db6,High,0,0.0937594,0.00070232,3
-WaveletFlow_3scales_db6_v4.0,WFM-3 db6,High,2.30259,0.0792845,0.000454085,3
-FM_data_space_v4.0,FM$_\text{pixel}$,Low,-2.30259,0.168948,0.00361559,3
-FM_data_space_v4.0,FM$_\text{pixel}$,Low,0,0.131542,0.00196662,3
-FM_data_space_v4.0,FM$_\text{pixel}$,Low,2.30259,0.135565,0.00208526,3
-FM_data_space_v4.0,FM$_\text{pixel}$,Mid,-2.30259,0.153389,0.000789116,3
-FM_data_space_v4.0,FM$_\text{pixel}$,Mid,0,0.159617,0.00164117,3
-FM_data_space_v4.0,FM$_\text{pixel}$,Mid,2.30259,0.133291,0.00100962,3
-FM_data_space_v4.0,FM$_\text{pixel}$,High,-2.30259,0.196767,0.00135859,3
-FM_data_space_v4.0,FM$_\text{pixel}$,High,0,0.148779,0.00694325,3
-FM_data_space_v4.0,FM$_\text{pixel}$,High,2.30259,0.105871,0.0012191,3
-FourierFlow_32modes_v4.0,FM$_\text{fourier}$,Low,-2.30259,0.342478,0.00168482,3
-FourierFlow_32modes_v4.0,FM$_\text{fourier}$,Low,0,0.313601,0.00147625,3
-FourierFlow_32modes_v4.0,FM$_\text{fourier}$,Low,2.30259,0.310573,0.00130711,3
-FourierFlow_32modes_v4.0,FM$_\text{fourier}$,Mid,-2.30259,0.308751,0.000244153,3
-FourierFlow_32modes_v4.0,FM$_\text{fourier}$,Mid,0,0.291504,0.000287934,3
-FourierFlow_32modes_v4.0,FM$_\text{fourier}$,Mid,2.30259,0.275338,0.00061935,3
-FourierFlow_32modes_v4.0,FM$_\text{fourier}$,High,-2.30259,0.261865,0.000587001,3
-FourierFlow_32modes_v4.0,FM$_\text{fourier}$,High,0,0.228016,0.000140078,3
-FourierFlow_32modes_v4.0,FM$_\text{fourier}$,High,2.30259,0.205233,7.00017e-05,3
-WDNO_db2,WDNO,Low,-2.30259,0.390438,0.0025408,3
-WDNO_db2,WDNO,Low,0,0.388363,0.00305849,3
-WDNO_db2,WDNO,Low,2.30259,0.412611,0.000914926,3
-WDNO_db2,WDNO,Mid,-2.30259,0.477149,0.000256078,3
-WDNO_db2,WDNO,Mid,0,0.497654,8.92075e-05,3
-WDNO_db2,WDNO,Mid,2.30259,0.505442,0.000881365,3
-WDNO_db2,WDNO,High,-2.30259,0.573742,0.000280654,3
-WDNO_db2,WDNO,High,0,0.57548,0.000244657,3
-WDNO_db2,WDNO,High,2.30259,0.54525,0.000229321,3
-LatentFM_dcae_f32c64_v4.0,LatentFM$_{\div 64}$,Low,-2.30259,0.199007,0.0106038,3
-LatentFM_dcae_f32c64_v4.0,LatentFM$_{\div 64}$,Low,0,0.172981,0.00445543,3
-LatentFM_dcae_f32c64_v4.0,LatentFM$_{\div 64}$,Low,2.30259,0.184837,0.00165622,3
-LatentFM_dcae_f32c64_v4.0,LatentFM$_{\div 64}$,Mid,-2.30259,0.160453,0.00115755,3
-LatentFM_dcae_f32c64_v4.0,LatentFM$_{\div 64}$,Mid,0,0.159987,0.000177458,3
-LatentFM_dcae_f32c64_v4.0,LatentFM$_{\div 64}$,Mid,2.30259,0.156831,0.000194925,3
-LatentFM_dcae_f32c64_v4.0,LatentFM$_{\div 64}$,High,-2.30259,0.162863,0.00142227,3
-LatentFM_dcae_f32c64_v4.0,LatentFM$_{\div 64}$,High,0,0.150756,0.000631257,3
-LatentFM_dcae_f32c64_v4.0,LatentFM$_{\div 64}$,High,2.30259,0.132034,0.00015686,3
+WFM_1scale_haar,WFM-1 haar,Low,-2.30259,0.187233,0.00732385,3
+WFM_1scale_haar,WFM-1 haar,Low,0,0.144002,0.00348662,3
+WFM_1scale_haar,WFM-1 haar,Low,2.30259,0.147292,0.00175092,3
+WFM_1scale_haar,WFM-1 haar,Mid,-2.30259,0.158091,0.00204581,3
+WFM_1scale_haar,WFM-1 haar,Mid,0,0.163582,0.000208839,3
+WFM_1scale_haar,WFM-1 haar,Mid,2.30259,0.135559,0.000141016,3
+WFM_1scale_haar,WFM-1 haar,High,-2.30259,0.192479,0.00351868,3
+WFM_1scale_haar,WFM-1 haar,High,0,0.154521,0.000917241,3
+WFM_1scale_haar,WFM-1 haar,High,2.30259,0.111277,0.00176103,3
+WFM_1scale_db2,WFM-1 db2,Low,-2.30259,0.179642,0.0112859,3
+WFM_1scale_db2,WFM-1 db2,Low,0,0.144777,0.00792503,3
+WFM_1scale_db2,WFM-1 db2,Low,2.30259,0.144647,0.00151663,3
+WFM_1scale_db2,WFM-1 db2,Mid,-2.30259,0.150308,0.00284012,3
+WFM_1scale_db2,WFM-1 db2,Mid,0,0.153314,0.000994711,3
+WFM_1scale_db2,WFM-1 db2,Mid,2.30259,0.122768,0.00164602,3
+WFM_1scale_db2,WFM-1 db2,High,-2.30259,0.181768,0.00121093,3
+WFM_1scale_db2,WFM-1 db2,High,0,0.135667,0.00425287,3
+WFM_1scale_db2,WFM-1 db2,High,2.30259,0.0869403,0.00125467,3
+WFM_1scale_db4,WFM-1 db4,Low,-2.30259,0.180813,0.0261354,3
+WFM_1scale_db4,WFM-1 db4,Low,0,0.141151,0.0057715,3
+WFM_1scale_db4,WFM-1 db4,Low,2.30259,0.147531,0.00283732,3
+WFM_1scale_db4,WFM-1 db4,Mid,-2.30259,0.137879,0.00395806,3
+WFM_1scale_db4,WFM-1 db4,Mid,0,0.133197,0.00215728,3
+WFM_1scale_db4,WFM-1 db4,Mid,2.30259,0.110596,0.000430454,3
+WFM_1scale_db4,WFM-1 db4,High,-2.30259,0.119609,0.00146676,3
+WFM_1scale_db4,WFM-1 db4,High,0,0.087261,0.00182476,3
+WFM_1scale_db4,WFM-1 db4,High,2.30259,0.0634216,0.000502389,3
+WFM_1scale_db6,WFM-1 db6,Low,-2.30259,0.200406,0.0127647,3
+WFM_1scale_db6,WFM-1 db6,Low,0,0.210393,0.00960414,3
+WFM_1scale_db6,WFM-1 db6,Low,2.30259,0.216527,0.00659373,3
+WFM_1scale_db6,WFM-1 db6,Mid,-2.30259,0.148378,0.00494518,3
+WFM_1scale_db6,WFM-1 db6,Mid,0,0.162174,0.00352491,3
+WFM_1scale_db6,WFM-1 db6,Mid,2.30259,0.165428,0.00218163,3
+WFM_1scale_db6,WFM-1 db6,High,-2.30259,0.128953,0.00638545,3
+WFM_1scale_db6,WFM-1 db6,High,0,0.149985,0.00612324,3
+WFM_1scale_db6,WFM-1 db6,High,2.30259,0.0910505,0.00355787,3
+WFM_3scale_haar,WFM-3 haar,Low,-2.30259,0.171473,0.0013981,3
+WFM_3scale_haar,WFM-3 haar,Low,0,0.139371,0.00334034,3
+WFM_3scale_haar,WFM-3 haar,Low,2.30259,0.136735,0.000971046,3
+WFM_3scale_haar,WFM-3 haar,Mid,-2.30259,0.154706,0.00294927,3
+WFM_3scale_haar,WFM-3 haar,Mid,0,0.158983,0.00173373,3
+WFM_3scale_haar,WFM-3 haar,Mid,2.30259,0.136224,0.00158433,3
+WFM_3scale_haar,WFM-3 haar,High,-2.30259,0.188962,0.00375807,3
+WFM_3scale_haar,WFM-3 haar,High,0,0.149829,0.00376191,3
+WFM_3scale_haar,WFM-3 haar,High,2.30259,0.107736,0.0018414,3
+WFM_3scale_db2,WFM-3 db2,Low,-2.30259,0.159646,0.01367,3
+WFM_3scale_db2,WFM-3 db2,Low,0,0.132967,0.00620827,3
+WFM_3scale_db2,WFM-3 db2,Low,2.30259,0.131499,0.00148311,3
+WFM_3scale_db2,WFM-3 db2,Mid,-2.30259,0.12823,0.00239305,3
+WFM_3scale_db2,WFM-3 db2,Mid,0,0.134123,0.000551929,3
+WFM_3scale_db2,WFM-3 db2,Mid,2.30259,0.112224,0.00192548,3
+WFM_3scale_db2,WFM-3 db2,High,-2.30259,0.122135,0.00199631,3
+WFM_3scale_db2,WFM-3 db2,High,0,0.0956865,0.00151976,3
+WFM_3scale_db2,WFM-3 db2,High,2.30259,0.0661144,0.000576923,3
+WFM_3scale_db4,WFM-3 db4,Low,-2.30259,0.163245,0.00636286,3
+WFM_3scale_db4,WFM-3 db4,Low,0,0.13008,0.00425071,3
+WFM_3scale_db4,WFM-3 db4,Low,2.30259,0.133674,0.000398649,3
+WFM_3scale_db4,WFM-3 db4,Mid,-2.30259,0.126071,0.00102812,3
+WFM_3scale_db4,WFM-3 db4,Mid,0,0.128456,0.00249006,3
+WFM_3scale_db4,WFM-3 db4,Mid,2.30259,0.107799,0.00134466,3
+WFM_3scale_db4,WFM-3 db4,High,-2.30259,0.112349,0.00221815,3
+WFM_3scale_db4,WFM-3 db4,High,0,0.090345,0.00130842,3
+WFM_3scale_db4,WFM-3 db4,High,2.30259,0.0661248,0.000456169,3
+WFM_3scale_db6,WFM-3 db6,Low,-2.30259,0.172294,0.00120028,3
+WFM_3scale_db6,WFM-3 db6,Low,0,0.137111,0.00287461,3
+WFM_3scale_db6,WFM-3 db6,Low,2.30259,0.139147,0.000442853,3
+WFM_3scale_db6,WFM-3 db6,Mid,-2.30259,0.129302,0.0011837,3
+WFM_3scale_db6,WFM-3 db6,Mid,0,0.131845,0.00115544,3
+WFM_3scale_db6,WFM-3 db6,Mid,2.30259,0.111281,0.000397963,3
+WFM_3scale_db6,WFM-3 db6,High,-2.30259,0.119672,0.00251207,3
+WFM_3scale_db6,WFM-3 db6,High,0,0.0937594,0.00070232,3
+WFM_3scale_db6,WFM-3 db6,High,2.30259,0.0792845,0.000454085,3
+FM_pixel,FM$_\text{pixel}$,Low,-2.30259,0.168948,0.00361559,3
+FM_pixel,FM$_\text{pixel}$,Low,0,0.131542,0.00196662,3
+FM_pixel,FM$_\text{pixel}$,Low,2.30259,0.135565,0.00208526,3
+FM_pixel,FM$_\text{pixel}$,Mid,-2.30259,0.153389,0.000789116,3
+FM_pixel,FM$_\text{pixel}$,Mid,0,0.159617,0.00164117,3
+FM_pixel,FM$_\text{pixel}$,Mid,2.30259,0.133291,0.00100962,3
+FM_pixel,FM$_\text{pixel}$,High,-2.30259,0.196767,0.00135859,3
+FM_pixel,FM$_\text{pixel}$,High,0,0.148779,0.00694325,3
+FM_pixel,FM$_\text{pixel}$,High,2.30259,0.105871,0.0012191,3
+FM_fourier,FM$_\text{fourier}$,Low,-2.30259,0.342478,0.00168482,3
+FM_fourier,FM$_\text{fourier}$,Low,0,0.313601,0.00147625,3
+FM_fourier,FM$_\text{fourier}$,Low,2.30259,0.310573,0.00130711,3
+FM_fourier,FM$_\text{fourier}$,Mid,-2.30259,0.308751,0.000244153,3
+FM_fourier,FM$_\text{fourier}$,Mid,0,0.291504,0.000287934,3
+FM_fourier,FM$_\text{fourier}$,Mid,2.30259,0.275338,0.00061935,3
+FM_fourier,FM$_\text{fourier}$,High,-2.30259,0.261865,0.000587001,3
+FM_fourier,FM$_\text{fourier}$,High,0,0.228016,0.000140078,3
+FM_fourier,FM$_\text{fourier}$,High,2.30259,0.205233,7.00017e-05,3
+WDNO,WDNO,Low,-2.30259,0.390438,0.0025408,3
+WDNO,WDNO,Low,0,0.388363,0.00305849,3
+WDNO,WDNO,Low,2.30259,0.412611,0.000914926,3
+WDNO,WDNO,Mid,-2.30259,0.477149,0.000256078,3
+WDNO,WDNO,Mid,0,0.497654,8.92075e-05,3
+WDNO,WDNO,Mid,2.30259,0.505442,0.000881365,3
+WDNO,WDNO,High,-2.30259,0.573742,0.000280654,3
+WDNO,WDNO,High,0,0.57548,0.000244657,3
+WDNO,WDNO,High,2.30259,0.54525,0.000229321,3
+LatentFM,LatentFM$_{\div 64}$,Low,-2.30259,0.199007,0.0106038,3
+LatentFM,LatentFM$_{\div 64}$,Low,0,0.172981,0.00445543,3
+LatentFM,LatentFM$_{\div 64}$,Low,2.30259,0.184837,0.00165622,3
+LatentFM,LatentFM$_{\div 64}$,Mid,-2.30259,0.160453,0.00115755,3
+LatentFM,LatentFM$_{\div 64}$,Mid,0,0.159987,0.000177458,3
+LatentFM,LatentFM$_{\div 64}$,Mid,2.30259,0.156831,0.000194925,3
+LatentFM,LatentFM$_{\div 64}$,High,-2.30259,0.162863,0.00142227,3
+LatentFM,LatentFM$_{\div 64}$,High,0,0.150756,0.000631257,3
+LatentFM,LatentFM$_{\div 64}$,High,2.30259,0.132034,0.00015686,3

@@ -37,10 +37,10 @@ def _key_of(label):
     if m:
         return C.wfm_key(m.group(1) + "scale", m.group(2))
     if "pixel" in label:
-        return "FM_data_space_v4.0"
+        return "FM_pixel"
     if "fourier" in label:
-        return "FourierFlow_32modes_v4.0"
-    return {"WDNO": "WDNO_db2", "WNO": "WNO_3scales_db2", "FNO": "FNO", "TFNO": "TFNO"}[label]
+        return "FM_fourier"
+    return {"WDNO": "WDNO", "WNO": "WNO", "FNO": "FNO", "TFNO": "TFNO"}[label]
 
 
 def paper_reproduction(save=True) -> pd.DataFrame:

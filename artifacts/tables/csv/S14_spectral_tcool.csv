@@ -1,298 +1,298 @@
 model,label,col0,col1,mean,std,n_seeds
-WaveletFlow_1scale_haar_v4.0,WFM-1 haar,Low,0.03,0.138454,0.00658418,3
-WaveletFlow_1scale_haar_v4.0,WFM-1 haar,Low,0.06,0.13922,0.00324638,3
-WaveletFlow_1scale_haar_v4.0,WFM-1 haar,Low,0.1,0.138497,0.00264007,3
-WaveletFlow_1scale_haar_v4.0,WFM-1 haar,Low,0.18,0.137612,0.00352254,3
-WaveletFlow_1scale_haar_v4.0,WFM-1 haar,Low,0.32,0.13154,0.00062977,3
-WaveletFlow_1scale_haar_v4.0,WFM-1 haar,Low,0.56,0.125128,0.00357139,3
-WaveletFlow_1scale_haar_v4.0,WFM-1 haar,Low,1,0.127122,0.00459773,3
-WaveletFlow_1scale_haar_v4.0,WFM-1 haar,Low,1.78,0.135936,0.00258185,3
-WaveletFlow_1scale_haar_v4.0,WFM-1 haar,Low,3.16,0.120967,0.00516906,3
-WaveletFlow_1scale_haar_v4.0,WFM-1 haar,Mid,0.03,0.189905,0.0013547,3
-WaveletFlow_1scale_haar_v4.0,WFM-1 haar,Mid,0.06,0.194073,0.00106236,3
-WaveletFlow_1scale_haar_v4.0,WFM-1 haar,Mid,0.1,0.188653,0.000528287,3
-WaveletFlow_1scale_haar_v4.0,WFM-1 haar,Mid,0.18,0.188795,0.00104932,3
-WaveletFlow_1scale_haar_v4.0,WFM-1 haar,Mid,0.32,0.180255,0.000252566,3
-WaveletFlow_1scale_haar_v4.0,WFM-1 haar,Mid,0.56,0.17157,0.00201685,3
-WaveletFlow_1scale_haar_v4.0,WFM-1 haar,Mid,1,0.157012,0.00368762,3
-WaveletFlow_1scale_haar_v4.0,WFM-1 haar,Mid,1.78,0.154684,0.00102193,3
-WaveletFlow_1scale_haar_v4.0,WFM-1 haar,Mid,3.16,0.149743,0.00390544,3
-WaveletFlow_1scale_haar_v4.0,WFM-1 haar,High,0.03,0.137867,0.00120716,3
-WaveletFlow_1scale_haar_v4.0,WFM-1 haar,High,0.06,0.138094,0.000830843,3
-WaveletFlow_1scale_haar_v4.0,WFM-1 haar,High,0.1,0.136181,0.00165146,3
-WaveletFlow_1scale_haar_v4.0,WFM-1 haar,High,0.18,0.140416,0.000586127,3
-WaveletFlow_1scale_haar_v4.0,WFM-1 haar,High,0.32,0.146994,0.000986569,3
-WaveletFlow_1scale_haar_v4.0,WFM-1 haar,High,0.56,0.146583,0.000511667,3
-WaveletFlow_1scale_haar_v4.0,WFM-1 haar,High,1,0.133215,0.000411345,3
-WaveletFlow_1scale_haar_v4.0,WFM-1 haar,High,1.78,0.120431,0.000633894,3
-WaveletFlow_1scale_haar_v4.0,WFM-1 haar,High,3.16,0.105741,0.000382858,3
-WaveletFlow_1scale_db2_v4.0,WFM-1 db2,Low,0.03,0.141334,0.00196455,3
-WaveletFlow_1scale_db2_v4.0,WFM-1 db2,Low,0.06,0.138785,0.00113056,3
-WaveletFlow_1scale_db2_v4.0,WFM-1 db2,Low,0.1,0.139866,0.00431655,3
-WaveletFlow_1scale_db2_v4.0,WFM-1 db2,Low,0.18,0.137011,0.00287917,3
-WaveletFlow_1scale_db2_v4.0,WFM-1 db2,Low,0.32,0.142826,0.00511677,3
-WaveletFlow_1scale_db2_v4.0,WFM-1 db2,Low,0.56,0.133812,0.00302281,3
-WaveletFlow_1scale_db2_v4.0,WFM-1 db2,Low,1,0.136328,0.00311343,3
-WaveletFlow_1scale_db2_v4.0,WFM-1 db2,Low,1.78,0.133697,0.000745207,3
-WaveletFlow_1scale_db2_v4.0,WFM-1 db2,Low,3.16,0.149198,0.00177448,3
-WaveletFlow_1scale_db2_v4.0,WFM-1 db2,Mid,0.03,0.19165,0.00211066,3
-WaveletFlow_1scale_db2_v4.0,WFM-1 db2,Mid,0.06,0.19536,0.000905633,3
-WaveletFlow_1scale_db2_v4.0,WFM-1 db2,Mid,0.1,0.189391,0.00389372,3
-WaveletFlow_1scale_db2_v4.0,WFM-1 db2,Mid,0.18,0.193028,0.00243956,3
-WaveletFlow_1scale_db2_v4.0,WFM-1 db2,Mid,0.32,0.189106,0.00367492,3
-WaveletFlow_1scale_db2_v4.0,WFM-1 db2,Mid,0.56,0.179114,0.00135555,3
-WaveletFlow_1scale_db2_v4.0,WFM-1 db2,Mid,1,0.169947,0.00234794,3
-WaveletFlow_1scale_db2_v4.0,WFM-1 db2,Mid,1.78,0.163166,0.00102667,3
-WaveletFlow_1scale_db2_v4.0,WFM-1 db2,Mid,3.16,0.16423,0.00162741,3
-WaveletFlow_1scale_db2_v4.0,WFM-1 db2,High,0.03,0.141539,0.00210609,3
-WaveletFlow_1scale_db2_v4.0,WFM-1 db2,High,0.06,0.142931,0.00026582,3
-WaveletFlow_1scale_db2_v4.0,WFM-1 db2,High,0.1,0.139108,0.00263604,3
-WaveletFlow_1scale_db2_v4.0,WFM-1 db2,High,0.18,0.145192,0.000531003,3
-WaveletFlow_1scale_db2_v4.0,WFM-1 db2,High,0.32,0.152786,0.00212625,3
-WaveletFlow_1scale_db2_v4.0,WFM-1 db2,High,0.56,0.154976,0.000965204,3
-WaveletFlow_1scale_db2_v4.0,WFM-1 db2,High,1,0.145385,0.00142815,3
-WaveletFlow_1scale_db2_v4.0,WFM-1 db2,High,1.78,0.13436,0.00123961,3
-WaveletFlow_1scale_db2_v4.0,WFM-1 db2,High,3.16,0.121528,0.00092813,3
-WaveletFlow_1scale_db4_v4.0,WFM-1 db4,Low,0.03,0.135683,0.00320433,3
-WaveletFlow_1scale_db4_v4.0,WFM-1 db4,Low,0.06,0.140587,0.00213407,3
-WaveletFlow_1scale_db4_v4.0,WFM-1 db4,Low,0.1,0.133925,0.00156025,3
-WaveletFlow_1scale_db4_v4.0,WFM-1 db4,Low,0.18,0.133997,0.00335669,3
-WaveletFlow_1scale_db4_v4.0,WFM-1 db4,Low,0.32,0.136023,0.000491158,3
-WaveletFlow_1scale_db4_v4.0,WFM-1 db4,Low,0.56,0.129995,0.00178388,3
-WaveletFlow_1scale_db4_v4.0,WFM-1 db4,Low,1,0.127226,0.00186812,3
-WaveletFlow_1scale_db4_v4.0,WFM-1 db4,Low,1.78,0.129312,0.00199333,3
-WaveletFlow_1scale_db4_v4.0,WFM-1 db4,Low,3.16,0.122801,0.00178576,3
-WaveletFlow_1scale_db4_v4.0,WFM-1 db4,Mid,0.03,0.189021,0.00171927,3
-WaveletFlow_1scale_db4_v4.0,WFM-1 db4,Mid,0.06,0.192469,0.000538284,3
-WaveletFlow_1scale_db4_v4.0,WFM-1 db4,Mid,0.1,0.185024,0.00173952,3
-WaveletFlow_1scale_db4_v4.0,WFM-1 db4,Mid,0.18,0.188439,0.00217472,3
-WaveletFlow_1scale_db4_v4.0,WFM-1 db4,Mid,0.32,0.184185,0.00105908,3
-WaveletFlow_1scale_db4_v4.0,WFM-1 db4,Mid,0.56,0.177067,0.00110745,3
-WaveletFlow_1scale_db4_v4.0,WFM-1 db4,Mid,1,0.162294,0.000510309,3
-WaveletFlow_1scale_db4_v4.0,WFM-1 db4,Mid,1.78,0.153607,3.67963e-05,3
-WaveletFlow_1scale_db4_v4.0,WFM-1 db4,Mid,3.16,0.148158,0.000484546,3
-WaveletFlow_1scale_db4_v4.0,WFM-1 db4,High,0.03,0.135975,0.00105188,3
-WaveletFlow_1scale_db4_v4.0,WFM-1 db4,High,0.06,0.137627,0.00104657,3
-WaveletFlow_1scale_db4_v4.0,WFM-1 db4,High,0.1,0.137424,0.00014573,3
-WaveletFlow_1scale_db4_v4.0,WFM-1 db4,High,0.18,0.144408,0.000475476,3
-WaveletFlow_1scale_db4_v4.0,WFM-1 db4,High,0.32,0.151264,0.000353479,3
-WaveletFlow_1scale_db4_v4.0,WFM-1 db4,High,0.56,0.157619,0.000391339,3
-WaveletFlow_1scale_db4_v4.0,WFM-1 db4,High,1,0.146688,0.000273905,3
-WaveletFlow_1scale_db4_v4.0,WFM-1 db4,High,1.78,0.134753,0.000172737,3
-WaveletFlow_1scale_db4_v4.0,WFM-1 db4,High,3.16,0.112424,0.000312602,3
-WaveletFlow_1scale_db6_v4.0,WFM-1 db6,Low,0.03,0.137722,0.000907766,3
-WaveletFlow_1scale_db6_v4.0,WFM-1 db6,Low,0.06,0.142744,0.00450334,3
-WaveletFlow_1scale_db6_v4.0,WFM-1 db6,Low,0.1,0.138501,0.00489221,3
-WaveletFlow_1scale_db6_v4.0,WFM-1 db6,Low,0.18,0.135773,0.00168857,3
-WaveletFlow_1scale_db6_v4.0,WFM-1 db6,Low,0.32,0.135556,0.000237647,3
-WaveletFlow_1scale_db6_v4.0,WFM-1 db6,Low,0.56,0.123524,0.00181768,3
-WaveletFlow_1scale_db6_v4.0,WFM-1 db6,Low,1,0.12812,0.0011453,3
-WaveletFlow_1scale_db6_v4.0,WFM-1 db6,Low,1.78,0.134446,0.000438865,3
-WaveletFlow_1scale_db6_v4.0,WFM-1 db6,Low,3.16,0.120311,0.00547226,3
-WaveletFlow_1scale_db6_v4.0,WFM-1 db6,Mid,0.03,0.190347,0.00111962,3
-WaveletFlow_1scale_db6_v4.0,WFM-1 db6,Mid,0.06,0.195653,0.00201854,3
-WaveletFlow_1scale_db6_v4.0,WFM-1 db6,Mid,0.1,0.190508,0.0030755,3
-WaveletFlow_1scale_db6_v4.0,WFM-1 db6,Mid,0.18,0.19105,0.00136252,3
-WaveletFlow_1scale_db6_v4.0,WFM-1 db6,Mid,0.32,0.183141,0.00113637,3
-WaveletFlow_1scale_db6_v4.0,WFM-1 db6,Mid,0.56,0.171899,0.00118033,3
-WaveletFlow_1scale_db6_v4.0,WFM-1 db6,Mid,1,0.158337,0.00288701,3
-WaveletFlow_1scale_db6_v4.0,WFM-1 db6,Mid,1.78,0.150827,0.000422355,3
-WaveletFlow_1scale_db6_v4.0,WFM-1 db6,Mid,3.16,0.145798,0.00222901,3
-WaveletFlow_1scale_db6_v4.0,WFM-1 db6,High,0.03,0.138929,0.000984247,3
-WaveletFlow_1scale_db6_v4.0,WFM-1 db6,High,0.06,0.139877,0.00127569,3
-WaveletFlow_1scale_db6_v4.0,WFM-1 db6,High,0.1,0.141266,0.000894025,3
-WaveletFlow_1scale_db6_v4.0,WFM-1 db6,High,0.18,0.146976,0.00105549,3
-WaveletFlow_1scale_db6_v4.0,WFM-1 db6,High,0.32,0.154363,0.000458042,3
-WaveletFlow_1scale_db6_v4.0,WFM-1 db6,High,0.56,0.159561,0.000711013,3
-WaveletFlow_1scale_db6_v4.0,WFM-1 db6,High,1,0.144847,0.000344641,3
-WaveletFlow_1scale_db6_v4.0,WFM-1 db6,High,1.78,0.13131,0.000325383,3
-WaveletFlow_1scale_db6_v4.0,WFM-1 db6,High,3.16,0.111773,0.000346565,3
-WaveletFlow_3scales_haar_v4.0,WFM-3 haar,Low,0.03,0.143439,0.00149781,3
-WaveletFlow_3scales_haar_v4.0,WFM-3 haar,Low,0.06,0.143821,0.00524572,3
-WaveletFlow_3scales_haar_v4.0,WFM-3 haar,Low,0.1,0.139086,0.00264752,3
-WaveletFlow_3scales_haar_v4.0,WFM-3 haar,Low,0.18,0.136297,0.00399758,3
-WaveletFlow_3scales_haar_v4.0,WFM-3 haar,Low,0.32,0.133107,0.00489609,3
-WaveletFlow_3scales_haar_v4.0,WFM-3 haar,Low,0.56,0.126698,0.00144213,3
-WaveletFlow_3scales_haar_v4.0,WFM-3 haar,Low,1,0.123111,0.0029098,3
-WaveletFlow_3scales_haar_v4.0,WFM-3 haar,Low,1.78,0.132483,0.000459656,3
-WaveletFlow_3scales_haar_v4.0,WFM-3 haar,Low,3.16,0.118128,0.00254619,3
-WaveletFlow_3scales_haar_v4.0,WFM-3 haar,Mid,0.03,0.193914,0.00131433,3
-WaveletFlow_3scales_haar_v4.0,WFM-3 haar,Mid,0.06,0.198795,0.00195397,3
-WaveletFlow_3scales_haar_v4.0,WFM-3 haar,Mid,0.1,0.187812,0.00133185,3
-WaveletFlow_3scales_haar_v4.0,WFM-3 haar,Mid,0.18,0.190042,0.000464195,3
-WaveletFlow_3scales_haar_v4.0,WFM-3 haar,Mid,0.32,0.180547,0.00289545,3
-WaveletFlow_3scales_haar_v4.0,WFM-3 haar,Mid,0.56,0.16725,0.00119891,3
-WaveletFlow_3scales_haar_v4.0,WFM-3 haar,Mid,1,0.152832,0.000723871,3
-WaveletFlow_3scales_haar_v4.0,WFM-3 haar,Mid,1.78,0.150222,0.00141043,3
-WaveletFlow_3scales_haar_v4.0,WFM-3 haar,Mid,3.16,0.144163,0.000849581,3
-WaveletFlow_3scales_haar_v4.0,WFM-3 haar,High,0.03,0.152338,0.00169746,3
-WaveletFlow_3scales_haar_v4.0,WFM-3 haar,High,0.06,0.151672,0.0019729,3
-WaveletFlow_3scales_haar_v4.0,WFM-3 haar,High,0.1,0.147578,0.00185756,3
-WaveletFlow_3scales_haar_v4.0,WFM-3 haar,High,0.18,0.148383,0.000499729,3
-WaveletFlow_3scales_haar_v4.0,WFM-3 haar,High,0.32,0.156577,0.000762199,3
-WaveletFlow_3scales_haar_v4.0,WFM-3 haar,High,0.56,0.151875,0.00022518,3
-WaveletFlow_3scales_haar_v4.0,WFM-3 haar,High,1,0.135155,0.00107353,3
-WaveletFlow_3scales_haar_v4.0,WFM-3 haar,High,1.78,0.123425,0.00128184,3
-WaveletFlow_3scales_haar_v4.0,WFM-3 haar,High,3.16,0.10287,0.000789288,3
-WaveletFlow_3scales_db2_v4.0,WFM-3 db2,Low,0.03,0.150225,0.00230452,3
-WaveletFlow_3scales_db2_v4.0,WFM-3 db2,Low,0.06,0.146215,0.00186485,3
-WaveletFlow_3scales_db2_v4.0,WFM-3 db2,Low,0.1,0.144667,0.00317602,3
-WaveletFlow_3scales_db2_v4.0,WFM-3 db2,Low,0.18,0.147601,0.00104845,3
-WaveletFlow_3scales_db2_v4.0,WFM-3 db2,Low,0.32,0.141194,0.006589,3
-WaveletFlow_3scales_db2_v4.0,WFM-3 db2,Low,0.56,0.135506,0.00394958,3
-WaveletFlow_3scales_db2_v4.0,WFM-3 db2,Low,1,0.122953,0.00306877,3
-WaveletFlow_3scales_db2_v4.0,WFM-3 db2,Low,1.78,0.140845,0.00247839,3
-WaveletFlow_3scales_db2_v4.0,WFM-3 db2,Low,3.16,0.122918,0.00251373,3
-WaveletFlow_3scales_db2_v4.0,WFM-3 db2,Mid,0.03,0.193077,0.00129672,3
-WaveletFlow_3scales_db2_v4.0,WFM-3 db2,Mid,0.06,0.19563,0.000834291,3
-WaveletFlow_3scales_db2_v4.0,WFM-3 db2,Mid,0.1,0.190876,0.00148812,3
-WaveletFlow_3scales_db2_v4.0,WFM-3 db2,Mid,0.18,0.200672,0.00185173,3
-WaveletFlow_3scales_db2_v4.0,WFM-3 db2,Mid,0.32,0.195008,0.00515299,3
-WaveletFlow_3scales_db2_v4.0,WFM-3 db2,Mid,0.56,0.188167,0.00229261,3
-WaveletFlow_3scales_db2_v4.0,WFM-3 db2,Mid,1,0.174367,0.00185243,3
-WaveletFlow_3scales_db2_v4.0,WFM-3 db2,Mid,1.78,0.179532,0.00276774,3
-WaveletFlow_3scales_db2_v4.0,WFM-3 db2,Mid,3.16,0.175331,0.000717783,3
-WaveletFlow_3scales_db2_v4.0,WFM-3 db2,High,0.03,0.152248,0.00196312,3
-WaveletFlow_3scales_db2_v4.0,WFM-3 db2,High,0.06,0.151149,0.00177715,3
-WaveletFlow_3scales_db2_v4.0,WFM-3 db2,High,0.1,0.146494,0.0015684,3
-WaveletFlow_3scales_db2_v4.0,WFM-3 db2,High,0.18,0.14322,0.000979391,3
-WaveletFlow_3scales_db2_v4.0,WFM-3 db2,High,0.32,0.140759,0.0019781,3
-WaveletFlow_3scales_db2_v4.0,WFM-3 db2,High,0.56,0.139701,0.000967797,3
-WaveletFlow_3scales_db2_v4.0,WFM-3 db2,High,1,0.12675,0.000422997,3
-WaveletFlow_3scales_db2_v4.0,WFM-3 db2,High,1.78,0.120042,0.00067246,3
-WaveletFlow_3scales_db2_v4.0,WFM-3 db2,High,3.16,0.105108,0.000450086,3
-WaveletFlow_3scales_db4_v4.0,WFM-3 db4,Low,0.03,0.150802,0.00278857,3
-WaveletFlow_3scales_db4_v4.0,WFM-3 db4,Low,0.06,0.146131,0.0027994,3
-WaveletFlow_3scales_db4_v4.0,WFM-3 db4,Low,0.1,0.141418,0.0041056,3
-WaveletFlow_3scales_db4_v4.0,WFM-3 db4,Low,0.18,0.144218,0.003692,3
-WaveletFlow_3scales_db4_v4.0,WFM-3 db4,Low,0.32,0.145632,0.00381095,3
-WaveletFlow_3scales_db4_v4.0,WFM-3 db4,Low,0.56,0.136627,0.00372079,3
-WaveletFlow_3scales_db4_v4.0,WFM-3 db4,Low,1,0.132424,0.00531309,3
-WaveletFlow_3scales_db4_v4.0,WFM-3 db4,Low,1.78,0.139651,0.00228577,3
-WaveletFlow_3scales_db4_v4.0,WFM-3 db4,Low,3.16,0.130732,0.0052172,3
-WaveletFlow_3scales_db4_v4.0,WFM-3 db4,Mid,0.03,0.195202,0.00142655,3
-WaveletFlow_3scales_db4_v4.0,WFM-3 db4,Mid,0.06,0.196969,0.00220524,3
-WaveletFlow_3scales_db4_v4.0,WFM-3 db4,Mid,0.1,0.189014,0.002865,3
-WaveletFlow_3scales_db4_v4.0,WFM-3 db4,Mid,0.18,0.19188,0.00182871,3
-WaveletFlow_3scales_db4_v4.0,WFM-3 db4,Mid,0.32,0.188827,0.000861589,3
-WaveletFlow_3scales_db4_v4.0,WFM-3 db4,Mid,0.56,0.176357,0.00272106,3
-WaveletFlow_3scales_db4_v4.0,WFM-3 db4,Mid,1,0.161986,0.00127062,3
-WaveletFlow_3scales_db4_v4.0,WFM-3 db4,Mid,1.78,0.155259,0.00112095,3
-WaveletFlow_3scales_db4_v4.0,WFM-3 db4,Mid,3.16,0.147216,0.0011394,3
-WaveletFlow_3scales_db4_v4.0,WFM-3 db4,High,0.03,0.148753,0.000957079,3
-WaveletFlow_3scales_db4_v4.0,WFM-3 db4,High,0.06,0.151514,0.00145872,3
-WaveletFlow_3scales_db4_v4.0,WFM-3 db4,High,0.1,0.149955,0.00234633,3
-WaveletFlow_3scales_db4_v4.0,WFM-3 db4,High,0.18,0.154478,0.00207404,3
-WaveletFlow_3scales_db4_v4.0,WFM-3 db4,High,0.32,0.159235,0.00224746,3
-WaveletFlow_3scales_db4_v4.0,WFM-3 db4,High,0.56,0.157343,0.00100175,3
-WaveletFlow_3scales_db4_v4.0,WFM-3 db4,High,1,0.141308,0.000922854,3
-WaveletFlow_3scales_db4_v4.0,WFM-3 db4,High,1.78,0.129214,0.000713733,3
-WaveletFlow_3scales_db4_v4.0,WFM-3 db4,High,3.16,0.108555,0.000500567,3
-WaveletFlow_3scales_db6_v4.0,WFM-3 db6,Low,0.03,0.145156,0.00199766,3
-WaveletFlow_3scales_db6_v4.0,WFM-3 db6,Low,0.06,0.146584,0.00456333,3
-WaveletFlow_3scales_db6_v4.0,WFM-3 db6,Low,0.1,0.144026,0.00341007,3
-WaveletFlow_3scales_db6_v4.0,WFM-3 db6,Low,0.18,0.138821,0.00554266,3
-WaveletFlow_3scales_db6_v4.0,WFM-3 db6,Low,0.32,0.14081,0.00214471,3
-WaveletFlow_3scales_db6_v4.0,WFM-3 db6,Low,0.56,0.125105,0.00223514,3
-WaveletFlow_3scales_db6_v4.0,WFM-3 db6,Low,1,0.131544,0.00348465,3
-WaveletFlow_3scales_db6_v4.0,WFM-3 db6,Low,1.78,0.136026,0.00539206,3
-WaveletFlow_3scales_db6_v4.0,WFM-3 db6,Low,3.16,0.118991,0.0013191,3
-WaveletFlow_3scales_db6_v4.0,WFM-3 db6,Mid,0.03,0.192587,0.000763322,3
-WaveletFlow_3scales_db6_v4.0,WFM-3 db6,Mid,0.06,0.197905,0.00193259,3
-WaveletFlow_3scales_db6_v4.0,WFM-3 db6,Mid,0.1,0.188374,0.00160313,3
-WaveletFlow_3scales_db6_v4.0,WFM-3 db6,Mid,0.18,0.191157,0.0028674,3
-WaveletFlow_3scales_db6_v4.0,WFM-3 db6,Mid,0.32,0.181365,0.00248215,3
-WaveletFlow_3scales_db6_v4.0,WFM-3 db6,Mid,0.56,0.167561,0.000765614,3
-WaveletFlow_3scales_db6_v4.0,WFM-3 db6,Mid,1,0.157706,0.00267752,3
-WaveletFlow_3scales_db6_v4.0,WFM-3 db6,Mid,1.78,0.15186,0.00332847,3
-WaveletFlow_3scales_db6_v4.0,WFM-3 db6,Mid,3.16,0.147115,0.00296185,3
-WaveletFlow_3scales_db6_v4.0,WFM-3 db6,High,0.03,0.148347,0.0010098,3
-WaveletFlow_3scales_db6_v4.0,WFM-3 db6,High,0.06,0.150487,0.00268212,3
-WaveletFlow_3scales_db6_v4.0,WFM-3 db6,High,0.1,0.15052,0.000706644,3
-WaveletFlow_3scales_db6_v4.0,WFM-3 db6,High,0.18,0.156259,0.00254695,3
-WaveletFlow_3scales_db6_v4.0,WFM-3 db6,High,0.32,0.170081,0.00146848,3
-WaveletFlow_3scales_db6_v4.0,WFM-3 db6,High,0.56,0.16353,0.000213218,3
-WaveletFlow_3scales_db6_v4.0,WFM-3 db6,High,1,0.144213,0.000667289,3
-WaveletFlow_3scales_db6_v4.0,WFM-3 db6,High,1.78,0.133874,0.000835151,3
-WaveletFlow_3scales_db6_v4.0,WFM-3 db6,High,3.16,0.111829,0.000808145,3
-FM_data_space_v4.0,FM$_\text{pixel}$,Low,0.03,0.144296,0.00351407,3
-FM_data_space_v4.0,FM$_\text{pixel}$,Low,0.06,0.142267,0.00319202,3
-FM_data_space_v4.0,FM$_\text{pixel}$,Low,0.1,0.141845,0.00249979,3
-FM_data_space_v4.0,FM$_\text{pixel}$,Low,0.18,0.143013,0.0025411,3
-FM_data_space_v4.0,FM$_\text{pixel}$,Low,0.32,0.140795,0.00288954,3
-FM_data_space_v4.0,FM$_\text{pixel}$,Low,0.56,0.142707,0.00268736,3
-FM_data_space_v4.0,FM$_\text{pixel}$,Low,1,0.13679,0.00388716,3
-FM_data_space_v4.0,FM$_\text{pixel}$,Low,1.78,0.153946,0.00379058,3
-FM_data_space_v4.0,FM$_\text{pixel}$,Low,3.16,0.126487,0.00533975,3
-FM_data_space_v4.0,FM$_\text{pixel}$,Mid,0.03,0.193214,0.00214665,3
-FM_data_space_v4.0,FM$_\text{pixel}$,Mid,0.06,0.198602,0.00158786,3
-FM_data_space_v4.0,FM$_\text{pixel}$,Mid,0.1,0.190757,0.000293048,3
-FM_data_space_v4.0,FM$_\text{pixel}$,Mid,0.18,0.195783,0.0016338,3
-FM_data_space_v4.0,FM$_\text{pixel}$,Mid,0.32,0.186343,0.00251681,3
-FM_data_space_v4.0,FM$_\text{pixel}$,Mid,0.56,0.18719,0.00142802,3
-FM_data_space_v4.0,FM$_\text{pixel}$,Mid,1,0.168861,0.00399104,3
-FM_data_space_v4.0,FM$_\text{pixel}$,Mid,1.78,0.162748,0.00399608,3
-FM_data_space_v4.0,FM$_\text{pixel}$,Mid,3.16,0.150647,0.00259291,3
-FM_data_space_v4.0,FM$_\text{pixel}$,High,0.03,0.15315,0.00447362,3
-FM_data_space_v4.0,FM$_\text{pixel}$,High,0.06,0.156511,0.00141618,3
-FM_data_space_v4.0,FM$_\text{pixel}$,High,0.1,0.149451,0.00243679,3
-FM_data_space_v4.0,FM$_\text{pixel}$,High,0.18,0.14988,0.00105813,3
-FM_data_space_v4.0,FM$_\text{pixel}$,High,0.32,0.152922,0.00179328,3
-FM_data_space_v4.0,FM$_\text{pixel}$,High,0.56,0.142072,0.0003192,3
-FM_data_space_v4.0,FM$_\text{pixel}$,High,1,0.126096,0.000356244,3
-FM_data_space_v4.0,FM$_\text{pixel}$,High,1.78,0.112692,0.00142389,3
-FM_data_space_v4.0,FM$_\text{pixel}$,High,3.16,0.0975505,0.000942808,3
-FourierFlow_32modes_v4.0,FM$_\text{fourier}$,Low,0.03,0.242114,0.00285875,3
-FourierFlow_32modes_v4.0,FM$_\text{fourier}$,Low,0.06,0.244514,0.00179535,3
-FourierFlow_32modes_v4.0,FM$_\text{fourier}$,Low,0.1,0.228393,0.000225757,3
-FourierFlow_32modes_v4.0,FM$_\text{fourier}$,Low,0.18,0.249363,0.00264432,3
-FourierFlow_32modes_v4.0,FM$_\text{fourier}$,Low,0.32,0.238431,0.00248879,3
-FourierFlow_32modes_v4.0,FM$_\text{fourier}$,Low,0.56,0.229423,0.00103491,3
-FourierFlow_32modes_v4.0,FM$_\text{fourier}$,Low,1,0.228914,0.0035275,3
-FourierFlow_32modes_v4.0,FM$_\text{fourier}$,Low,1.78,0.243479,0.00182774,3
-FourierFlow_32modes_v4.0,FM$_\text{fourier}$,Low,3.16,0.216786,0.00179532,3
-FourierFlow_32modes_v4.0,FM$_\text{fourier}$,Mid,0.03,0.495942,0.0026778,3
-FourierFlow_32modes_v4.0,FM$_\text{fourier}$,Mid,0.06,0.496507,0.00108062,3
-FourierFlow_32modes_v4.0,FM$_\text{fourier}$,Mid,0.1,0.493354,0.00132693,3
-FourierFlow_32modes_v4.0,FM$_\text{fourier}$,Mid,0.18,0.502101,0.0021743,3
-FourierFlow_32modes_v4.0,FM$_\text{fourier}$,Mid,0.32,0.49328,0.00139439,3
-FourierFlow_32modes_v4.0,FM$_\text{fourier}$,Mid,0.56,0.487384,0.000526964,3
-FourierFlow_32modes_v4.0,FM$_\text{fourier}$,Mid,1,0.481152,0.00120949,3
-FourierFlow_32modes_v4.0,FM$_\text{fourier}$,Mid,1.78,0.468249,0.0010708,3
-FourierFlow_32modes_v4.0,FM$_\text{fourier}$,Mid,3.16,0.464254,0.000234036,3
-FourierFlow_32modes_v4.0,FM$_\text{fourier}$,High,0.03,0.489565,0.00194844,3
-FourierFlow_32modes_v4.0,FM$_\text{fourier}$,High,0.06,0.480791,0.00130963,3
-FourierFlow_32modes_v4.0,FM$_\text{fourier}$,High,0.1,0.460413,0.00177998,3
-FourierFlow_32modes_v4.0,FM$_\text{fourier}$,High,0.18,0.453819,0.00493533,3
-FourierFlow_32modes_v4.0,FM$_\text{fourier}$,High,0.32,0.412949,0.0016971,3
-FourierFlow_32modes_v4.0,FM$_\text{fourier}$,High,0.56,0.385133,0.00156217,3
-FourierFlow_32modes_v4.0,FM$_\text{fourier}$,High,1,0.36165,0.00198471,3
-FourierFlow_32modes_v4.0,FM$_\text{fourier}$,High,1.78,0.349242,0.00140469,3
-FourierFlow_32modes_v4.0,FM$_\text{fourier}$,High,3.16,0.344133,0.000772048,3
-WDNO_db2,WDNO,Low,0.03,0.203924,0.000888252,3
-WDNO_db2,WDNO,Low,0.06,0.202615,0.000407312,3
-WDNO_db2,WDNO,Low,0.1,0.193686,0.000309447,3
-WDNO_db2,WDNO,Low,0.18,0.204988,0.00101396,3
-WDNO_db2,WDNO,Low,0.32,0.19511,0.000326901,3
-WDNO_db2,WDNO,Low,0.56,0.191644,0.00124189,3
-WDNO_db2,WDNO,Low,1,0.195301,0.000785352,3
-WDNO_db2,WDNO,Low,1.78,0.214993,0.00134953,3
-WDNO_db2,WDNO,Low,3.16,0.190078,0.00157344,3
-WDNO_db2,WDNO,Mid,0.03,0.253342,0.000328661,3
-WDNO_db2,WDNO,Mid,0.06,0.251739,0.000130777,3
-WDNO_db2,WDNO,Mid,0.1,0.250047,0.000473843,3
-WDNO_db2,WDNO,Mid,0.18,0.245918,0.00103441,3
-WDNO_db2,WDNO,Mid,0.32,0.24069,0.000327502,3
-WDNO_db2,WDNO,Mid,0.56,0.244282,0.000720929,3
-WDNO_db2,WDNO,Mid,1,0.247191,0.000205198,3
-WDNO_db2,WDNO,Mid,1.78,0.250953,0.000987893,3
-WDNO_db2,WDNO,Mid,3.16,0.262061,0.00058064,3
-WDNO_db2,WDNO,High,0.03,0.359443,0.000445517,3
-WDNO_db2,WDNO,High,0.06,0.363328,0.000747182,3
-WDNO_db2,WDNO,High,0.1,0.35535,0.000589477,3
-WDNO_db2,WDNO,High,0.18,0.363475,0.000385915,3
-WDNO_db2,WDNO,High,0.32,0.366945,0.00101313,3
-WDNO_db2,WDNO,High,0.56,0.370466,0.000342996,3
-WDNO_db2,WDNO,High,1,0.376116,0.000360181,3
-WDNO_db2,WDNO,High,1.78,0.377627,0.000525451,3
-WDNO_db2,WDNO,High,3.16,0.372775,0.00076095,3
+WFM_1scale_haar,WFM-1 haar,Low,0.03,0.138454,0.00658418,3
+WFM_1scale_haar,WFM-1 haar,Low,0.06,0.13922,0.00324638,3
+WFM_1scale_haar,WFM-1 haar,Low,0.1,0.138497,0.00264007,3
+WFM_1scale_haar,WFM-1 haar,Low,0.18,0.137612,0.00352254,3
+WFM_1scale_haar,WFM-1 haar,Low,0.32,0.13154,0.00062977,3
+WFM_1scale_haar,WFM-1 haar,Low,0.56,0.125128,0.00357139,3
+WFM_1scale_haar,WFM-1 haar,Low,1,0.127122,0.00459773,3
+WFM_1scale_haar,WFM-1 haar,Low,1.78,0.135936,0.00258185,3
+WFM_1scale_haar,WFM-1 haar,Low,3.16,0.120967,0.00516906,3
+WFM_1scale_haar,WFM-1 haar,Mid,0.03,0.189905,0.0013547,3
+WFM_1scale_haar,WFM-1 haar,Mid,0.06,0.194073,0.00106236,3
+WFM_1scale_haar,WFM-1 haar,Mid,0.1,0.188653,0.000528287,3
+WFM_1scale_haar,WFM-1 haar,Mid,0.18,0.188795,0.00104932,3
+WFM_1scale_haar,WFM-1 haar,Mid,0.32,0.180255,0.000252566,3
+WFM_1scale_haar,WFM-1 haar,Mid,0.56,0.17157,0.00201685,3
+WFM_1scale_haar,WFM-1 haar,Mid,1,0.157012,0.00368762,3
+WFM_1scale_haar,WFM-1 haar,Mid,1.78,0.154684,0.00102193,3
+WFM_1scale_haar,WFM-1 haar,Mid,3.16,0.149743,0.00390544,3
+WFM_1scale_haar,WFM-1 haar,High,0.03,0.137867,0.00120716,3
+WFM_1scale_haar,WFM-1 haar,High,0.06,0.138094,0.000830843,3
+WFM_1scale_haar,WFM-1 haar,High,0.1,0.136181,0.00165146,3
+WFM_1scale_haar,WFM-1 haar,High,0.18,0.140416,0.000586127,3
+WFM_1scale_haar,WFM-1 haar,High,0.32,0.146994,0.000986569,3
+WFM_1scale_haar,WFM-1 haar,High,0.56,0.146583,0.000511667,3
+WFM_1scale_haar,WFM-1 haar,High,1,0.133215,0.000411345,3
+WFM_1scale_haar,WFM-1 haar,High,1.78,0.120431,0.000633894,3
+WFM_1scale_haar,WFM-1 haar,High,3.16,0.105741,0.000382858,3
+WFM_1scale_db2,WFM-1 db2,Low,0.03,0.141334,0.00196455,3
+WFM_1scale_db2,WFM-1 db2,Low,0.06,0.138785,0.00113056,3
+WFM_1scale_db2,WFM-1 db2,Low,0.1,0.139866,0.00431655,3
+WFM_1scale_db2,WFM-1 db2,Low,0.18,0.137011,0.00287917,3
+WFM_1scale_db2,WFM-1 db2,Low,0.32,0.142826,0.00511677,3
+WFM_1scale_db2,WFM-1 db2,Low,0.56,0.133812,0.00302281,3
+WFM_1scale_db2,WFM-1 db2,Low,1,0.136328,0.00311343,3
+WFM_1scale_db2,WFM-1 db2,Low,1.78,0.133697,0.000745207,3
+WFM_1scale_db2,WFM-1 db2,Low,3.16,0.149198,0.00177448,3
+WFM_1scale_db2,WFM-1 db2,Mid,0.03,0.19165,0.00211066,3
+WFM_1scale_db2,WFM-1 db2,Mid,0.06,0.19536,0.000905633,3
+WFM_1scale_db2,WFM-1 db2,Mid,0.1,0.189391,0.00389372,3
+WFM_1scale_db2,WFM-1 db2,Mid,0.18,0.193028,0.00243956,3
+WFM_1scale_db2,WFM-1 db2,Mid,0.32,0.189106,0.00367492,3
+WFM_1scale_db2,WFM-1 db2,Mid,0.56,0.179114,0.00135555,3
+WFM_1scale_db2,WFM-1 db2,Mid,1,0.169947,0.00234794,3
+WFM_1scale_db2,WFM-1 db2,Mid,1.78,0.163166,0.00102667,3
+WFM_1scale_db2,WFM-1 db2,Mid,3.16,0.16423,0.00162741,3
+WFM_1scale_db2,WFM-1 db2,High,0.03,0.141539,0.00210609,3
+WFM_1scale_db2,WFM-1 db2,High,0.06,0.142931,0.00026582,3
+WFM_1scale_db2,WFM-1 db2,High,0.1,0.139108,0.00263604,3
+WFM_1scale_db2,WFM-1 db2,High,0.18,0.145192,0.000531003,3
+WFM_1scale_db2,WFM-1 db2,High,0.32,0.152786,0.00212625,3
+WFM_1scale_db2,WFM-1 db2,High,0.56,0.154976,0.000965204,3
+WFM_1scale_db2,WFM-1 db2,High,1,0.145385,0.00142815,3
+WFM_1scale_db2,WFM-1 db2,High,1.78,0.13436,0.00123961,3
+WFM_1scale_db2,WFM-1 db2,High,3.16,0.121528,0.00092813,3
+WFM_1scale_db4,WFM-1 db4,Low,0.03,0.135683,0.00320433,3
+WFM_1scale_db4,WFM-1 db4,Low,0.06,0.140587,0.00213407,3
+WFM_1scale_db4,WFM-1 db4,Low,0.1,0.133925,0.00156025,3
+WFM_1scale_db4,WFM-1 db4,Low,0.18,0.133997,0.00335669,3
+WFM_1scale_db4,WFM-1 db4,Low,0.32,0.136023,0.000491158,3
+WFM_1scale_db4,WFM-1 db4,Low,0.56,0.129995,0.00178388,3
+WFM_1scale_db4,WFM-1 db4,Low,1,0.127226,0.00186812,3
+WFM_1scale_db4,WFM-1 db4,Low,1.78,0.129312,0.00199333,3
+WFM_1scale_db4,WFM-1 db4,Low,3.16,0.122801,0.00178576,3
+WFM_1scale_db4,WFM-1 db4,Mid,0.03,0.189021,0.00171927,3
+WFM_1scale_db4,WFM-1 db4,Mid,0.06,0.192469,0.000538284,3
+WFM_1scale_db4,WFM-1 db4,Mid,0.1,0.185024,0.00173952,3
+WFM_1scale_db4,WFM-1 db4,Mid,0.18,0.188439,0.00217472,3
+WFM_1scale_db4,WFM-1 db4,Mid,0.32,0.184185,0.00105908,3
+WFM_1scale_db4,WFM-1 db4,Mid,0.56,0.177067,0.00110745,3
+WFM_1scale_db4,WFM-1 db4,Mid,1,0.162294,0.000510309,3
+WFM_1scale_db4,WFM-1 db4,Mid,1.78,0.153607,3.67963e-05,3
+WFM_1scale_db4,WFM-1 db4,Mid,3.16,0.148158,0.000484546,3
+WFM_1scale_db4,WFM-1 db4,High,0.03,0.135975,0.00105188,3
+WFM_1scale_db4,WFM-1 db4,High,0.06,0.137627,0.00104657,3
+WFM_1scale_db4,WFM-1 db4,High,0.1,0.137424,0.00014573,3
+WFM_1scale_db4,WFM-1 db4,High,0.18,0.144408,0.000475476,3
+WFM_1scale_db4,WFM-1 db4,High,0.32,0.151264,0.000353479,3
+WFM_1scale_db4,WFM-1 db4,High,0.56,0.157619,0.000391339,3
+WFM_1scale_db4,WFM-1 db4,High,1,0.146688,0.000273905,3
+WFM_1scale_db4,WFM-1 db4,High,1.78,0.134753,0.000172737,3
+WFM_1scale_db4,WFM-1 db4,High,3.16,0.112424,0.000312602,3
+WFM_1scale_db6,WFM-1 db6,Low,0.03,0.137722,0.000907766,3
+WFM_1scale_db6,WFM-1 db6,Low,0.06,0.142744,0.00450334,3
+WFM_1scale_db6,WFM-1 db6,Low,0.1,0.138501,0.00489221,3
+WFM_1scale_db6,WFM-1 db6,Low,0.18,0.135773,0.00168857,3
+WFM_1scale_db6,WFM-1 db6,Low,0.32,0.135556,0.000237647,3
+WFM_1scale_db6,WFM-1 db6,Low,0.56,0.123524,0.00181768,3
+WFM_1scale_db6,WFM-1 db6,Low,1,0.12812,0.0011453,3
+WFM_1scale_db6,WFM-1 db6,Low,1.78,0.134446,0.000438865,3
+WFM_1scale_db6,WFM-1 db6,Low,3.16,0.120311,0.00547226,3
+WFM_1scale_db6,WFM-1 db6,Mid,0.03,0.190347,0.00111962,3
+WFM_1scale_db6,WFM-1 db6,Mid,0.06,0.195653,0.00201854,3
+WFM_1scale_db6,WFM-1 db6,Mid,0.1,0.190508,0.0030755,3
+WFM_1scale_db6,WFM-1 db6,Mid,0.18,0.19105,0.00136252,3
+WFM_1scale_db6,WFM-1 db6,Mid,0.32,0.183141,0.00113637,3
+WFM_1scale_db6,WFM-1 db6,Mid,0.56,0.171899,0.00118033,3
+WFM_1scale_db6,WFM-1 db6,Mid,1,0.158337,0.00288701,3
+WFM_1scale_db6,WFM-1 db6,Mid,1.78,0.150827,0.000422355,3
+WFM_1scale_db6,WFM-1 db6,Mid,3.16,0.145798,0.00222901,3
+WFM_1scale_db6,WFM-1 db6,High,0.03,0.138929,0.000984247,3
+WFM_1scale_db6,WFM-1 db6,High,0.06,0.139877,0.00127569,3
+WFM_1scale_db6,WFM-1 db6,High,0.1,0.141266,0.000894025,3
+WFM_1scale_db6,WFM-1 db6,High,0.18,0.146976,0.00105549,3
+WFM_1scale_db6,WFM-1 db6,High,0.32,0.154363,0.000458042,3
+WFM_1scale_db6,WFM-1 db6,High,0.56,0.159561,0.000711013,3
+WFM_1scale_db6,WFM-1 db6,High,1,0.144847,0.000344641,3
+WFM_1scale_db6,WFM-1 db6,High,1.78,0.13131,0.000325383,3
+WFM_1scale_db6,WFM-1 db6,High,3.16,0.111773,0.000346565,3
+WFM_3scale_haar,WFM-3 haar,Low,0.03,0.143439,0.00149781,3
+WFM_3scale_haar,WFM-3 haar,Low,0.06,0.143821,0.00524572,3
+WFM_3scale_haar,WFM-3 haar,Low,0.1,0.139086,0.00264752,3
+WFM_3scale_haar,WFM-3 haar,Low,0.18,0.136297,0.00399758,3
+WFM_3scale_haar,WFM-3 haar,Low,0.32,0.133107,0.00489609,3
+WFM_3scale_haar,WFM-3 haar,Low,0.56,0.126698,0.00144213,3
+WFM_3scale_haar,WFM-3 haar,Low,1,0.123111,0.0029098,3
+WFM_3scale_haar,WFM-3 haar,Low,1.78,0.132483,0.000459656,3
+WFM_3scale_haar,WFM-3 haar,Low,3.16,0.118128,0.00254619,3
+WFM_3scale_haar,WFM-3 haar,Mid,0.03,0.193914,0.00131433,3
+WFM_3scale_haar,WFM-3 haar,Mid,0.06,0.198795,0.00195397,3
+WFM_3scale_haar,WFM-3 haar,Mid,0.1,0.187812,0.00133185,3
+WFM_3scale_haar,WFM-3 haar,Mid,0.18,0.190042,0.000464195,3
+WFM_3scale_haar,WFM-3 haar,Mid,0.32,0.180547,0.00289545,3
+WFM_3scale_haar,WFM-3 haar,Mid,0.56,0.16725,0.00119891,3
+WFM_3scale_haar,WFM-3 haar,Mid,1,0.152832,0.000723871,3
+WFM_3scale_haar,WFM-3 haar,Mid,1.78,0.150222,0.00141043,3
+WFM_3scale_haar,WFM-3 haar,Mid,3.16,0.144163,0.000849581,3
+WFM_3scale_haar,WFM-3 haar,High,0.03,0.152338,0.00169746,3
+WFM_3scale_haar,WFM-3 haar,High,0.06,0.151672,0.0019729,3
+WFM_3scale_haar,WFM-3 haar,High,0.1,0.147578,0.00185756,3
+WFM_3scale_haar,WFM-3 haar,High,0.18,0.148383,0.000499729,3
+WFM_3scale_haar,WFM-3 haar,High,0.32,0.156577,0.000762199,3
+WFM_3scale_haar,WFM-3 haar,High,0.56,0.151875,0.00022518,3
+WFM_3scale_haar,WFM-3 haar,High,1,0.135155,0.00107353,3
+WFM_3scale_haar,WFM-3 haar,High,1.78,0.123425,0.00128184,3
+WFM_3scale_haar,WFM-3 haar,High,3.16,0.10287,0.000789288,3
+WFM_3scale_db2,WFM-3 db2,Low,0.03,0.150225,0.00230452,3
+WFM_3scale_db2,WFM-3 db2,Low,0.06,0.146215,0.00186485,3
+WFM_3scale_db2,WFM-3 db2,Low,0.1,0.144667,0.00317602,3
+WFM_3scale_db2,WFM-3 db2,Low,0.18,0.147601,0.00104845,3
+WFM_3scale_db2,WFM-3 db2,Low,0.32,0.141194,0.006589,3
+WFM_3scale_db2,WFM-3 db2,Low,0.56,0.135506,0.00394958,3
+WFM_3scale_db2,WFM-3 db2,Low,1,0.122953,0.00306877,3
+WFM_3scale_db2,WFM-3 db2,Low,1.78,0.140845,0.00247839,3
+WFM_3scale_db2,WFM-3 db2,Low,3.16,0.122918,0.00251373,3
+WFM_3scale_db2,WFM-3 db2,Mid,0.03,0.193077,0.00129672,3
+WFM_3scale_db2,WFM-3 db2,Mid,0.06,0.19563,0.000834291,3
+WFM_3scale_db2,WFM-3 db2,Mid,0.1,0.190876,0.00148812,3
+WFM_3scale_db2,WFM-3 db2,Mid,0.18,0.200672,0.00185173,3
+WFM_3scale_db2,WFM-3 db2,Mid,0.32,0.195008,0.00515299,3
+WFM_3scale_db2,WFM-3 db2,Mid,0.56,0.188167,0.00229261,3
+WFM_3scale_db2,WFM-3 db2,Mid,1,0.174367,0.00185243,3
+WFM_3scale_db2,WFM-3 db2,Mid,1.78,0.179532,0.00276774,3
+WFM_3scale_db2,WFM-3 db2,Mid,3.16,0.175331,0.000717783,3
+WFM_3scale_db2,WFM-3 db2,High,0.03,0.152248,0.00196312,3
+WFM_3scale_db2,WFM-3 db2,High,0.06,0.151149,0.00177715,3
+WFM_3scale_db2,WFM-3 db2,High,0.1,0.146494,0.0015684,3
+WFM_3scale_db2,WFM-3 db2,High,0.18,0.14322,0.000979391,3
+WFM_3scale_db2,WFM-3 db2,High,0.32,0.140759,0.0019781,3
+WFM_3scale_db2,WFM-3 db2,High,0.56,0.139701,0.000967797,3
+WFM_3scale_db2,WFM-3 db2,High,1,0.12675,0.000422997,3
+WFM_3scale_db2,WFM-3 db2,High,1.78,0.120042,0.00067246,3
+WFM_3scale_db2,WFM-3 db2,High,3.16,0.105108,0.000450086,3
+WFM_3scale_db4,WFM-3 db4,Low,0.03,0.150802,0.00278857,3
+WFM_3scale_db4,WFM-3 db4,Low,0.06,0.146131,0.0027994,3
+WFM_3scale_db4,WFM-3 db4,Low,0.1,0.141418,0.0041056,3
+WFM_3scale_db4,WFM-3 db4,Low,0.18,0.144218,0.003692,3
+WFM_3scale_db4,WFM-3 db4,Low,0.32,0.145632,0.00381095,3
+WFM_3scale_db4,WFM-3 db4,Low,0.56,0.136627,0.00372079,3
+WFM_3scale_db4,WFM-3 db4,Low,1,0.132424,0.00531309,3
+WFM_3scale_db4,WFM-3 db4,Low,1.78,0.139651,0.00228577,3
+WFM_3scale_db4,WFM-3 db4,Low,3.16,0.130732,0.0052172,3
+WFM_3scale_db4,WFM-3 db4,Mid,0.03,0.195202,0.00142655,3
+WFM_3scale_db4,WFM-3 db4,Mid,0.06,0.196969,0.00220524,3
+WFM_3scale_db4,WFM-3 db4,Mid,0.1,0.189014,0.002865,3
+WFM_3scale_db4,WFM-3 db4,Mid,0.18,0.19188,0.00182871,3
+WFM_3scale_db4,WFM-3 db4,Mid,0.32,0.188827,0.000861589,3
+WFM_3scale_db4,WFM-3 db4,Mid,0.56,0.176357,0.00272106,3
+WFM_3scale_db4,WFM-3 db4,Mid,1,0.161986,0.00127062,3
+WFM_3scale_db4,WFM-3 db4,Mid,1.78,0.155259,0.00112095,3
+WFM_3scale_db4,WFM-3 db4,Mid,3.16,0.147216,0.0011394,3
+WFM_3scale_db4,WFM-3 db4,High,0.03,0.148753,0.000957079,3
+WFM_3scale_db4,WFM-3 db4,High,0.06,0.151514,0.00145872,3
+WFM_3scale_db4,WFM-3 db4,High,0.1,0.149955,0.00234633,3
+WFM_3scale_db4,WFM-3 db4,High,0.18,0.154478,0.00207404,3
+WFM_3scale_db4,WFM-3 db4,High,0.32,0.159235,0.00224746,3
+WFM_3scale_db4,WFM-3 db4,High,0.56,0.157343,0.00100175,3
+WFM_3scale_db4,WFM-3 db4,High,1,0.141308,0.000922854,3
+WFM_3scale_db4,WFM-3 db4,High,1.78,0.129214,0.000713733,3
+WFM_3scale_db4,WFM-3 db4,High,3.16,0.108555,0.000500567,3
+WFM_3scale_db6,WFM-3 db6,Low,0.03,0.145156,0.00199766,3
+WFM_3scale_db6,WFM-3 db6,Low,0.06,0.146584,0.00456333,3
+WFM_3scale_db6,WFM-3 db6,Low,0.1,0.144026,0.00341007,3
+WFM_3scale_db6,WFM-3 db6,Low,0.18,0.138821,0.00554266,3
+WFM_3scale_db6,WFM-3 db6,Low,0.32,0.14081,0.00214471,3
+WFM_3scale_db6,WFM-3 db6,Low,0.56,0.125105,0.00223514,3
+WFM_3scale_db6,WFM-3 db6,Low,1,0.131544,0.00348465,3
+WFM_3scale_db6,WFM-3 db6,Low,1.78,0.136026,0.00539206,3
+WFM_3scale_db6,WFM-3 db6,Low,3.16,0.118991,0.0013191,3
+WFM_3scale_db6,WFM-3 db6,Mid,0.03,0.192587,0.000763322,3
+WFM_3scale_db6,WFM-3 db6,Mid,0.06,0.197905,0.00193259,3
+WFM_3scale_db6,WFM-3 db6,Mid,0.1,0.188374,0.00160313,3
+WFM_3scale_db6,WFM-3 db6,Mid,0.18,0.191157,0.0028674,3
+WFM_3scale_db6,WFM-3 db6,Mid,0.32,0.181365,0.00248215,3
+WFM_3scale_db6,WFM-3 db6,Mid,0.56,0.167561,0.000765614,3
+WFM_3scale_db6,WFM-3 db6,Mid,1,0.157706,0.00267752,3
+WFM_3scale_db6,WFM-3 db6,Mid,1.78,0.15186,0.00332847,3
+WFM_3scale_db6,WFM-3 db6,Mid,3.16,0.147115,0.00296185,3
+WFM_3scale_db6,WFM-3 db6,High,0.03,0.148347,0.0010098,3
+WFM_3scale_db6,WFM-3 db6,High,0.06,0.150487,0.00268212,3
+WFM_3scale_db6,WFM-3 db6,High,0.1,0.15052,0.000706644,3
+WFM_3scale_db6,WFM-3 db6,High,0.18,0.156259,0.00254695,3
+WFM_3scale_db6,WFM-3 db6,High,0.32,0.170081,0.00146848,3
+WFM_3scale_db6,WFM-3 db6,High,0.56,0.16353,0.000213218,3
+WFM_3scale_db6,WFM-3 db6,High,1,0.144213,0.000667289,3
+WFM_3scale_db6,WFM-3 db6,High,1.78,0.133874,0.000835151,3
+WFM_3scale_db6,WFM-3 db6,High,3.16,0.111829,0.000808145,3
+FM_pixel,FM$_\text{pixel}$,Low,0.03,0.144296,0.00351407,3
+FM_pixel,FM$_\text{pixel}$,Low,0.06,0.142267,0.00319202,3
+FM_pixel,FM$_\text{pixel}$,Low,0.1,0.141845,0.00249979,3
+FM_pixel,FM$_\text{pixel}$,Low,0.18,0.143013,0.0025411,3
+FM_pixel,FM$_\text{pixel}$,Low,0.32,0.140795,0.00288954,3
+FM_pixel,FM$_\text{pixel}$,Low,0.56,0.142707,0.00268736,3
+FM_pixel,FM$_\text{pixel}$,Low,1,0.13679,0.00388716,3
+FM_pixel,FM$_\text{pixel}$,Low,1.78,0.153946,0.00379058,3
+FM_pixel,FM$_\text{pixel}$,Low,3.16,0.126487,0.00533975,3
+FM_pixel,FM$_\text{pixel}$,Mid,0.03,0.193214,0.00214665,3
+FM_pixel,FM$_\text{pixel}$,Mid,0.06,0.198602,0.00158786,3
+FM_pixel,FM$_\text{pixel}$,Mid,0.1,0.190757,0.000293048,3
+FM_pixel,FM$_\text{pixel}$,Mid,0.18,0.195783,0.0016338,3
+FM_pixel,FM$_\text{pixel}$,Mid,0.32,0.186343,0.00251681,3
+FM_pixel,FM$_\text{pixel}$,Mid,0.56,0.18719,0.00142802,3
+FM_pixel,FM$_\text{pixel}$,Mid,1,0.168861,0.00399104,3
+FM_pixel,FM$_\text{pixel}$,Mid,1.78,0.162748,0.00399608,3
+FM_pixel,FM$_\text{pixel}$,Mid,3.16,0.150647,0.00259291,3
+FM_pixel,FM$_\text{pixel}$,High,0.03,0.15315,0.00447362,3
+FM_pixel,FM$_\text{pixel}$,High,0.06,0.156511,0.00141618,3
+FM_pixel,FM$_\text{pixel}$,High,0.1,0.149451,0.00243679,3
+FM_pixel,FM$_\text{pixel}$,High,0.18,0.14988,0.00105813,3
+FM_pixel,FM$_\text{pixel}$,High,0.32,0.152922,0.00179328,3
+FM_pixel,FM$_\text{pixel}$,High,0.56,0.142072,0.0003192,3
+FM_pixel,FM$_\text{pixel}$,High,1,0.126096,0.000356244,3
+FM_pixel,FM$_\text{pixel}$,High,1.78,0.112692,0.00142389,3
+FM_pixel,FM$_\text{pixel}$,High,3.16,0.0975505,0.000942808,3
+FM_fourier,FM$_\text{fourier}$,Low,0.03,0.242114,0.00285875,3
+FM_fourier,FM$_\text{fourier}$,Low,0.06,0.244514,0.00179535,3
+FM_fourier,FM$_\text{fourier}$,Low,0.1,0.228393,0.000225757,3
+FM_fourier,FM$_\text{fourier}$,Low,0.18,0.249363,0.00264432,3
+FM_fourier,FM$_\text{fourier}$,Low,0.32,0.238431,0.00248879,3
+FM_fourier,FM$_\text{fourier}$,Low,0.56,0.229423,0.00103491,3
+FM_fourier,FM$_\text{fourier}$,Low,1,0.228914,0.0035275,3
+FM_fourier,FM$_\text{fourier}$,Low,1.78,0.243479,0.00182774,3
+FM_fourier,FM$_\text{fourier}$,Low,3.16,0.216786,0.00179532,3
+FM_fourier,FM$_\text{fourier}$,Mid,0.03,0.495942,0.0026778,3
+FM_fourier,FM$_\text{fourier}$,Mid,0.06,0.496507,0.00108062,3
+FM_fourier,FM$_\text{fourier}$,Mid,0.1,0.493354,0.00132693,3
+FM_fourier,FM$_\text{fourier}$,Mid,0.18,0.502101,0.0021743,3
+FM_fourier,FM$_\text{fourier}$,Mid,0.32,0.49328,0.00139439,3
+FM_fourier,FM$_\text{fourier}$,Mid,0.56,0.487384,0.000526964,3
+FM_fourier,FM$_\text{fourier}$,Mid,1,0.481152,0.00120949,3
+FM_fourier,FM$_\text{fourier}$,Mid,1.78,0.468249,0.0010708,3
+FM_fourier,FM$_\text{fourier}$,Mid,3.16,0.464254,0.000234036,3
+FM_fourier,FM$_\text{fourier}$,High,0.03,0.489565,0.00194844,3
+FM_fourier,FM$_\text{fourier}$,High,0.06,0.480791,0.00130963,3
+FM_fourier,FM$_\text{fourier}$,High,0.1,0.460413,0.00177998,3
+FM_fourier,FM$_\text{fourier}$,High,0.18,0.453819,0.00493533,3
+FM_fourier,FM$_\text{fourier}$,High,0.32,0.412949,0.0016971,3
+FM_fourier,FM$_\text{fourier}$,High,0.56,0.385133,0.00156217,3
+FM_fourier,FM$_\text{fourier}$,High,1,0.36165,0.00198471,3
+FM_fourier,FM$_\text{fourier}$,High,1.78,0.349242,0.00140469,3
+FM_fourier,FM$_\text{fourier}$,High,3.16,0.344133,0.000772048,3
+WDNO,WDNO,Low,0.03,0.203924,0.000888252,3
+WDNO,WDNO,Low,0.06,0.202615,0.000407312,3
+WDNO,WDNO,Low,0.1,0.193686,0.000309447,3
+WDNO,WDNO,Low,0.18,0.204988,0.00101396,3
+WDNO,WDNO,Low,0.32,0.19511,0.000326901,3
+WDNO,WDNO,Low,0.56,0.191644,0.00124189,3
+WDNO,WDNO,Low,1,0.195301,0.000785352,3
+WDNO,WDNO,Low,1.78,0.214993,0.00134953,3
+WDNO,WDNO,Low,3.16,0.190078,0.00157344,3
+WDNO,WDNO,Mid,0.03,0.253342,0.000328661,3
+WDNO,WDNO,Mid,0.06,0.251739,0.000130777,3
+WDNO,WDNO,Mid,0.1,0.250047,0.000473843,3
+WDNO,WDNO,Mid,0.18,0.245918,0.00103441,3
+WDNO,WDNO,Mid,0.32,0.24069,0.000327502,3
+WDNO,WDNO,Mid,0.56,0.244282,0.000720929,3
+WDNO,WDNO,Mid,1,0.247191,0.000205198,3
+WDNO,WDNO,Mid,1.78,0.250953,0.000987893,3
+WDNO,WDNO,Mid,3.16,0.262061,0.00058064,3
+WDNO,WDNO,High,0.03,0.359443,0.000445517,3
+WDNO,WDNO,High,0.06,0.363328,0.000747182,3
+WDNO,WDNO,High,0.1,0.35535,0.000589477,3
+WDNO,WDNO,High,0.18,0.363475,0.000385915,3
+WDNO,WDNO,High,0.32,0.366945,0.00101313,3
+WDNO,WDNO,High,0.56,0.370466,0.000342996,3
+WDNO,WDNO,High,1,0.376116,0.000360181,3
+WDNO,WDNO,High,1.78,0.377627,0.000525451,3
+WDNO,WDNO,High,3.16,0.372775,0.00076095,3

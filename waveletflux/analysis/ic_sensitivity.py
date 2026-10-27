@@ -3,7 +3,7 @@
 WFM 3-scale (haar) on TRL; Gaussian noise of std eta * sigma_c added to the
 initial conditions before the autoregressive rollout. Runs are produced by
 ``waveletflux/inference_wavelet_fm_ic_pert.py`` (``scripts/inference_ic_pert.pbs``)
-and saved as ``WaveletFlow_<pde>_3scales_haar_v4.0_..._seed<S>_ic0p<eta>_metrics.csv``.
+and renamed to ``WFM_3scale_haar_<pde>_ic0p<eta>_seed<S>_metrics.csv``.
 
 Aggregation: mean over (trajectories, fields, steps in window) within each
 (eta, seed), then mean ± std across seeds.
@@ -20,6 +20,7 @@ from .paths import metrics_dir
 
 PDE = "turbulent_radiative_layer_2D"
 _ETA_RX = re.compile(r"_ic0p(\d+)_")
+MODEL = "WFM_3scale_haar"
 
 
 def _eta(token: str) -> float:
@@ -28,7 +29,7 @@ def _eta(token: str) -> float:
 
 
 def load_ic(pde=PDE) -> pd.DataFrame:
-    files = sorted(glob.glob(str(metrics_dir(pde) / "*_ic0p*_metrics.csv")))
+    files = sorted(glob.glob(str(metrics_dir(pde) / f"{MODEL}_{pde}_ic0p*_seed*_metrics.csv")))
     if not files:
         raise FileNotFoundError(f"no IC-perturbation files in {metrics_dir(pde)}")
     frames = []

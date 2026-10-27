@@ -17,33 +17,33 @@ WFM_3scale_best,WFM 3-scale,rayleigh_benard,65:196,0.347906,0.02273,3
 WFM_3scale_best,WFM 3-scale,active_matter,01:16,0.112457,0.00183482,3
 WFM_3scale_best,WFM 3-scale,active_matter,17:32,0.391376,0.0107251,3
 WFM_3scale_best,WFM 3-scale,active_matter,33:77,0.531145,0.00342619,3
-FM_data_space_v4.0,FM$_\text{pixel}$,turbulent_radiative_layer_2D,01:32,0.0161552,0.000999444,3
-FM_data_space_v4.0,FM$_\text{pixel}$,turbulent_radiative_layer_2D,33:64,0.066876,0.0040953,3
-FM_data_space_v4.0,FM$_\text{pixel}$,turbulent_radiative_layer_2D,65:97,0.176606,0.00662583,3
-FM_data_space_v4.0,FM$_\text{pixel}$,rayleigh_benard,01:32,0.00375396,2.04444e-05,3
-FM_data_space_v4.0,FM$_\text{pixel}$,rayleigh_benard,33:64,0.234893,0.004999,3
-FM_data_space_v4.0,FM$_\text{pixel}$,rayleigh_benard,65:196,0.251337,0.0101002,3
-FM_data_space_v4.0,FM$_\text{pixel}$,active_matter,01:16,0.0511367,0.000975401,3
-FM_data_space_v4.0,FM$_\text{pixel}$,active_matter,17:32,0.287566,0.0116719,3
-FM_data_space_v4.0,FM$_\text{pixel}$,active_matter,33:77,0.320475,0.0098308,3
-FourierFlow_32modes_v4.0,FM$_\text{fourier}$,turbulent_radiative_layer_2D,01:32,0.037222,0.00258533,3
-FourierFlow_32modes_v4.0,FM$_\text{fourier}$,turbulent_radiative_layer_2D,33:64,0.0824437,0.00345069,3
-FourierFlow_32modes_v4.0,FM$_\text{fourier}$,turbulent_radiative_layer_2D,65:97,0.149646,0.0129382,3
-FourierFlow_32modes_v4.0,FM$_\text{fourier}$,rayleigh_benard,01:32,0.00619797,0.000112902,3
-FourierFlow_32modes_v4.0,FM$_\text{fourier}$,rayleigh_benard,33:64,0.153251,0.00151731,3
-FourierFlow_32modes_v4.0,FM$_\text{fourier}$,rayleigh_benard,65:196,1.01812,0.00546514,3
-FourierFlow_32modes_v4.0,FM$_\text{fourier}$,active_matter,01:16,0.439525,0.00244052,3
-FourierFlow_32modes_v4.0,FM$_\text{fourier}$,active_matter,17:32,0.5133,0.00109631,3
-FourierFlow_32modes_v4.0,FM$_\text{fourier}$,active_matter,33:77,0.641507,0.00756514,3
-WDNO_db2,WDNO,turbulent_radiative_layer_2D,01:32,0.355859,0.000412826,3
-WDNO_db2,WDNO,turbulent_radiative_layer_2D,33:64,0.224912,0.00101878,3
-WDNO_db2,WDNO,turbulent_radiative_layer_2D,65:97,0.456987,0.0015199,3
-WDNO_db2,WDNO,rayleigh_benard,01:32,1.01381,0.0020627,3
-WDNO_db2,WDNO,rayleigh_benard,33:64,2.50604,0.00704151,3
-WDNO_db2,WDNO,rayleigh_benard,65:196,2.30914,0.00305871,3
-WDNO_db2,WDNO,active_matter,01:16,0.746825,0.00160633,3
-WDNO_db2,WDNO,active_matter,17:32,0.890445,0.00157107,3
-WDNO_db2,WDNO,active_matter,33:77,1.05206,0.00192725,3
-LatentFM_dcae_f32c64_v4.0,LatentFM$_{\div 64}$,rayleigh_benard,01:32,0.251708,0.0033391,3
-LatentFM_dcae_f32c64_v4.0,LatentFM$_{\div 64}$,rayleigh_benard,33:64,0.574001,0.00823153,3
-LatentFM_dcae_f32c64_v4.0,LatentFM$_{\div 64}$,rayleigh_benard,65:196,0.913174,0.0363158,3
+FM_pixel,FM$_\text{pixel}$,turbulent_radiative_layer_2D,01:32,0.0161552,0.000999444,3
+FM_pixel,FM$_\text{pixel}$,turbulent_radiative_layer_2D,33:64,0.066876,0.0040953,3
+FM_pixel,FM$_\text{pixel}$,turbulent_radiative_layer_2D,65:97,0.176606,0.00662583,3
+FM_pixel,FM$_\text{pixel}$,rayleigh_benard,01:32,0.00375396,2.04444e-05,3
+FM_pixel,FM$_\text{pixel}$,rayleigh_benard,33:64,0.234893,0.004999,3
+FM_pixel,FM$_\text{pixel}$,rayleigh_benard,65:196,0.251337,0.0101002,3
+FM_pixel,FM$_\text{pixel}$,active_matter,01:16,0.0511367,0.000975401,3
+FM_pixel,FM$_\text{pixel}$,active_matter,17:32,0.287566,0.0116719,3
+FM_pixel,FM$_\text{pixel}$,active_matter,33:77,0.320475,0.0098308,3
+FM_fourier,FM$_\text{fourier}$,turbulent_radiative_layer_2D,01:32,0.037222,0.00258533,3
+FM_fourier,FM$_\text{fourier}$,turbulent_radiative_layer_2D,33:64,0.0824437,0.00345069,3
+FM_fourier,FM$_\text{fourier}$,turbulent_radiative_layer_2D,65:97,0.149646,0.0129382,3
+FM_fourier,FM$_\text{fourier}$,rayleigh_benard,01:32,0.00619797,0.000112902,3
+FM_fourier,FM$_\text{fourier}$,rayleigh_benard,33:64,0.153251,0.00151731,3
+FM_fourier,FM$_\text{fourier}$,rayleigh_benard,65:196,1.01812,0.00546514,3
+FM_fourier,FM$_\text{fourier}$,active_matter,01:16,0.439525,0.00244052,3
+FM_fourier,FM$_\text{fourier}$,active_matter,17:32,0.5133,0.00109631,3
+FM_fourier,FM$_\text{fourier}$,active_matter,33:77,0.641507,0.00756514,3
+WDNO,WDNO,turbulent_radiative_layer_2D,01:32,0.355859,0.000412826,3
+WDNO,WDNO,turbulent_radiative_layer_2D,33:64,0.224912,0.00101878,3
+WDNO,WDNO,turbulent_radiative_layer_2D,65:97,0.456987,0.0015199,3
+WDNO,WDNO,rayleigh_benard,01:32,1.01381,0.0020627,3
+WDNO,WDNO,rayleigh_benard,33:64,2.50604,0.00704151,3
+WDNO,WDNO,rayleigh_benard,65:196,2.30914,0.00305871,3
+WDNO,WDNO,active_matter,01:16,0.746825,0.00160633,3
+WDNO,WDNO,active_matter,17:32,0.890445,0.00157107,3
+WDNO,WDNO,active_matter,33:77,1.05206,0.00192725,3
+LatentFM,LatentFM$_{\div 64}$,rayleigh_benard,01:32,0.251708,0.0033391,3
+LatentFM,LatentFM$_{\div 64}$,rayleigh_benard,33:64,0.574001,0.00823153,3
+LatentFM,LatentFM$_{\div 64}$,rayleigh_benard,65:196,0.913174,0.0363158,3

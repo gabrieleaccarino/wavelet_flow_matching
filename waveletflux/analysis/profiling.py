@@ -1,4 +1,4 @@
-"""Inference profiling (Tables 2, S18, S19) from ``experiments/<pde>/performance/*_perf.yaml``.
+"""Inference profiling (Tables 2, S18, S19) from ``experiments/<pde>/performance/<MODEL>_<pde>_perf.yaml``.
 
 Each YAML is written by the inference driver: wall_clock_s (max over ranks),
 total_steps_global, throughput_*, gpu_peak_mem_GiB (per rank). All models use
@@ -16,7 +16,7 @@ import yaml
 from . import catalog as C
 from .paths import EXPERIMENTS
 
-BASE = "FM_data_space_v4.0"
+BASE = "FM_pixel"
 
 
 def _mem(block):
@@ -29,10 +29,8 @@ def _mem(block):
 def load_profiles(pdes=C.PDES) -> pd.DataFrame:
     recs = []
     for pde in pdes:
-        for p in sorted((EXPERIMENTS / pde / "performance").glob("*_perf.yaml")):
-            if p.name.startswith("-") or "_v4.0_" not in p.name:   # '-' prefix = disabled run
-                continue
-            model = p.name.split("_nsampling")[0]
+        for p in sorted((EXPERIMENTS / pde / "performance").glob(f"*_{pde}_perf.yaml")):
+            model = p.name[: -len(f"_{pde}_perf.yaml")]
             raw = yaml.safe_load(p.read_text())
             wc, ts = raw.get("wall_clock_s"), raw.get("total_steps_global")
             recs.append(dict(pde=pde, model=model, wall_clock_s=wc,
