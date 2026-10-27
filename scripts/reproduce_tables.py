@@ -20,7 +20,7 @@ if __name__ == "__main__":
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("--mean-only", nargs="*", metavar="TABLE",
                     help="seed mean only (no +- std). Without names: every table. With names: just "
-                         "those, e.g. --mean-only T3_crps_tcool_main T3_crps_Ra_main S14_spectral_tcool")
+                         "those, e.g. --mean-only T3a_crps_tcool T3b_crps_Ra S16_spectral_tcool")
     ap.add_argument("--std-rel", type=float, default=None, metavar="PCT",
                     help="mean-only tables: relative std bound in %% of the mean (default 5); "
                          "cells above it are marked *")

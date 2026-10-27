@@ -23,7 +23,7 @@ import pandas as pd
 
 GLOBAL_FIELD_LABEL = "_global_"
 
-# TRL rollout horizons, matching Table S10. `step` in the CSV is the 0-indexed
+# TRL rollout horizons, matching Table S12. `step` in the CSV is the 0-indexed
 # lead time (step 0 = first predicted frame = lead time 1), so lead times a:b
 # correspond to step in [a-1, b-1].
 HORIZONS = [("01:32", 0, 31), ("33:64", 32, 63), ("65:97", 64, 96)]

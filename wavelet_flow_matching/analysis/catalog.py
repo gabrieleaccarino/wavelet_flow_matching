@@ -95,7 +95,7 @@ GROUPS_GEN = [WFM_1SCALE, WFM_3SCALE, GEN_MODELS]
 ROWS_BEST_GEN = BEST + GEN_MODELS
 GROUPS_BEST_GEN = [BEST, GEN_MODELS]
 
-# Selected wavelet per PDE (Table S9). The tables module re-derives this from
+# Selected wavelet per PDE (Table S11). The tables module re-derives this from
 # the data and refuses to build if the two disagree.
 BEST_WFM_PER_PDE = {
     "turbulent_radiative_layer_2D": {"1scale": "haar", "3scale": "haar"},
@@ -115,7 +115,7 @@ PDE_LABELS = {
 PDE_SHORT = {"turbulent_radiative_layer_2D": "TRL", "rayleigh_benard": "RB", "active_matter": "AM"}
 
 # Rollout horizons: (inclusive upper bound on the 1-based lead time, label).
-# Inclusive bounds reproduce the paper's Tables S10/S11 exactly.
+# Inclusive bounds reproduce the paper's Tables S12/S13 exactly.
 HORIZON_EDGES = {
     "turbulent_radiative_layer_2D": [(32, "01:32"), (64, "33:64"), (97,  "65:97")],
     "rayleigh_benard":              [(32, "01:32"), (64, "33:64"), (196, "65:196")],

@@ -61,7 +61,7 @@ def best_view(df, keep=()):
 # builders — each takes ONE seed's rows and returns Model x columns
 # ===========================================================================
 def horizon_table(df, metric, models):
-    """VRMSE / CRPS per rollout horizon.  [Tables S10, S11]"""
+    """VRMSE / CRPS per rollout horizon.  [Tables S12, S13]"""
     parts = {}
     for pde in C.PDES:
         d = df[(df.pde == pde) & df.model.isin(models)]
@@ -73,7 +73,7 @@ def horizon_table(df, metric, models):
 
 
 def bands_table(df, models, time_agg="horizon"):
-    """Spectral coherence RMSE per frequency band.  [Table S12]"""
+    """Spectral coherence RMSE per frequency band.  [Table S14]"""
     parts = {}
     for pde in C.PDES:
         d = df[(df.pde == pde) & df.model.isin(models)]
@@ -182,7 +182,7 @@ def _union(ixs):
 
 
 # ===========================================================================
-# wavelet selection  [Table 1 bold / Table S9]
+# wavelet selection  [Table 1 bold / Table S11]
 # ===========================================================================
 def select_wavelets(sel_mean: pd.DataFrame) -> dict:
     """(pde, scale) -> (model key, value): lowest band-averaged spectral RMSE."""
