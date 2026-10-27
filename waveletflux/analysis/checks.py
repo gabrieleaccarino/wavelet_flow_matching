@@ -18,7 +18,6 @@ into the camera-ready, which uses inclusive horizon bounds everywhere:
 """
 from __future__ import annotations
 
-import copy
 import json
 import re
 from pathlib import Path
@@ -40,19 +39,14 @@ def _key_of(label):
     if "pixel" in label:
         return "FM_data_space_v4.0"
     if "fourier" in label:
-        return "FourierFlow_16modes_v4.0"
+        return "FourierFlow_32modes_v4.0"
     return {"WDNO": "WDNO_db2", "WNO": "WNO_3scales_db2", "FNO": "FNO", "TFNO": "TFNO"}[label]
 
 
 def paper_reproduction(save=True) -> pd.DataFrame:
     """Return one row per checked cell (paper value, rebuilt value, match)."""
     ref = json.loads(REFERENCE.read_text())
-    saved = copy.deepcopy(C.MODEL_REGISTRY["FourierFlow_16modes_v4.0"])
-    C.MODEL_REGISTRY["FourierFlow_16modes_v4.0"]["stats_key"] = "FourierFlow_32modes_v4.0"
-    try:
-        df, _ = C.load(source="stats", verbose=False)
-    finally:
-        C.MODEL_REGISTRY["FourierFlow_16modes_v4.0"] = saved
+    df, _ = C.load(source="stats", verbose=False)
 
     one = lambda b, d=df, **kw: T.across_seeds(b, d, **kw)[0]
     legacy = df.copy()

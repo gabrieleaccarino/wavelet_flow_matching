@@ -1,6 +1,6 @@
 \begin{table}[ht]
 \centering
-\caption{Rayleigh--B\'enard: spectral coherence RMSE per band (averaged over rollout horizons) and CRPS per rollout horizon, including the latent-space baseline LatentFM$_{\div 64}$ (autoencoder of~\citet{rozet2025}). Mean\,$\pm$\,std over three inference seeds (42, 84, 168).}
+\caption{Rayleigh--B\'enard: spectral coherence RMSE per band (averaged over rollout horizons) and CRPS per rollout horizon, including the latent-space baseline LatentFM$_{\div 64}$ (autoencoder of~\citet{rozet2025}). Mean over three inference seeds (42, 84, 168); the standard deviation across seeds is below 5\% of the mean for all entries except those marked $^{*}$.}
 \label{tab:rb_latentfm}
 \resizebox{\linewidth}{!}{%
 \begin{tabular}{l ccc ccc}
@@ -9,13 +9,13 @@ Model & \multicolumn{3}{c}{Spectral coherence RMSE} & \multicolumn{3}{c}{CRPS} \
 \cmidrule(lr){2-4} \cmidrule(lr){5-7}
  & Low & Mid & High & 01:32 & 33:64 & 65:196 \\
 \midrule
-WFM 1-scale & 0.168{\scriptsize$\,\pm\,$0.005} & \underline{0.118{\scriptsize$\,\pm\,$0.001}} & \underline{0.077{\scriptsize$\,\pm\,$$<$0.001}} & 0.007{\scriptsize$\,\pm\,$$<$0.001} & 0.041{\scriptsize$\,\pm\,$$<$0.001} & \underline{0.073{\scriptsize$\,\pm\,$0.003}} \\
-WFM 3-scale & \textbf{0.143{\scriptsize$\,\pm\,$0.002}} & \textbf{0.109{\scriptsize$\,\pm\,$0.001}} & \textbf{0.075{\scriptsize$\,\pm\,$0.001}} & \textbf{0.004{\scriptsize$\,\pm\,$$<$0.001}} & \textbf{0.032{\scriptsize$\,\pm\,$$<$0.001}} & \textbf{0.069{\scriptsize$\,\pm\,$0.001}} \\
+WFM 1-scale & 0.168 & \underline{0.118} & \underline{0.077} & 0.007 & 0.041 & \underline{0.073} \\
+WFM 3-scale & \textbf{0.143} & \textbf{0.109} & \textbf{0.075} & \textbf{0.004} & \textbf{0.032} & \textbf{0.069} \\
 \midrule
-FM$_\text{pixel}$ & \underline{0.149{\scriptsize$\,\pm\,$0.001}} & 0.129{\scriptsize$\,\pm\,$$<$0.001} & 0.115{\scriptsize$\,\pm\,$0.001} & \underline{0.005{\scriptsize$\,\pm\,$$<$0.001}} & \underline{0.036{\scriptsize$\,\pm\,$0.001}} & 0.076{\scriptsize$\,\pm\,$0.005} \\
-FM$_\text{fourier}$ & 0.294{\scriptsize$\,\pm\,$0.002} & 0.332{\scriptsize$\,\pm\,$$<$0.001} & 0.113{\scriptsize$\,\pm\,$$<$0.001} & 0.013{\scriptsize$\,\pm\,$$<$0.001} & 0.040{\scriptsize$\,\pm\,$0.001} & 0.090{\scriptsize$\,\pm\,$0.001} \\
-WDNO & 0.392{\scriptsize$\,\pm\,$0.001} & 0.474{\scriptsize$\,\pm\,$$<$0.001} & 0.535{\scriptsize$\,\pm\,$$<$0.001} & 0.050{\scriptsize$\,\pm\,$$<$0.001} & 0.102{\scriptsize$\,\pm\,$$<$0.001} & 0.138{\scriptsize$\,\pm\,$$<$0.001} \\
-LatentFM$_{\div 64}$ & 0.196{\scriptsize$\,\pm\,$$<$0.001} & 0.159{\scriptsize$\,\pm\,$$<$0.001} & 0.131{\scriptsize$\,\pm\,$0.001} & 0.026{\scriptsize$\,\pm\,$$<$0.001} & 0.057{\scriptsize$\,\pm\,$$<$0.001} & 0.088{\scriptsize$\,\pm\,$0.004} \\
+FM$_\text{pixel}$ & \underline{0.149} & 0.129 & 0.115 & \underline{0.005} & \underline{0.036} & 0.076$^{*}$ \\
+FM$_\text{fourier}$ & 0.327 & 0.263 & 0.209 & 0.009 & 0.038 & 0.096 \\
+WDNO & 0.392 & 0.474 & 0.535 & 0.050 & 0.102 & 0.138 \\
+LatentFM$_{\div 64}$ & 0.196 & 0.159 & 0.131 & 0.026 & 0.057 & 0.088 \\
 \bottomrule
 \end{tabular}
 }

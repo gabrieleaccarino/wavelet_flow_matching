@@ -52,7 +52,7 @@ for _w in WAVELETS:
         label=f"WFM-3 {_w}", group="wfm-3scale", color=_rgb(117, 176, 138), source="metrics")
 MODEL_REGISTRY.update({
     "FM_data_space_v4.0":       dict(label=r"FM$_\text{pixel}$",   group="generative", color=_rgb(176, 176, 176), source="metrics"),
-    "FourierFlow_16modes_v4.0": dict(label=r"FM$_\text{fourier}$", group="generative", color=_rgb(143, 94, 106),  source="metrics"),
+    "FourierFlow_32modes_v4.0": dict(label=r"FM$_\text{fourier}$", group="generative", color=_rgb(143, 94, 106),  source="metrics"),
     "WDNO_db2":                 dict(label="WDNO",                 group="generative", color=_rgb(191, 134, 148), source="metrics",
                                      stats_key="WDNO_{pde}"),
     # Latent-space FM baseline (rebuttal): DC-AE (spatial /32, 64 ch) of Rozet et al. 2025

@@ -26,9 +26,9 @@ WaveletFlow_3scales_db6_v4.0,WFM-3 db6,active_matter,0.237715,0.000271402,3
 FM_data_space_v4.0,FM$_\text{pixel}$,turbulent_radiative_layer_2D,0.153368,0.000784174,3
 FM_data_space_v4.0,FM$_\text{pixel}$,rayleigh_benard,0.130914,0.000698026,3
 FM_data_space_v4.0,FM$_\text{pixel}$,active_matter,0.244349,0.000518625,3
-FourierFlow_16modes_v4.0,FM$_\text{fourier}$,turbulent_radiative_layer_2D,0.387223,0.000846402,3
-FourierFlow_16modes_v4.0,FM$_\text{fourier}$,rayleigh_benard,0.246429,0.000705598,3
-FourierFlow_16modes_v4.0,FM$_\text{fourier}$,active_matter,0.323697,0.000335216,3
+FourierFlow_32modes_v4.0,FM$_\text{fourier}$,turbulent_radiative_layer_2D,0.379138,0.000441832,3
+FourierFlow_32modes_v4.0,FM$_\text{fourier}$,rayleigh_benard,0.266195,0.00042854,3
+FourierFlow_32modes_v4.0,FM$_\text{fourier}$,active_matter,0.375885,0.000513,3
 WDNO_db2,WDNO,turbulent_radiative_layer_2D,0.271308,0.000114396,3
 WDNO_db2,WDNO,rayleigh_benard,0.466977,0.000210433,3
 WDNO_db2,WDNO,active_matter,0.303662,0.000254327,3
