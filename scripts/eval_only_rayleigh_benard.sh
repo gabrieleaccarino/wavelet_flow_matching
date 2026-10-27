@@ -1,7 +1,7 @@
 #!/bin/bash -l
 #PBS -N WaveletFlow_1scale_db2_eval_only_rayleigh_benard
-#PBS -o /glade/work/gaccarino/waveletflux/scripts/logs/rayleigh_benard/WaveletFlow_1scale_db2_eval_only_rayleigh_benard.out
-#PBS -e /glade/work/gaccarino/waveletflux/scripts/logs/rayleigh_benard/WaveletFlow_1scale_db2_eval_only_rayleigh_benard.err
+#PBS -o /glade/work/gaccarino/wavelet_flow_matching/scripts/logs/rayleigh_benard/WaveletFlow_1scale_db2_eval_only_rayleigh_benard.out
+#PBS -e /glade/work/gaccarino/wavelet_flow_matching/scripts/logs/rayleigh_benard/WaveletFlow_1scale_db2_eval_only_rayleigh_benard.err
 
 # === Project / Queue ===
 #PBS -A UCLB0062
@@ -15,7 +15,7 @@
 cd $PBS_O_WORKDIR
 
 DATASET_NAME="rayleigh_benard"
-REPO=/glade/work/gaccarino/waveletflux
+REPO=/glade/work/gaccarino/wavelet_flow_matching
 CONFIG=${REPO}/configs/${DATASET_NAME}/inference_${DATASET_NAME}.yaml
 N_ENSEMBLE=8
 NUM_SAMPLING=20
@@ -33,7 +33,7 @@ echo "========================================================"
 
 mkdir -p ${REPO}/scripts/logs/${DATASET_NAME}
 
-python ${REPO}/waveletflux/eval_only.py \
+python ${REPO}/wavelet_flow_matching/eval_only.py \
     --config ${CONFIG} \
     --override \
         n_ensemble=${N_ENSEMBLE} \

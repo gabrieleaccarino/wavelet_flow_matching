@@ -1,11 +1,11 @@
-# waveletflux — Wavelet Flow Matching for Multi-Scale Physics Emulation
+# wavelet_flow_matching — Wavelet Flow Matching for Multi-Scale Physics Emulation
 
 Code for *Wavelet Flow Matching for Multi-Scale Physics Emulation* (NeurIPS 2026).
 
 ## Layout
 
 ```
-waveletflux/            package
+wavelet_flow_matching/            package
   models/, modules/, wavelets/, utils/   model, training and inference code (torch)
   train_*.py, inference_*.py, eval_only.py   entry points used by scripts/*.sh (PBS)
   analysis/             numpy/pandas only — rebuilds every table of the paper
@@ -45,7 +45,7 @@ section checks the builders against the submitted paper. Headless equivalent
 python scripts/reproduce_tables.py          # ~10 s, needs numpy, pandas, pyyaml
 python scripts/check_paper_reproduction.py  # sanity check vs. the submitted paper
 ```
-Set `WAVELETFLUX_ROOT=/path/to/checkout` if `experiments/` lives elsewhere.
+Set `WAVELET_FLOW_MATCHING_ROOT=/path/to/checkout` if `experiments/` lives elsewhere.
 
 **Metric files.** `experiments/<pde>/metrics/<model>_..._seed{42,84,168}_<pde>_metrics.csv`
 (one per inference seed; all WFM variants and generative baselines) and

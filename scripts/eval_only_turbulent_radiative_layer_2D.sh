@@ -1,7 +1,7 @@
 #!/bin/bash -l
 #PBS -N FM_data_space_eval_only_turbulent_radiative_layer_2D
-#PBS -o /glade/work/gaccarino/waveletflux/scripts/logs/turbulent_radiative_layer_2D/FM_data_space_eval_only_turbulent_radiative_layer_2D.out
-#PBS -e /glade/work/gaccarino/waveletflux/scripts/logs/turbulent_radiative_layer_2D/FM_data_space_eval_only_turbulent_radiative_layer_2D.err
+#PBS -o /glade/work/gaccarino/wavelet_flow_matching/scripts/logs/turbulent_radiative_layer_2D/FM_data_space_eval_only_turbulent_radiative_layer_2D.out
+#PBS -e /glade/work/gaccarino/wavelet_flow_matching/scripts/logs/turbulent_radiative_layer_2D/FM_data_space_eval_only_turbulent_radiative_layer_2D.err
 
 # === Project / Queue ===
 #PBS -A UCLB0062
@@ -15,7 +15,7 @@
 cd $PBS_O_WORKDIR
 
 DATASET_NAME="turbulent_radiative_layer_2D"
-REPO=/glade/work/gaccarino/waveletflux
+REPO=/glade/work/gaccarino/wavelet_flow_matching
 CONFIG=${REPO}/configs/${DATASET_NAME}/inference_${DATASET_NAME}.yaml
 N_ENSEMBLE=8
 NUM_SAMPLING=20
@@ -33,7 +33,7 @@ echo "========================================================"
 
 mkdir -p ${REPO}/scripts/logs/${DATASET_NAME}
 
-python ${REPO}/waveletflux/eval_only.py \
+python ${REPO}/wavelet_flow_matching/eval_only.py \
     --config ${CONFIG} \
     --override \
         n_ensemble=${N_ENSEMBLE} \

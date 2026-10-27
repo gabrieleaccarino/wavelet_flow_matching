@@ -5,11 +5,11 @@
     ckpt = ''
 
 [path]
-    project_path      = '/glade/work/gaccarino/waveletflux'
+    project_path      = '/glade/work/gaccarino/wavelet_flow_matching'
     well_base_path    = '/glade/work/gaccarino/data/datasets'
     well_dataset_name = 'rayleigh_benard'
     stats_path        = '/glade/work/gaccarino/data/datasets/rayleigh_benard/stats.yaml'
-    experiments_path  = '/glade/work/gaccarino/waveletflux/experiments/rayleigh_benard'
+    experiments_path  = '/glade/work/gaccarino/wavelet_flow_matching/experiments/rayleigh_benard'
 
 [random]
     seed = 9039

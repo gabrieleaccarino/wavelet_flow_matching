@@ -1,12 +1,12 @@
-"""Fast regression tests for waveletflux.analysis (python -m pytest tests/test_analysis.py)."""
+"""Fast regression tests for wavelet_flow_matching.analysis (python -m pytest tests/test_analysis.py)."""
 import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from waveletflux.analysis import catalog as C, tables as T  # noqa: E402
-from waveletflux.analysis.checks import paper_reproduction  # noqa: E402
+from wavelet_flow_matching.analysis import catalog as C, tables as T  # noqa: E402
+from wavelet_flow_matching.analysis.checks import paper_reproduction  # noqa: E402
 
 
 def test_paper_reproduction():

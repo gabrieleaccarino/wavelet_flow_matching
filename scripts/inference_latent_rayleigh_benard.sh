@@ -1,7 +1,7 @@
 #!/bin/bash -l
 #PBS -N LatentFM_rayleigh_benard_dcae_f32c64_v4.0_inference_seed168
-#PBS -o /glade/work/gaccarino/waveletflux/scripts/logs/rayleigh_benard/LatentFM_rayleigh_benard_dcae_f32c64_v4.0_inference_seed168.out
-#PBS -e /glade/work/gaccarino/waveletflux/scripts/logs/rayleigh_benard/LatentFM_rayleigh_benard_dcae_f32c64_v4.0_inference_seed168.err
+#PBS -o /glade/work/gaccarino/wavelet_flow_matching/scripts/logs/rayleigh_benard/LatentFM_rayleigh_benard_dcae_f32c64_v4.0_inference_seed168.out
+#PBS -e /glade/work/gaccarino/wavelet_flow_matching/scripts/logs/rayleigh_benard/LatentFM_rayleigh_benard_dcae_f32c64_v4.0_inference_seed168.err
 
 # === Project / Queue ===
 #PBS -A UCLB0062
@@ -15,13 +15,13 @@
 cd $PBS_O_WORKDIR
 
 DATASET_NAME="rayleigh_benard"
-REPO=/glade/work/gaccarino/waveletflux
+REPO=/glade/work/gaccarino/wavelet_flow_matching
 CONFIG=${REPO}/configs/${DATASET_NAME}/inference_${DATASET_NAME}_seed.yaml
 
 # The inference driver is model-agnostic (dispatch via `model_class` in the
-# YAML through waveletflux.utils.registry). This must be the registry-based
+# YAML through wavelet_flow_matching.utils.registry). This must be the registry-based
 # inference file you edited.
-INFER=${REPO}/waveletflux/inference_latent_fm.py
+INFER=${REPO}/wavelet_flow_matching/inference_latent_fm.py
 
 N_GPUS=4
 N_ENSEMBLE=8

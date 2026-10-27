@@ -1,7 +1,7 @@
 #!/bin/bash -l
 #PBS -N WaveletFlow_turbulent_radiative_layer_2D_3scales_db2_v4.0_inference_seed168
-#PBS -o /glade/work/gaccarino/waveletflux/scripts/logs/turbulent_radiative_layer_2D/WaveletFlow_turbulent_radiative_layer_2D_3scales_db2_v4.0_inference_seed168.out
-#PBS -e /glade/work/gaccarino/waveletflux/scripts/logs/turbulent_radiative_layer_2D/WaveletFlow_turbulent_radiative_layer_2D_3scales_db2_v4.0_inference_seed168.err
+#PBS -o /glade/work/gaccarino/wavelet_flow_matching/scripts/logs/turbulent_radiative_layer_2D/WaveletFlow_turbulent_radiative_layer_2D_3scales_db2_v4.0_inference_seed168.out
+#PBS -e /glade/work/gaccarino/wavelet_flow_matching/scripts/logs/turbulent_radiative_layer_2D/WaveletFlow_turbulent_radiative_layer_2D_3scales_db2_v4.0_inference_seed168.err
 
 # === Project / Queue ===
 #PBS -A UCLB0062
@@ -15,7 +15,7 @@
 cd $PBS_O_WORKDIR
 
 DATASET_NAME="turbulent_radiative_layer_2D"
-REPO=/glade/work/gaccarino/waveletflux
+REPO=/glade/work/gaccarino/wavelet_flow_matching
 CONFIG=${REPO}/configs/${DATASET_NAME}/inference_${DATASET_NAME}_seed.yaml
 N_GPUS=4
 N_ENSEMBLE=8
@@ -46,10 +46,10 @@ echo "========================================================"
 
 mkdir -p ${REPO}/scripts/logs/${DATASET_NAME}
 
-#${REPO}/waveletflux/inference_fourier_fm.py \
+#${REPO}/wavelet_flow_matching/inference_fourier_fm.py \
 torchrun \
     --nproc_per_node=${N_GPUS} \
-    ${REPO}/waveletflux/inference_wavelet_fm.py \
+    ${REPO}/wavelet_flow_matching/inference_wavelet_fm.py \
     --config ${CONFIG} \
     --override \
         n_ensemble=${N_ENSEMBLE} \

@@ -1,0 +1,1 @@
+from wavelet_flow_matching.models.wavelet_unet import WaveletFlowUNet

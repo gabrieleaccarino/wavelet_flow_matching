@@ -3,7 +3,7 @@
 # Rayleigh-Bénard convection — wavelet-space model
 # ─────────────────────────────────────────────────────────────────────────────
 
-project_root:    "/glade/work/gaccarino/waveletflux"
+project_root:    "/glade/work/gaccarino/wavelet_flow_matching"
 well_base_path:  "/glade/work/gaccarino/data/datasets"
 well_dataset_name: "rayleigh_benard"
 

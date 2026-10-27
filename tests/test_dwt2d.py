@@ -1,8 +1,8 @@
-"""DWT round-trip tests (moved out of waveletflux/wavelets/DWT2D.py). Needs torch + pytorch_wavelets.
+"""DWT round-trip tests (moved out of wavelet_flow_matching/wavelets/DWT2D.py). Needs torch + pytorch_wavelets.
 Run on the cluster env: python -m pytest tests/test_dwt2d.py"""
 import pytest
 torch = pytest.importorskip("torch")
-from waveletflux.wavelets.DWT2D import WaveletDecomposer2D
+from wavelet_flow_matching.wavelets.DWT2D import WaveletDecomposer2D
 
 
 def test_wavelet_reconstruction():

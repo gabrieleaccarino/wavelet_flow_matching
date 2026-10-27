@@ -1,7 +1,7 @@
 #!/bin/bash -l
 #PBS -N FNO_active_matter_v1.0
-#PBS -o /glade/work/gaccarino/waveletflux/scripts/logs/FNO_active_matter_v1.0.out
-#PBS -e /glade/work/gaccarino/waveletflux/scripts/logs/FNO_active_matter_v1.0.err
+#PBS -o /glade/work/gaccarino/wavelet_flow_matching/scripts/logs/FNO_active_matter_v1.0.out
+#PBS -e /glade/work/gaccarino/wavelet_flow_matching/scripts/logs/FNO_active_matter_v1.0.err
 
 # === Project / Queue ===
 #PBS -A UCLB0062
@@ -28,8 +28,8 @@ export DS_SKIP_AUTOTUNE=1
 conda activate mlenv
 
 # === Run ===
-REPO=/glade/work/gaccarino/waveletflux
-torchrun --nproc_per_node=2 ${REPO}/waveletflux/train_neural_ops.py \
+REPO=/glade/work/gaccarino/wavelet_flow_matching
+torchrun --nproc_per_node=2 ${REPO}/wavelet_flow_matching/train_neural_ops.py \
         --model fno \
         --modes 16 \
         --n_blocks 4 \

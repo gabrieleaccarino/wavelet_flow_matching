@@ -5,11 +5,11 @@
     ckpt = ''
 
 [path]
-    project_path      = '/glade/work/gaccarino/waveletflux'
+    project_path      = '/glade/work/gaccarino/wavelet_flow_matching'
     well_base_path    = '/glade/work/gaccarino/data/datasets'
     well_dataset_name = 'rayleigh_benard'
     stats_path        = '/glade/work/gaccarino/data/datasets/rayleigh_benard/stats.yaml'
-    experiments_path  = '/glade/work/gaccarino/waveletflux/experiments/rayleigh_benard'
+    experiments_path  = '/glade/work/gaccarino/wavelet_flow_matching/experiments/rayleigh_benard'
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Pre-trained (frozen) LOLA autoencoder.
@@ -19,9 +19,9 @@
 # You may instead give explicit `config_yaml` and `state_path` keys.
 # ─────────────────────────────────────────────────────────────────────────────
 [autoencoder]
-    run_dir = '/glade/work/gaccarino/waveletflux/experiments/rayleigh_benard/DCAE/dcae_fc32c64'
-    config_yaml = '/glade/work/gaccarino/waveletflux/experiments/rayleigh_benard/DCAE/dcae_fc32c64/config.yaml'
-    state_path  = '/glade/work/gaccarino/waveletflux/experiments/rayleigh_benard/DCAE/dcae_fc32c64/state.pth'
+    run_dir = '/glade/work/gaccarino/wavelet_flow_matching/experiments/rayleigh_benard/DCAE/dcae_fc32c64'
+    config_yaml = '/glade/work/gaccarino/wavelet_flow_matching/experiments/rayleigh_benard/DCAE/dcae_fc32c64/config.yaml'
+    state_path  = '/glade/work/gaccarino/wavelet_flow_matching/experiments/rayleigh_benard/DCAE/dcae_fc32c64/state.pth'
 
 [random]
     seed = 8940

@@ -9,7 +9,7 @@
 set -euo pipefail
 
 DATASET_NAME="turbulent_radiative_layer_2D"
-REPO=/glade/work/gaccarino/waveletflux
+REPO=/glade/work/gaccarino/wavelet_flow_matching
 PBS_SCRIPT=${REPO}/scripts/inference_ic_pert.pbs
 LOGDIR=${REPO}/scripts/logs/${DATASET_NAME}
 mkdir -p "${LOGDIR}"

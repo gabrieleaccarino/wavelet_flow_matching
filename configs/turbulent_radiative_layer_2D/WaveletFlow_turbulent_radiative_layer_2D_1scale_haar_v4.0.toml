@@ -5,11 +5,11 @@
     ckpt = ''
 
 [path]
-    project_path      = '/glade/work/gaccarino/waveletflux'
+    project_path      = '/glade/work/gaccarino/wavelet_flow_matching'
     well_base_path    = '/glade/work/gaccarino/data/datasets'
     well_dataset_name = 'turbulent_radiative_layer_2D'
     stats_path        = '/glade/work/gaccarino/data/datasets/turbulent_radiative_layer_2D/stats.yaml'
-    experiments_path  = '/glade/work/gaccarino/waveletflux/experiments/turbulent_radiative_layer_2D'
+    experiments_path  = '/glade/work/gaccarino/wavelet_flow_matching/experiments/turbulent_radiative_layer_2D'
 
 [random]
     seed = 4786

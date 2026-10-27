@@ -36,7 +36,7 @@ IC_TAG="ic${IC_NOISE//./p}"          # 0.05 -> ic0p05
 RUN_TAG="seed${SEED}_${IC_TAG}"
 
 DATASET_NAME="turbulent_radiative_layer_2D"
-REPO=/glade/work/gaccarino/waveletflux
+REPO=/glade/work/gaccarino/wavelet_flow_matching
 CONFIG=${REPO}/configs/${DATASET_NAME}/inference_${DATASET_NAME}_seed.yaml
 N_GPUS=4
 N_ENSEMBLE=8
@@ -69,7 +69,7 @@ echo "========================================================"
 
 torchrun \
   --nproc_per_node=${N_GPUS} \
-  ${REPO}/waveletflux/inference_wavelet_fm_ic_pert.py \
+  ${REPO}/wavelet_flow_matching/inference_wavelet_fm_ic_pert.py \
   --config ${CONFIG} \
   --override \
   n_ensemble=${N_ENSEMBLE} \

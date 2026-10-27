@@ -1,7 +1,7 @@
 #!/bin/bash -l
 #PBS -N WaveletFlow_active_matter_1scale_db6_v4.0
-#PBS -o /glade/work/gaccarino/waveletflux/scripts/logs/active_matter/WaveletFlow_active_matter_1scale_db6_v4.0.out
-#PBS -e /glade/work/gaccarino/waveletflux/scripts/logs/active_matter/WaveletFlow_active_matter_1scale_db6_v4.0.err
+#PBS -o /glade/work/gaccarino/wavelet_flow_matching/scripts/logs/active_matter/WaveletFlow_active_matter_1scale_db6_v4.0.out
+#PBS -e /glade/work/gaccarino/wavelet_flow_matching/scripts/logs/active_matter/WaveletFlow_active_matter_1scale_db6_v4.0.err
 
 # === Project / Queue ===
 #PBS -A UCLB0062
@@ -28,9 +28,9 @@ export DS_SKIP_AUTOTUNE=1
 conda activate mlenv
 
 # === Run ===
-#${REPO}/waveletflux/train_wavelet_fm.py \
-REPO=/glade/work/gaccarino/waveletflux
+#${REPO}/wavelet_flow_matching/train_wavelet_fm.py \
+REPO=/glade/work/gaccarino/wavelet_flow_matching
 torchrun --nproc_per_node=4 \
-    ${REPO}/waveletflux/train_wavelet_fm.py \
+    ${REPO}/wavelet_flow_matching/train_wavelet_fm.py \
     -c ${REPO}/configs/active_matter/WaveletFlow_active_matter_1scale_db6_v4.0.toml \
     -n 1 -d 4
