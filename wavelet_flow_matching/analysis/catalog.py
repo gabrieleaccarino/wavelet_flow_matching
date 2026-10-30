@@ -108,7 +108,7 @@ BEST_WFM_PER_PDE = {
 # ---------------------------------------------------------------------------
 PDES = ["turbulent_radiative_layer_2D", "rayleigh_benard", "active_matter"]
 PDE_LABELS = {
-    "turbulent_radiative_layer_2D": r"Turb. Rad. Layer 2D",
+    "turbulent_radiative_layer_2D": r"Turbulent Radiative Layer 2D",
     "rayleigh_benard":              r"Rayleigh--B\'{e}nard",
     "active_matter":                "Active Matter",
 }
