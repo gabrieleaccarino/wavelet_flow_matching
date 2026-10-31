@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Wavelet Flow Matching for Multi-Scale Physics Emulation</title>
+  <meta name="description" content="Wavelet Flow Matching (WFM) is a generative emulator for multi-scale PDE dynamics that performs optimal-transport flow matching directly in a lossless, training-free wavelet space.">
+  <meta name="keywords" content="flow matching, wavelets, PDE emulation, generative models, turbulence, scientific machine learning, The Well, NeurIPS 2026">
+  <meta name="author" content="Gabriele Accarino, Juan Nathaniel, Carla Roesch, Pierre Gentine, Sara Shamekh, Duncan Watson-Parris, Viviana Acquaviva">
+  <meta name="theme-color" content="#3b2a7a">
+
+  <meta property="og:type" content="article">
+  <meta property="og:title" content="Wavelet Flow Matching for Multi-Scale Physics Emulation">
+  <meta property="og:description" content="Generative emulation of chaotic fluid dynamics via flow matching in a lossless, training-free wavelet space.">
+  <meta property="og:image" content="https://gabrieleaccarino.github.io/wavelet_flow_matching/static/images/og_image.jpg">
+  <meta property="og:url" content="https://gabrieleaccarino.github.io/wavelet_flow_matching/">
+  <meta name="twitter:card" content="summary_large_image">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="static/css/style.css">
+
+  <script>
+    window.MathJax = {
+      tex: { inlineMath: [['$', '$'], ['\\(', '\\)']], displayMath: [['$$', '$$'], ['\\[', '\\]']] },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script defer src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-svg.js"></script>
+  <script defer src="static/js/main.js"></script>
+</head>
+<body>
+
+<!-- ============================== HERO ============================== -->
+<header class="hero">
+  <svg class="hero-motif" viewBox="0 0 1200 120" preserveAspectRatio="none" aria-hidden="true">
+    <path d="M0 60 L75 60 L75 20 L150 20 L150 100 L225 100 L225 60 L300 60 L300 40 L337 40 L337 80 L375 80 L375 60 L450 60 L450 50 L468 50 L468 70 L487 70 L487 60 L600 60 L600 20 L675 20 L675 100 L750 100 L750 60 L825 60 L825 40 L862 40 L862 80 L900 80 L900 60 L975 60 L975 50 L993 50 L993 70 L1012 70 L1012 60 L1200 60"/>
+  </svg>
+  <div class="container hero-inner">
+    <p class="venue">NeurIPS 2026</p>
+    <h1>Wavelet Flow Matching</h1>
+    <p class="subtitle">for Multi-Scale Physics Emulation</p>
+
+    <p class="authors">
+      <span>Gabriele Accarino<sup>1</sup></span>
+      <span>Juan Nathaniel<sup>1</sup></span>
+      <span>Carla Roesch<sup>2</sup></span>
+      <span>Pierre Gentine<sup>1,3</sup></span>
+      <span>Sara Shamekh<sup>4</sup></span>
+      <span>Duncan Watson-Parris<sup>5</sup></span>
+      <span>Viviana Acquaviva<sup>6,7</sup></span>
+    </p>
+    <p class="affiliations">
+      <span><sup>1</sup>Columbia University</span>
+      <span><sup>2</sup>University of Edinburgh</span>
+      <span><sup>3</sup>École Normale Supérieure – PSL</span>
+      <span><sup>4</sup>Courant Institute, NYU</span>
+      <span><sup>5</sup>UC San Diego</span>
+      <span><sup>6</sup>CUNY City Tech</span>
+      <span><sup>7</sup>Lamont-Doherty Earth Observatory</span>
+    </p>
+
+    <nav class="buttons">
+      <!-- TODO: replace href="#" with the paper / arXiv URLs once available -->
+      <a class="btn disabled" href="#" title="Coming soon">
+        <svg viewBox="0 0 24 24"><path d="M6 2h9l5 5v15H6z M14 2v6h6" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg>Paper</a>
+      <a class="btn disabled" href="#" title="Coming soon">
+        <svg viewBox="0 0 24 24"><path d="M4 4l16 16M20 4L4 20" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>arXiv</a>
+      <a class="btn" href="https://github.com/gabrieleaccarino/wavelet_flow_matching">
+        <svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 .5a11.5 11.5 0 0 0-3.64 22.41c.58.1.79-.25.79-.56v-2c-3.2.7-3.88-1.37-3.88-1.37-.52-1.33-1.28-1.69-1.28-1.69-1.05-.71.08-.7.08-.7 1.16.08 1.77 1.19 1.77 1.19 1.03 1.77 2.7 1.26 3.36.96.1-.75.4-1.26.73-1.55-2.55-.29-5.24-1.28-5.24-5.68 0-1.25.45-2.28 1.19-3.08-.12-.29-.52-1.46.11-3.04 0 0 .97-.31 3.17 1.18a11 11 0 0 1 5.77 0c2.2-1.49 3.17-1.18 3.17-1.18.63 1.58.23 2.75.11 3.04.74.8 1.19 1.83 1.19 3.08 0 4.41-2.7 5.38-5.26 5.67.41.36.78 1.06.78 2.14v3.17c0 .31.21.67.8.56A11.5 11.5 0 0 0 12 .5z"/></svg>Code</a>
+      <a class="btn" href="#bibtex">
+        <svg viewBox="0 0 24 24"><path d="M7 4H5v16h2M17 4h2v16h-2" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>BibTeX</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+<!-- ============================== TEASER ============================== -->
+<section class="container teaser">
+  <div class="tldr">
+    <span class="tldr-label">TL;DR</span>
+    <p>
+      We emulate chaotic PDE dynamics by running <strong>optimal-transport flow matching directly on the
+      multi-scale wavelet coefficients</strong> of the next state. The representation is lossless and requires
+      no training, a single U-Net predicts coupled velocities at every scale, and on three systems from
+      <a href="https://polymathic-ai.org/the_well/">The Well</a> WFM achieves the best spectral coherence among
+      generative baselines while sampling <strong>1.1–1.5× faster</strong> than pixel-space flow matching.
+    </p>
+  </div>
+
+  <figure class="video-figure hero-video">
+    <div class="video-frame" data-video>
+      <video autoplay muted loop playsinline preload="metadata" poster="static/images/qual_rb.jpg">
+        <source src="static/videos/rayleigh_benard_rollout.mp4" type="video/mp4">
+      </video>
+      <div class="video-missing">Rollout animation coming soon</div>
+    </div>
+    <figcaption><strong>Rayleigh–Bénard convection: autoregressive rollout.</strong> Ground truth vs. WFM 3-scale samples over a long horizon.</figcaption>
+  </figure>
+</section>
+
+<!-- ============================== ABSTRACT ============================== -->
+<section id="abstract" class="container narrow">
+  <h2><a href="#abstract">#</a>Abstract</h2>
+  <p>
+    Accurate emulation of multi-scale physical systems governed by PDEs demands models that remain stable over long
+    autoregressive rollouts while preserving fine-scale structures. Deterministic emulators produce overly smoothed
+    predictions, while generative approaches better capture details but are costly. Latent-space generative models
+    have emerged as a compromise but with the additional cost of separately pre-trained autoencoders. We propose
+    <strong>Wavelet Flow Matching</strong> (WFM), a generative emulator that overcomes current trade-offs between
+    cost and skill by performing optimal-transport flow matching directly in the multi-scale wavelet space. Rather
+    than learning a latent compression, WFM leverages the hierarchical structure of a U-Net to jointly predict the
+    transport velocities of a prescribed, lossless wavelet representation. On three challenging systems of chaotic
+    fluid dynamics, WFM achieves superior spectral coherence and competitive or better long-horizon accuracy compared
+    to state-of-the-art models. Our results position the wavelet space as an effective training-free representation
+    for generative emulation of complex physical dynamics.
+  </p>
+
+  <div class="highlights">
+    <div class="highlight">
+      <div class="hl-num">0</div>
+      <div class="hl-text">extra networks to pre-train: the wavelet basis is prescribed and exactly invertible</div>
+    </div>
+    <div class="highlight">
+      <div class="hl-num">1.1–1.5×</div>
+      <div class="hl-text">faster sampling than pixel-space flow matching at matched NFEs</div>
+    </div>
+    <div class="highlight">
+      <div class="hl-num">3</div>
+      <div class="hl-text">chaotic systems: turbulent radiative layer, Rayleigh–Bénard, active matter</div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== METHOD ============================== -->
+<section id="method" class="container">
+  <h2><a href="#method">#</a>Method</h2>
+
+  <figure class="figure">
+    <img src="static/images/architecture.png" alt="Wavelet Flow Matching architecture" loading="lazy">
+    <figcaption>
+      <strong>Wavelet Flow Matching.</strong> Gaussian noise is sampled to match the wavelet coefficients at each
+      scale. OT-CFM interpolation is applied between the next-state coefficients $w_j^{t+1}$ and noise at every scale
+      with a shared time $\tau$, yielding $J$ per-scale flows coupled through a shared U-Net $u_\theta$, conditioned on
+      $\tau$, the current-state coefficients $w_j^{t}$, PDE constants $\kappa$, and an embedding of $L$ past frames.
+    </figcaption>
+  </figure>
+
+  <div class="narrow">
+    <h3>1 · A lossless multi-scale representation</h3>
+    <p>
+      The discrete wavelet transform (DWT) decomposes a field into components that are localized simultaneously in
+      space and in scale. For an orthonormal wavelet $\psi$ with scaling function $\phi$,
+    </p>
+    $$ f \;=\; \sum_{n} a_J[n]\,\phi_{J,n} \;+\; \sum_{j=1}^{J}\sum_{n} d_j[n]\,\psi_{j,n},
+       \qquad \psi_{j,n}(x) = 2^{-j/2}\,\psi\!\left(2^{-j}x - n\right). $$
+    <p>
+      Applied to a state $x \in \mathbb{R}^{C\times H\times W}$, each scale yields one approximation (LL) and three
+      oriented detail sub-bands (LH, HL, HH) on a progressively coarser grid,
+    </p>
+    $$ w_j = \mathcal{W}_j(x) \in \mathbb{R}^{C \times 4 \times H_j \times W_j}, \qquad
+       H_j \approx H/2^{j},\;\; W_j \approx W/2^{j}, $$
+    <p>
+      and the inverse transform reconstructs the field exactly, $x = \mathcal{W}^{-1}(w)$. We use Daubechies wavelets
+      ($\mathrm{haar}$, $\mathrm{db}2$, $\mathrm{db}4$, $\mathrm{db}6$): no training, no information loss.
+    </p>
+
+    <h3>2 · One flow per scale, one shared network</h3>
+    <p>
+      Instead of modelling $p(x^{t+1}\mid x^t)$ in pixel space, WFM learns
+      $p\bigl(w^{t+1} \mid w^t, \{x^{t-l}\}_{l=1}^{L}, \kappa\bigr)$. At every scale $j$ we build a straight
+      optimal-transport path from scale-matched Gaussian noise to the target coefficients, with a shared
+      interpolation time:
+    </p>
+    $$ w_{j}^{\tau} = \tau\, w_{j}^{t+1} + (1-\tau)\,\varepsilon_{j}, \qquad
+       \tau \sim \mathcal{U}([0,1]), \quad \varepsilon_j \sim \mathcal{N}(0, I). $$
+    <p>
+      Because the basis is orthonormal, sampling noise directly in wavelet space is equivalent in distribution to
+      transforming pixel-space noise, $\mathcal{W}_j(\varepsilon) \overset{d}{=} \varepsilon_j$. The target velocity
+      along each path is constant:
+    </p>
+    $$ u_j = \frac{d\,w_j^{\tau}}{d\tau} = w_j^{t+1} - \varepsilon_j . $$
+    <p>
+      The velocity network is a U-Net whose encoder–decoder hierarchy mirrors the DWT. The coefficients
+      $z_j^{\tau} = [\,w_j^{t},\, w_j^{\tau}\,]_C$ of each scale are injected at the matching encoder level through a
+      dedicated stem, and $J$ decoder heads predict $\hat u_j$ at their native resolution. Because all heads share one
+      backbone, the $J$ flows are <em>coupled</em> at every integration step.
+    </p>
+
+    <h3>3 · Variance-normalized multi-scale objective</h3>
+    <p>
+      Approximation and detail coefficients differ in energy by orders of magnitude. To prevent the LL sub-band from
+      dominating, each per-scale loss is normalized by the spatial variance of its target velocity:
+    </p>
+    $$ \ell_j(\theta) = \mathbb{E}\!\left[\frac{1}{BC}\sum_{b,c}
+       \frac{\bigl\langle (\hat u_j - u_j)^2 \bigr\rangle}
+            {\bigl\langle (u_j - \langle u_j\rangle)^2 \bigr\rangle + \epsilon}\right],
+       \qquad
+       \mathcal{L}(\theta) = \sum_{j=1}^{J} \frac{\lambda_j}{\sum_{j'}\lambda_{j'}}\,\ell_j(\theta). $$
+
+    <h3>4 · Sampling and autoregressive rollout</h3>
+    <p>
+      Sampling happens entirely in wavelet space. Starting from $w_j^{0} = \varepsilon_j$, we integrate the learned
+      field with $N$ Euler steps,
+    </p>
+    $$ w_j^{\tau_{n+1}} = w_j^{\tau_n} + \Delta\tau\; u_\theta\!\left(\bigl[w_j^{t}, w_j^{\tau_n}\bigr]_C,\,
+       \tau_n,\, \kappa,\, \{x^{t-l}\}_{l=1}^{L}\right), $$
+    <p>
+      and recover the physical state with a single inverse transform,
+      $\hat x^{t+1} = \mathcal{W}^{-1}\bigl(\{\hat w_j^{t+1}\}_{j=1}^{J}\bigr)$, which is fed back as the next input.
+    </p>
+  </div>
+
+  <details class="figure-details">
+    <summary>Show the velocity-predicting U-Net</summary>
+    <figure class="figure">
+      <img src="static/images/unet.png" alt="Velocity-predicting U-Net" loading="lazy">
+      <figcaption>Each wavelet scale enters the encoder at the matching resolution; one output head per scale
+        predicts the velocity $\hat u_j$. Conditioning on $\tau$, $\kappa$ and past frames is injected via AdaGN.</figcaption>
+    </figure>
+  </details>
+</section>
+
+<!-- ============================== ROLLOUTS ============================== -->
+<section id="rollouts" class="container">
+  <h2><a href="#rollouts">#</a>Rollouts</h2>
+  <p class="narrow">
+    Autoregressive rollouts on three systems from <a href="https://polymathic-ai.org/the_well/">The Well</a>, each
+    with distinct dynamics: shear-driven Kelvin–Helmholtz mixing with radiative cooling, buoyancy-driven convection
+    from laminar to turbulent regimes, and non-equilibrium collective flows of active particles.
+  </p>
+
+  <div class="tabs" role="tablist">
+    <button class="tab active" data-tab="rb">Rayleigh–Bénard</button>
+    <button class="tab" data-tab="trl">Turbulent Radiative Layer 2D</button>
+    <button class="tab" data-tab="am">Active Matter</button>
+  </div>
+
+  <div class="tab-panel active" id="tab-rb">
+    <figure class="video-figure">
+      <div class="video-frame" data-video>
+        <video muted loop playsinline controls preload="metadata" poster="static/images/qual_rb.jpg">
+          <source src="static/videos/rayleigh_benard_rollout.mp4" type="video/mp4">
+        </video>
+        <div class="video-missing">Rollout animation coming soon</div>
+      </div>
+      <figcaption><strong>Rayleigh–Bénard convection</strong> ($512\times128$, 4 fields, 200 steps). A fluid layer
+        heated from below develops rising plumes; trajectories span $Ra \in [10^6, 10^{10}]$ and
+        $Pr \in [10^{-1}, 10]$.</figcaption>
+    </figure>
+    <figure class="figure">
+      <img src="static/images/qual_rb.jpg" alt="Qualitative rollouts on Rayleigh–Bénard" loading="lazy">
+      <figcaption>Snapshots at increasing rollout lead times.</figcaption>
+    </figure>
+  </div>
+
+  <div class="tab-panel" id="tab-trl">
+    <figure class="video-figure">
+      <div class="video-frame" data-video>
+        <video muted loop playsinline controls preload="metadata" poster="static/images/qual_trl.jpg">
+          <source src="static/videos/turbulent_radiative_layer_2D_rollout.mp4" type="video/mp4">
+        </video>
+        <div class="video-missing">Rollout animation coming soon</div>
+      </div>
+      <figcaption><strong>Turbulent Radiative Layer 2D</strong> ($384\times128$, 4 fields, 101 steps). Cold dense
+        and hot dilute gas in relative motion; mixed gas cools rapidly, controlled by the cooling time
+        $t_{\mathrm{cool}}$.</figcaption>
+    </figure>
+    <figure class="figure">
+      <img src="static/images/qual_trl.jpg" alt="Qualitative rollouts on Turbulent Radiative Layer 2D" loading="lazy">
+      <figcaption>Snapshots at increasing rollout lead times.</figcaption>
+    </figure>
+  </div>
+
+  <div class="tab-panel" id="tab-am">
+    <figure class="video-figure">
+      <div class="video-frame" data-video>
+        <video muted loop playsinline controls preload="metadata" poster="static/images/qual_am.jpg">
+          <source src="static/videos/active_matter_rollout.mp4" type="video/mp4">
+        </video>
+        <div class="video-missing">Rollout animation coming soon</div>
+      </div>
+      <figcaption><strong>Active Matter</strong> ($256\times256$, 11 fields, 81 steps). Elongated active particles in
+        a Stokes fluid, from disordered motion to coherent nematic flows. WFM 1-scale loses coherent structure as early
+        as $t=16$, while WFM 3-scale preserves it throughout.</figcaption>
+    </figure>
+    <figure class="figure">
+      <img src="static/images/qual_am.jpg" alt="Qualitative rollouts on Active Matter" loading="lazy">
+      <figcaption>Snapshots at increasing rollout lead times.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ============================== RESULTS ============================== -->
+<section id="results" class="container">
+  <h2><a href="#results">#</a>Results</h2>
+  <p class="narrow">
+    We compare against flow matching in pixel space (FM<sub>pixel</sub>, an architecturally identical control),
+    in Fourier space (FM<sub>fourier</sub>, capacity-matched to WFM 3-scale), in the latent space of a pre-trained
+    64× autoencoder (LatentFM<sub>÷64</sub>), the Wavelet Diffusion Neural Operator (WDNO), and deterministic
+    neural operators (FNO, TFNO, WNO). All flow-matching models share the U-Net, objective and sampler
+    ($N=50$ Euler steps, $\mathcal{M}=8$ trajectories); they differ only in the space where generation happens.
+    Scores are averaged over three inference seeds.
+  </p>
+
+  <h3>Spectral coherence</h3>
+  <div class="table-wrap">
+    <table>
+      <caption>Spectral coherence RMSE (↓) averaged over Low, Mid and High frequency bands and rollout horizons.
+        WFM rows use the mother wavelet selected per system (in parentheses).
+        <span class="best">Bold</span> = best.</caption>
+      <thead>
+        <tr><th>Model</th><th>Turbulent Radiative Layer 2D</th><th>Rayleigh–Bénard</th><th>Active Matter</th></tr>
+      </thead>
+      <tbody>
+        <tr class="ours"><td>WFM 1-scale</td><td class="best">0.147 <small>(haar)</small></td><td>0.121 <small>(db4)</small></td><td>0.241 <small>(haar)</small></td></tr>
+        <tr class="ours"><td>WFM 3-scale</td><td>0.149 <small>(haar)</small></td><td class="best">0.109 <small>(db4)</small></td><td class="best">0.220 <small>(db2)</small></td></tr>
+        <tr><td>FM<sub>pixel</sub></td><td>0.153</td><td>0.131</td><td>0.244</td></tr>
+        <tr><td>FM<sub>fourier</sub></td><td>0.379</td><td>0.266</td><td>0.376</td></tr>
+        <tr><td>WDNO</td><td>0.271</td><td>0.467</td><td>0.304</td></tr>
+        <tr><td>LatentFM<sub>÷64</sub></td><td>–</td><td>0.162</td><td>–</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <figure class="figure">
+    <img src="static/images/spectral_bands.png" alt="Spectral coherence RMSE per frequency band" loading="lazy">
+    <figcaption>Spectral coherence RMSE per frequency band for WFM and generative baselines. FM<sub>pixel</sub>
+      (dashed gray) serves as a quality-control reference.</figcaption>
+  </figure>
+
+  <h3>Accuracy and calibration</h3>
+  <p class="narrow">
+    WFM 3-scale outperforms all deterministic baselines in VRMSE and the other generative baselines in CRPS across
+    all systems, and is competitive with the pixel-space control.
+  </p>
+  <div class="figure-grid">
+    <figure class="figure">
+      <img src="static/images/vrmse_det.png" alt="VRMSE vs deterministic baselines" loading="lazy">
+      <figcaption>VRMSE (↓) for WFM variants and deterministic baselines, averaged over rollout horizons.</figcaption>
+    </figure>
+    <figure class="figure">
+      <img src="static/images/crps_gen.png" alt="CRPS vs generative baselines" loading="lazy">
+      <figcaption>CRPS (↓) for WFM variants and generative baselines, averaged over rollout horizons.</figcaption>
+    </figure>
+  </div>
+
+  <h3>Robustness across dynamical regimes</h3>
+  <p class="narrow">
+    The advantage of a multi-scale representation is clearest in the most chaotic regimes: the shortest cooling
+    times in TRL, where rapid condensation produces a highly corrugated interface, and the highest Rayleigh number in
+    Rayleigh–Bénard. On RB, WFM achieves the lowest CRPS across the full $Ra$–$Pr$ parameter space.
+  </p>
+  <div class="table-grid">
+    <div class="table-wrap">
+      <table class="compact">
+        <caption>TRL: CRPS (↓) per cooling time $t_{\mathrm{cool}}$.</caption>
+        <thead><tr><th>Model</th><th>0.03</th><th>0.06</th><th>0.1</th></tr></thead>
+        <tbody>
+          <tr class="ours"><td>WFM-1 haar</td><td>1.165</td><td>1.135</td><td>0.865</td></tr>
+          <tr class="ours"><td>WFM-1 db2</td><td>1.112</td><td>1.078</td><td>0.878</td></tr>
+          <tr class="ours"><td>WFM-1 db4</td><td>1.170</td><td>1.102</td><td>0.847</td></tr>
+          <tr class="ours"><td>WFM-1 db6</td><td>1.076</td><td>1.074</td><td class="second">0.831</td></tr>
+          <tr class="ours sep"><td>WFM-3 haar</td><td>1.107</td><td>1.117</td><td>0.868</td></tr>
+          <tr class="ours"><td>WFM-3 db2</td><td>1.248</td><td>1.141</td><td>0.894</td></tr>
+          <tr class="ours"><td>WFM-3 db4</td><td class="best">1.048</td><td class="best">1.006</td><td class="best">0.817</td></tr>
+          <tr class="ours"><td>WFM-3 db6</td><td class="second">1.075</td><td class="second">1.034</td><td>0.882</td></tr>
+          <tr class="sep"><td>FM<sub>pixel</sub></td><td>1.220</td><td>1.126</td><td>0.875</td></tr>
+          <tr><td>FM<sub>fourier</sub></td><td>1.439</td><td>1.424</td><td>1.195</td></tr>
+          <tr><td>WDNO</td><td>3.330</td><td>3.292</td><td>3.183</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="table-wrap">
+      <table class="compact">
+        <caption>Rayleigh–Bénard: CRPS (↓) per $Ra$, averaged over $Pr$.</caption>
+        <thead><tr><th>Model</th><th>$10^{6}$</th><th>$10^{8}$</th><th>$10^{10}$</th></tr></thead>
+        <tbody>
+          <tr class="ours"><td>WFM-1 haar</td><td>0.059</td><td>0.060</td><td>0.051</td></tr>
+          <tr class="ours"><td>WFM-1 db2</td><td class="best">0.052</td><td>0.062</td><td>0.052</td></tr>
+          <tr class="ours"><td>WFM-1 db4</td><td>0.059</td><td>0.060</td><td>0.051</td></tr>
+          <tr class="ours"><td>WFM-1 db6</td><td>0.060</td><td>0.069</td><td>0.075</td></tr>
+          <tr class="ours sep"><td>WFM-3 haar</td><td>0.060</td><td>0.060</td><td>0.055</td></tr>
+          <tr class="ours"><td>WFM-3 db2</td><td>0.054</td><td class="second">0.055</td><td class="second">0.049</td></tr>
+          <tr class="ours"><td>WFM-3 db4</td><td class="second">0.053</td><td>0.058</td><td class="best">0.048</td></tr>
+          <tr class="ours"><td>WFM-3 db6</td><td>0.065</td><td class="best">0.055</td><td>0.057</td></tr>
+          <tr class="sep"><td>FM<sub>pixel</sub></td><td>0.057</td><td>0.066</td><td>0.051</td></tr>
+          <tr><td>FM<sub>fourier</sub></td><td>0.071</td><td>0.081</td><td>0.065</td></tr>
+          <tr><td>WDNO</td><td>0.120</td><td>0.117</td><td>0.116</td></tr>
+          <tr><td>LatentFM<sub>÷64</sub></td><td>0.087</td><td>0.067</td><td>0.065</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <p class="table-note"><span class="best">Bold</span> = best, <span class="second">underlined</span> = second best.
+    Mean over three inference seeds (42, 84, 168).</p>
+</section>
+
+<!-- ============================== EFFICIENCY ============================== -->
+<section id="efficiency" class="container">
+  <h2><a href="#efficiency">#</a>Efficiency</h2>
+  <div class="two-col">
+    <div>
+      <p>
+        Because the generative process runs on spatially smaller coefficient maps, WFM samples faster than
+        FM<sub>pixel</sub> under identical conditions (same trajectories, NFEs, solver and hardware), with
+        essentially the same memory footprint.
+      </p>
+      <p>
+        WFM also needs no pre-training stage: it trains in about <strong>6 hours on 4×A100</strong>, whereas the
+        Rayleigh–Bénard autoencoder used by latent-space flow matching required about <strong>one day on
+        8×H100</strong> before any generative model could be trained.
+      </p>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <caption>Inference speedup relative to FM<sub>pixel</sub> (↑).</caption>
+        <thead><tr><th>System</th><th>WFM 1-scale</th><th>WFM 3-scale</th></tr></thead>
+        <tbody>
+          <tr><td>Turbulent Radiative Layer 2D</td><td>1.25×</td><td>1.14×</td></tr>
+          <tr><td>Rayleigh–Bénard</td><td>1.52×</td><td>1.38×</td></tr>
+          <tr><td>Active Matter</td><td>1.46×</td><td>1.26×</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== ANALYSIS ============================== -->
+<section id="analysis" class="container">
+  <h2><a href="#analysis">#</a>Coupling, physics and robustness</h2>
+  <div class="two-col">
+    <figure class="figure">
+      <img src="static/images/cross_scale.png" alt="Cross-scale sensitivity matrix" loading="lazy">
+      <figcaption>Cross-scale sensitivity $S_{jj'}$ of WFM 3-scale on TRL: relative change of head $\hat u_j$
+        when the interpolant at scale $j'$ is perturbed.</figcaption>
+    </figure>
+    <div>
+      <h3>The flows are coupled</h3>
+      <p>
+        Independent per-scale flows would give zero off-diagonal sensitivity. Perturbing one scale changes the
+        velocity predicted at all others: <strong>15.1%</strong> of the total sensitivity lies off the diagonal,
+        flowing both coarse-to-fine and fine-to-coarse through the shared encoder–decoder.
+      </p>
+      <h3>Physical consistency</h3>
+      <p>
+        On TRL, WFM 3-scale tracks the reference kinetic energy as well as FM<sub>pixel</sub> and better at the
+        longest horizon. On RB and AM the pixel-space control has lower late-horizon kinetic-energy error, while WFM
+        stays below FM<sub>fourier</sub> and WDNO.
+      </p>
+      <h3>Robust to initial conditions</h3>
+      <p>
+        Perturbing the initial conditions with Gaussian noise of up to 10% of each channel’s standard deviation
+        changes CRPS by at most 2.1% and leaves spectral coherence unchanged at three decimals.
+      </p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== LIMITATIONS ============================== -->
+<section id="limitations" class="container narrow">
+  <h2><a href="#limitations">#</a>Limitations</h2>
+  <p>
+    We only explore the Daubechies family of orthonormal wavelets; symlets and coiflets remain untested, and the
+    mother wavelet is currently selected per dataset rather than learned or chosen a priori. The DWT assumes regular
+    grids and handles non-periodic boundaries through padding. Extending WFM to irregular meshes and spherical
+    domains would open the way to weather and climate emulation.
+  </p>
+</section>
+
+<!-- ============================== BIBTEX ============================== -->
+<section id="bibtex" class="container narrow">
+  <h2><a href="#bibtex">#</a>BibTeX</h2>
+  <div class="bibtex">
+    <button class="copy-btn" type="button">Copy</button>
+<pre><code id="bibtex-code">@inproceedings{accarino2026wfm,
+  title     = {Wavelet Flow Matching for Multi-Scale Physics Emulation},
+  author    = {Accarino, Gabriele and Nathaniel, Juan and Roesch, Carla and
+               Gentine, Pierre and Shamekh, Sara and Watson-Parris, Duncan and
+               Acquaviva, Viviana},
+  booktitle = {Advances in Neural Information Processing Systems},
+  year      = {2026}
+}</code></pre>
+  </div>
+</section>
+
+<section id="acknowledgements" class="container narrow">
+  <h2><a href="#acknowledgements">#</a>Acknowledgements</h2>
+  <p class="small">
+    We acknowledge funding from NSF through the Learning the Earth with Artificial intelligence and Physics (LEAP)
+    Science and Technology Center (Award #2019625). VA acknowledges support from a PIVOT Research award (Award #12871)
+    from the Simons Foundation. This work used NSF NCAR Derecho-GPU through allocation CIS251353 from the
+    <a href="https://access-ci.org">ACCESS</a> program, supported by U.S. National Science Foundation grants
+    #2138259, #2138286, #2138307, #2137603, and #2138296.
+  </p>
+</section>
+
+</main>
+
+<footer class="footer">
+  <div class="container">
+    <p>
+      Layout inspired by the <a href="https://t-muser.github.io/flowers/">Flowers</a> project page and the
+      <a href="https://github.com/eliahuhorwitz/Academic-project-page-template">Academic Project Page Template</a>.
+      This website is licensed under a
+      <a href="http://creativecommons.org/licenses/by-sa/4.0/">Creative Commons Attribution-ShareAlike 4.0 International License</a>.
+    </p>
+  </div>
+</footer>
+
+</body>
+</html>
