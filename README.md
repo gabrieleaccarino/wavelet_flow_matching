@@ -1,64 +1,247 @@
-# wavelet_flow_matching — Wavelet Flow Matching for Multi-Scale Physics Emulation
+<div align="center">
 
-Code for *Wavelet Flow Matching for Multi-Scale Physics Emulation* (NeurIPS 2026).
+# Wavelet Flow Matching for Multi-Scale Physics Emulation
 
-## Layout
+**NeurIPS 2026**
 
+Gabriele Accarino · Juan Nathaniel · Carla Roesch · Pierre Gentine · Sara Shamekh · Duncan Watson-Parris · Viviana Acquaviva
+
+[**Project page**](https://gabrieleaccarino.github.io/wavelet_flow_matching/) ·
+[**Paper**](#) <!-- TODO: paper link --> ·
+[**arXiv**](#) <!-- TODO: arXiv link --> ·
+[**Pre-trained weights**](#) <!-- TODO: weights link --> ·
+[**BibTeX**](#citation)
+
+<img src="docs/static/images/architecture.png" width="95%" alt="Wavelet Flow Matching architecture">
+
+</div>
+
+---
+
+**Wavelet Flow Matching (WFM)** is a generative emulator for multi-scale PDE dynamics. Instead of learning a latent
+compression, WFM performs optimal-transport conditional flow matching **directly on the multi-scale wavelet
+coefficients** of the next state. The discrete wavelet transform is prescribed, lossless and needs no training; a
+single U-Net, whose encoder–decoder hierarchy mirrors the wavelet scales, predicts coupled transport velocities for
+every scale at once. A single inverse transform at the end of sampling returns the physical field.
+
+On three chaotic systems from [The Well](https://polymathic-ai.org/the_well/) (Turbulent Radiative Layer 2D,
+Rayleigh–Bénard convection and Active Matter), WFM achieves the best spectral coherence among generative baselines,
+competitive or better long-horizon accuracy, and samples **1.1–1.5× faster** than pixel-space flow matching.
+
+## Contents
+
+- [Installation](#installation)
+- [Data](#data)
+- [Quick start](#quick-start)
+- [Training](#training)
+- [Inference and evaluation](#inference-and-evaluation)
+- [Reproducing the paper tables and figures](#reproducing-the-paper-tables-and-figures)
+- [Repository layout](#repository-layout)
+- [Project page](#project-page)
+- [Citation](#citation)
+- [Acknowledgements](#acknowledgements)
+
+## Installation
+
+> **Note** — a pinned environment file is coming soon. The steps below install the package and its main
+> dependencies.
+
+```bash
+git clone https://github.com/gabrieleaccarino/wavelet_flow_matching.git
+cd wavelet_flow_matching
+
+# create an environment (Python >= 3.10)
+conda create -n wfm python=3.10 -y
+conda activate wfm
+
+# install PyTorch for your CUDA version first: https://pytorch.org/get-started/locally/
+# then the remaining dependencies and the package itself (editable)
+pip install pytorch-lightning pywavelets einops the_well numpy pandas pyyaml toml munch pot matplotlib tqdm
+pip install -e .
 ```
-wavelet_flow_matching/            package
-  models/, modules/, wavelets/, utils/   model, training and inference code (torch)
-  train_*.py, inference_*.py, eval_only.py   entry points used by scripts/*.sh (PBS)
-  analysis/             numpy/pandas only — rebuilds every table of the paper
-    catalog.py            model registry, PDE metadata, metric-file loading
-    tables.py             table builders, across-seed mean ± std, LaTeX export
-    physics.py            kinetic-energy diagnostic (rebuttal)
-    ic_sensitivity.py     initial-condition perturbation study (rebuttal)
-    profiling.py          inference speed / memory (Tables 2, S18, S19)
-    paper_tables.py       one function per paper table: build, write tex/csv, return mean/std/n
-    checks.py             rebuilds the submitted paper's tables (single run) cell by cell
-configs/<pde>/          v4.0 training configs + inference YAMLs (`*_seed.yaml` = 3-seed runs)
-scripts/                PBS job scripts + analysis entry points
-  reproduce_tables.py     headless equivalent of notebooks/01_tables.ipynb
-  check_paper_reproduction.py   CLI for analysis/checks.py
-notebooks/
-  01_tables.ipynb             builds + writes every table -> artifacts/tables/
-  02_figures.ipynb            Figs 3a-c, S2-S4          -> artifacts/figures/
-  03_qualitative_rollouts.ipynb  Figs 2a-b, S5          -> artifacts/figures/
-  04_physics_consistency.ipynb   physics figures (rebuttal)
-  05_cross_scale_coupling.ipynb  cross-scale sensitivity (needs GPU + checkpoint)
-  06_profiling_tables.ipynb      Tables 2, S18, S19 (interactive)
-  07_architecture_figure.ipynb   Fig 1 panels
-  examples/, data_prep/
-artifacts/              everything that goes into the paper (tracked in git)
-  tables/tex, tables/csv, figures/, rebuttal/, checks/, manifests/
-experiments/<pde>/      (not in git) ckpts/, metrics/, performance/
+
+The analysis code (`wavelet_flow_matching.analysis`) only needs `numpy`, `pandas` and `pyyaml`, so the paper tables
+can be rebuilt without a GPU or PyTorch.
+
+## Data
+
+All experiments use datasets from [The Well](https://github.com/PolymathicAI/the_well). Download them with the
+`the_well` CLI, e.g.:
+
+```bash
+the-well-download --base-path ./data/datasets --dataset turbulent_radiative_layer_2D
+the-well-download --base-path ./data/datasets --dataset rayleigh_benard
+the-well-download --base-path ./data/datasets --dataset active_matter
 ```
 
-## Reproducing the tables
+| System | Resolution | Channels | Trajectories | Steps | Scalar constants $\kappa$ |
+|---|---|---|---|---|---|
+| Turbulent Radiative Layer 2D | 384×128 | 4 | 90 | 101 | $t_{\mathrm{cool}}$ |
+| Rayleigh–Bénard | 512×128 | 4 | 1750 | 200 | $Ra$, $Pr$ |
+| Active Matter | 256×256 | 11 | 225 | 81 | $\alpha$, $\zeta$ |
 
-Run `notebooks/01_tables.ipynb` top to bottom: one cell per paper table, each
-writing `artifacts/tables/tex/<name>.tex` and `csv/<name>.csv`; the last
-section checks the builders against the submitted paper. Headless equivalent
-(same functions, byte-identical output):
+## Quick start
+
+### Multi-scale wavelet transform
+
+```python
+import torch
+from wavelet_flow_matching.wavelets import WaveletDecomposer2D
+
+dwt = WaveletDecomposer2D(wavelet="db4", n_scales=3, mode="periodic")
+
+x = torch.randn(2, 4, 1, 128, 384)          # (B, C, T, H, W)
+coeffs = dwt.forward_transform(x)            # {scale: (B, C, T, 4, H_j, W_j)}, fine -> coarse
+x_rec = dwt.inverse_transform(coeffs)        # exact reconstruction
+
+print({j: tuple(c.shape) for j, c in coeffs.items()})
+print("max reconstruction error:", (x - x_rec).abs().max().item())
+```
+
+### Autoregressive rollout from a pre-trained checkpoint
+
+```python
+import torch
+from wavelet_flow_matching.utils.well_data import get_well_dataset, get_well_inputs
+from wavelet_flow_matching.modules.wavelet_fm import WaveletFlowModule
+
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+model = WaveletFlowModule.from_checkpoint("path/to/WaveletFlow_..._portable.ckpt", map_location=device)
+model.eval().to(device)
+
+dataset = get_well_dataset(
+    path="./data/datasets", physics="turbulent_radiative_layer_2D",
+    split="test", steps=-1, transform=["log_scalars"], augment=[],
+)
+
+N_STEPS_INPUT, N_ENSEMBLE = 4, 8                       # 4-frame context, 8 trajectories
+x_full, label = get_well_inputs(dataset[0], device=device)   # (T, H, W, C), (num_cond,)
+seed = x_full[:N_STEPS_INPUT].unsqueeze(0).expand(N_ENSEMBLE, -1, -1, -1, -1)
+cond = label.unsqueeze(0).expand(N_ENSEMBLE, -1) if label is not None else None
+
+with torch.inference_mode():
+    _, preds = model.rollout(
+        seed=seed, scalar_conds=cond,
+        rollout_steps=x_full.shape[0] - N_STEPS_INPUT,
+        n_ensemble=1,                                  # ensemble is carried by the batch dimension
+    )
+# preds: (B, E, rollout_steps, H, W, C) in physical units
+```
+
+A complete, runnable version is in [`notebooks/examples/rollout_wavelet_fm.ipynb`](notebooks/examples/rollout_wavelet_fm.ipynb);
+baselines are rolled out in [`notebooks/examples/rollout_baselines.ipynb`](notebooks/examples/rollout_baselines.ipynb).
+
+## Training
+
+Each model is fully specified by a TOML config in `configs/<pde>/`. Config names encode the model, the number of
+wavelet scales and the mother wavelet, e.g. `WaveletFlow_rayleigh_benard_3scales_db4_ablation_v4.0.toml`.
+
+```bash
+# WFM (single node, 4 GPUs)
+torchrun --nproc_per_node=4 wavelet_flow_matching/train_wavelet_fm.py \
+    -c configs/turbulent_radiative_layer_2D/WaveletFlow_turbulent_radiative_layer_2D_3scales_haar_ablation_v4.0.toml \
+    -n 1 -d 4
+```
+
+Baselines use the analogous entry points `train_fourier_fm.py` (FM<sub>pixel</sub> / FM<sub>fourier</sub>),
+`train_latent_fm.py` (LatentFM) and `train_neural_ops.py` (FNO, TFNO, WNO). PBS job scripts used on NCAR Derecho
+are in `scripts/train_<pde>.sh`.
+
+Selected mother wavelets (lowest average spectral coherence RMSE):
+
+| | TRL 2D | Rayleigh–Bénard | Active Matter |
+|---|---|---|---|
+| WFM 1-scale | haar | db4 | haar |
+| WFM 3-scale | haar | db4 | db2 |
+
+## Inference and evaluation
+
+Ensemble rollouts and metrics (VRMSE, CRPS, spectral coherence RMSE, physics diagnostics) are produced from a YAML
+config:
+
+```bash
+python wavelet_flow_matching/inference_wavelet_fm.py \
+    --config configs/turbulent_radiative_layer_2D/inference_turbulent_radiative_layer_2D_seed.yaml \
+    --override n_ensemble=8 seed=42
+```
+
+This writes `experiments/<pde>/metrics/*_metrics.csv` (one per inference seed) and `*_perf.yaml` (profiling).
+Initial-condition perturbation runs use `inference_wavelet_fm_ic_pert.py` (`scripts/inference_ic_pert.pbs`).
+
+## Reproducing the paper tables and figures
+
+Run `notebooks/01_tables.ipynb` top to bottom: one cell per paper table, each writing
+`artifacts/tables/tex/<name>.tex` and `csv/<name>.csv`. Headless equivalent (same functions, byte-identical output):
 
 ```bash
 python scripts/reproduce_tables.py          # ~10 s, needs numpy, pandas, pyyaml
 python scripts/check_paper_reproduction.py  # sanity check vs. the submitted paper
 ```
+
 Set `WAVELET_FLOW_MATCHING_ROOT=/path/to/checkout` if `experiments/` lives elsewhere.
 
-**Metric files.** `experiments/<pde>/metrics/<model>_..._seed{42,84,168}_<pde>_metrics.csv`
-(one per inference seed; all WFM variants and generative baselines) and
-`<model>_..._<pde>_stats.csv` (single run; deterministic baselines FNO/TFNO/WNO).
+**Metric files.** `experiments/<pde>/metrics/<model>_..._seed{42,84,168}_<pde>_metrics.csv` (one per inference
+seed; all WFM variants and generative baselines) and `<model>_..._<pde>_stats.csv` (single run; deterministic
+baselines FNO/TFNO/WNO).
 
-**Aggregation.** Within a seed: mean over trajectories, fields and lead times;
-across seeds: mean ± sample std. Spectral coherence "averaged over the rollout"
-(Table 1, S12) is horizon-balanced (mean of the three horizon means); the
-physical-parameter tables (Table 3, S13–S17) average over all lead times.
-Horizon bins are inclusive (e.g. RB: 1–32, 33–64, 65–196).
+**Aggregation.** Within a seed: mean over trajectories, fields and lead times; across seeds: mean ± sample std.
+Spectral coherence "averaged over the rollout" is horizon-balanced (mean of the three horizon means); the
+physical-parameter tables average over all lead times. Horizon bins are inclusive (e.g. RB: 1–32, 33–64, 65–196).
 
-## Producing the metric files (cluster)
+Figures: `notebooks/02_figures.ipynb` (metrics), `03_qualitative_rollouts.ipynb` (rollout snapshots),
+`04_kinetic_energy.ipynb`, `05_cross_scale_coupling.ipynb` (needs GPU + checkpoint), `06_architecture_figure.ipynb`.
 
-`scripts/train_<pde>.sh` → checkpoints; `scripts/inference_<pde>.sh` with
-`configs/<pde>/inference_<pde>_seed.yaml` → `*_metrics.csv` and `*_perf.yaml`;
-`scripts/inference_ic_pert.pbs` / `submit_ic_grid.sh` → IC-perturbation runs.
+## Repository layout
+
+```
+wavelet_flow_matching/            package
+  wavelets/             DWT2D: batched multi-scale 2D DWT / IDWT (PyWavelets backend)
+  models/               WaveletFlowUNet (velocity network), DC-AE wrapper
+  modules/              Lightning modules: wavelet_fm, fourier_fm, latent_fm, neural_ops
+  utils/                data loading (The Well), rollout, metrics, physics diagnostics
+  train_*.py, inference_*.py, eval_only.py   entry points
+  analysis/             numpy/pandas only — rebuilds every table of the paper
+configs/<pde>/          training configs (TOML) + inference configs (YAML, *_seed.yaml = 3-seed runs)
+scripts/                PBS job scripts + analysis entry points
+notebooks/              tables, figures, qualitative rollouts, examples
+artifacts/              tables and figures that go into the paper (tracked in git)
+docs/                   project page (GitHub Pages)
+experiments/<pde>/      (not in git) checkpoints, metrics, profiling
+```
+
+## Project page
+
+The project page lives in [`docs/`](docs/) and is served with GitHub Pages
+(**Settings → Pages → Deploy from a branch → `main` / `/docs`**). Rollout animations go in
+[`docs/static/videos/`](docs/static/videos/README.md).
+
+## Citation
+
+```bibtex
+@inproceedings{accarino2026wfm,
+  title     = {Wavelet Flow Matching for Multi-Scale Physics Emulation},
+  author    = {Accarino, Gabriele and Nathaniel, Juan and Roesch, Carla and
+               Gentine, Pierre and Shamekh, Sara and Watson-Parris, Duncan and
+               Acquaviva, Viviana},
+  booktitle = {Advances in Neural Information Processing Systems},
+  year      = {2026}
+}
+```
+
+## Acknowledgements
+
+We acknowledge funding from NSF through the Learning the Earth with Artificial intelligence and Physics (LEAP)
+Science and Technology Center (Award #2019625). VA acknowledges support from a PIVOT Research award (Award #12871)
+from the Simons Foundation. This work used NSF NCAR Derecho-GPU through allocation CIS251353 from the
+[ACCESS](https://access-ci.org) program, supported by U.S. National Science Foundation grants #2138259, #2138286,
+#2138307, #2137603 and #2138296.
+
+We thank the authors of [The Well](https://github.com/PolymathicAI/the_well) for the datasets and baseline
+configurations, [PyWavelets](https://github.com/PyWavelets/pywt) for the wavelet backend, and
+Rozet et al. (*Lost in Latent Space*) for the pre-trained autoencoder used by the latent baseline.
+The project page layout is inspired by [Flowers](https://t-muser.github.io/flowers/).
+
+## Contact
+
+Gabriele Accarino — ga2673@columbia.edu
