@@ -91,13 +91,11 @@
   </div>
 
   <figure class="video-figure hero-video">
-    <div class="video-frame" data-video>
-      <video autoplay muted loop playsinline preload="metadata" poster="static/images/qual_rb.jpg">
-        <source src="static/videos/rayleigh_benard_rollout.mp4" type="video/mp4">
-      </video>
-      <div class="video-missing">Rollout animation coming soon</div>
-    </div>
-    <figcaption><strong>Rayleigh–Bénard convection: autoregressive rollout.</strong> Ground truth vs. WFM 3-scale samples over a long horizon.</figcaption>
+    <div class="video-frame" data-gif>
+        <img class="rollout-gif" src="static/gifs/rayleigh_benard_rollout.gif" data-fallback="static/images/qual_rb.jpg" alt="Autoregressive rollout animation">
+        <div class="video-missing">Rollout animation coming soon</div>
+      </div>
+    <figcaption><strong>Rayleigh–Bénard convection: autoregressive rollout.</strong> Ground truth (left) next to WFM and pixel-space flow matching over the full rollout.</figcaption>
   </figure>
 </section>
 
@@ -240,10 +238,8 @@
 
   <div class="tab-panel active" id="tab-rb">
     <figure class="video-figure">
-      <div class="video-frame" data-video>
-        <video muted loop playsinline controls preload="metadata" poster="static/images/qual_rb.jpg">
-          <source src="static/videos/rayleigh_benard_rollout.mp4" type="video/mp4">
-        </video>
+      <div class="video-frame" data-gif>
+        <img class="rollout-gif" src="static/gifs/rayleigh_benard_rollout.gif" data-fallback="static/images/qual_rb.jpg" alt="Autoregressive rollout animation" loading="lazy">
         <div class="video-missing">Rollout animation coming soon</div>
       </div>
       <figcaption><strong>Rayleigh–Bénard convection</strong> ($512\times128$, 4 fields, 200 steps). A fluid layer
@@ -258,10 +254,8 @@
 
   <div class="tab-panel" id="tab-trl">
     <figure class="video-figure">
-      <div class="video-frame" data-video>
-        <video muted loop playsinline controls preload="metadata" poster="static/images/qual_trl.jpg">
-          <source src="static/videos/turbulent_radiative_layer_2D_rollout.mp4" type="video/mp4">
-        </video>
+      <div class="video-frame" data-gif>
+        <img class="rollout-gif" src="static/gifs/turbulent_radiative_layer_2D_rollout.gif" data-fallback="static/images/qual_trl.jpg" alt="Autoregressive rollout animation" loading="lazy">
         <div class="video-missing">Rollout animation coming soon</div>
       </div>
       <figcaption><strong>Turbulent Radiative Layer 2D</strong> ($384\times128$, 4 fields, 101 steps). Cold dense
@@ -276,10 +270,8 @@
 
   <div class="tab-panel" id="tab-am">
     <figure class="video-figure">
-      <div class="video-frame" data-video>
-        <video muted loop playsinline controls preload="metadata" poster="static/images/qual_am.jpg">
-          <source src="static/videos/active_matter_rollout.mp4" type="video/mp4">
-        </video>
+      <div class="video-frame" data-gif>
+        <img class="rollout-gif" src="static/gifs/active_matter_rollout.gif" data-fallback="static/images/qual_am.jpg" alt="Autoregressive rollout animation" loading="lazy">
         <div class="video-missing">Rollout animation coming soon</div>
       </div>
       <figcaption><strong>Active Matter</strong> ($256\times256$, 11 fields, 81 steps). Elongated active particles in

@@ -18,15 +18,10 @@ Gabriele Accarino · Juan Nathaniel · Carla Roesch · Pierre Gentine · Sara Sh
 
 ---
 
-**Wavelet Flow Matching (WFM)** is a generative emulator for multi-scale PDE dynamics. Instead of learning a latent
-compression, WFM performs optimal-transport conditional flow matching **directly on the multi-scale wavelet
-coefficients** of the next state. The discrete wavelet transform is prescribed, lossless and needs no training; a
-single U-Net, whose encoder–decoder hierarchy mirrors the wavelet scales, predicts coupled transport velocities for
-every scale at once. A single inverse transform at the end of sampling returns the physical field.
+**Wavelet Flow Matching (WFM)** is a generative emulator for multi-scale PDE dynamics. Instead of learning a latent compression, WFM performs optimal-transport conditional flow matching **directly on the multi-scale wavelet coefficients** of the next state. The discrete wavelet transform is prescribed, lossless and needs no training; a single U-Net, whose encoder–decoder hierarchy mirrors the wavelet scales, predicts coupled transport velocities for every scale at once. A single inverse transform at the end of sampling returns the physical field.
 
 On three chaotic systems from [The Well](https://polymathic-ai.org/the_well/) (Turbulent Radiative Layer 2D,
-Rayleigh–Bénard convection and Active Matter), WFM achieves the best spectral coherence among generative baselines,
-competitive or better long-horizon accuracy, and samples **1.1–1.5× faster** than pixel-space flow matching.
+Rayleigh–Bénard convection and Active Matter), WFM achieves the best spectral coherence among generative baselines, competitive or better long-horizon accuracy, and samples **1.1–1.5× faster** than pixel-space flow matching.
 
 ## Contents
 
@@ -172,11 +167,10 @@ Initial-condition perturbation runs use `inference_wavelet_fm_ic_pert.py` (`scri
 ## Reproducing the paper tables and figures
 
 Run `notebooks/01_tables.ipynb` top to bottom: one cell per paper table, each writing
-`artifacts/tables/tex/<name>.tex` and `csv/<name>.csv`. Headless equivalent (same functions, byte-identical output):
+`artifacts/tables/tex/<name>.tex` and `csv/<name>.csv` (needs only numpy, pandas and pyyaml). Without Jupyter:
 
 ```bash
-python scripts/reproduce_tables.py          # ~10 s, needs numpy, pandas, pyyaml
-python scripts/check_paper_reproduction.py  # sanity check vs. the submitted paper
+python -c "from wavelet_flow_matching.analysis import paper_tables as P; P.build_all()"
 ```
 
 Set `WAVELET_FLOW_MATCHING_ROOT=/path/to/checkout` if `experiments/` lives elsewhere.
@@ -189,8 +183,15 @@ baselines FNO/TFNO/WNO).
 Spectral coherence "averaged over the rollout" is horizon-balanced (mean of the three horizon means); the
 physical-parameter tables average over all lead times. Horizon bins are inclusive (e.g. RB: 1–32, 33–64, 65–196).
 
-Figures: `notebooks/02_figures.ipynb` (metrics), `03_qualitative_rollouts.ipynb` (rollout snapshots),
-`04_kinetic_energy.ipynb`, `05_cross_scale_coupling.ipynb` (needs GPU + checkpoint), `06_architecture_figure.ipynb`.
+| Notebook | Produces |
+|---|---|
+| `01_tables.ipynb` | every table of the paper → `artifacts/tables/` |
+| `02_figures.ipynb` | metric figures (Fig. 3, S2–S4) → `artifacts/figures/` |
+| `03_qualitative_rollouts.ipynb` | rollout snapshots (Fig. 2, S5) → `artifacts/figures/` |
+| `04_kinetic_energy.ipynb` | kinetic-energy diagnostic |
+| `05_cross_scale_coupling.ipynb` | cross-scale sensitivity (needs GPU + checkpoint) |
+| `06_architecture_figure.ipynb` | Fig. 1 panels |
+| `07_rollout_animations.ipynb` | rollout GIFs → `artifacts/gifs/` (copied to `docs/static/gifs/` for the project page) |
 
 ## Repository layout
 
@@ -199,12 +200,12 @@ wavelet_flow_matching/            package
   wavelets/             DWT2D: batched multi-scale 2D DWT / IDWT (PyWavelets backend)
   models/               WaveletFlowUNet (velocity network), DC-AE wrapper
   modules/              Lightning modules: wavelet_fm, fourier_fm, latent_fm, neural_ops
-  utils/                data loading (The Well), rollout, metrics, physics diagnostics
+  utils/                data loading (The Well), rollout, metrics, physics diagnostics, GIF animations
   train_*.py, inference_*.py, eval_only.py   entry points
   analysis/             numpy/pandas only — rebuilds every table of the paper
 configs/<pde>/          training configs (TOML) + inference configs (YAML, *_seed.yaml = 3-seed runs)
-scripts/                PBS job scripts + analysis entry points
-notebooks/              tables, figures, qualitative rollouts, examples
+scripts/                PBS job scripts (training, inference, IC-perturbation runs)
+notebooks/              tables, figures, rollout snapshots and animations, examples, data preparation
 artifacts/              tables and figures that go into the paper (tracked in git)
 docs/                   project page (GitHub Pages)
 experiments/<pde>/      (not in git) checkpoints, metrics, profiling
@@ -213,8 +214,9 @@ experiments/<pde>/      (not in git) checkpoints, metrics, profiling
 ## Project page
 
 The project page lives in [`docs/`](docs/) and is served with GitHub Pages
-(**Settings → Pages → Deploy from a branch → `main` / `/docs`**). Rollout animations go in
-[`docs/static/videos/`](docs/static/videos/README.md).
+(**Settings → Pages → Deploy from a branch → `main` / `/docs`**). The rollout GIFs it shows live in
+[`docs/static/gifs/`](docs/static/gifs/README.md), copied from `artifacts/gifs/` (written by
+`notebooks/07_rollout_animations.ipynb`).
 
 ## Citation
 

@@ -2,10 +2,8 @@
 
 Each function builds its table from the loaded metric frames, writes
 ``artifacts/tables/tex/<name>.tex`` + ``artifacts/tables/csv/<name>.csv``,
-records the cell-wise seed spread, and returns ``(mean, std, n)`` frames.
-They are called identically by ``notebooks/01_tables.ipynb`` and
-``scripts/reproduce_tables.py`` (via :func:`build_all`), so both produce
-byte-identical artifacts.
+and returns ``(mean, std, n)`` frames. They are called by
+``notebooks/01_tables.ipynb``; :func:`build_all` builds every table in one go.
 
     from wavelet_flow_matching.analysis import paper_tables as P
     df, gdf = P.load_all()
@@ -21,7 +19,7 @@ import pandas as pd
 from . import catalog as C
 from . import tables as T
 from .ic_sensitivity import ic_tables, load_ic
-from .paths import CHECKS, ensure_artifact_dirs
+from .paths import ensure_artifact_dirs
 from .physics import ke_table
 from .profiling import load_profiles, selected
 
@@ -68,25 +66,21 @@ def seeds_note(mean=None, std=None) -> str:
 DET_NOTE = r" Deterministic baselines (WNO, FNO, TFNO) are single runs."
 LF_NOTE = r" LatentFM$_{\div 64}$ is evaluated on Rayleigh--B\'enard only."
 
-_SPREADS: dict[str, pd.DataFrame] = {}     # name -> per-cell seed spread (re-running a table overwrites)
 VERBOSE = True
 
 
 def _emit(name, res, tex):
     mean, std, n = res
     T.save(name, mean, std, n, tex)
-    _SPREADS[name] = T.spread_report(name, mean, std, n)
     if VERBOSE:
         print(f"  wrote {name}")
     return res
 
 
 def load_all(verbose=True):
-    """Load every metric file; write artifacts/checks/coverage.csv."""
+    """Load every metric file (per-field rows, `_global_` physics rows)."""
     ensure_artifact_dirs()
-    df, gdf = C.load(verbose=verbose)
-    C.coverage(pd.concat([df, gdf])).to_csv(CHECKS / "coverage.csv", index=False)
-    return df, gdf
+    return C.load(verbose=verbose)
 
 
 # ---------------------------------------------------------------------------
@@ -414,27 +408,10 @@ def s21_s22_ic_perturbation(show_std=None, std_rel_crps=None, std_rel_spectral=N
 
 
 # ---------------------------------------------------------------------------
-# Audit + everything
+# Everything
 # ---------------------------------------------------------------------------
-TABLE_ORDER = ["T1_wavelet_selection", "S12_vrmse", "S13_crps", "S14_spectral_bands",
-               "S15_crps_tcool", "T3a_crps_tcool", "S17_crps_Ra", "T3b_crps_Ra", "S18_crps_Pr",
-               "S16_spectral_tcool", "S19a_spectral_Ra", "S19b_spectral_Pr", "X_rb_latentfm", "S20_ke_mae"]
-
-
-def write_seed_spread():
-    """artifacts/checks/seed_spread{,_summary}.csv from every table built so far."""
-    names = [n for n in TABLE_ORDER if n in _SPREADS] + [n for n in _SPREADS if n not in TABLE_ORDER]
-    sp = pd.concat([_SPREADS[n] for n in names], ignore_index=True)
-    sp.to_csv(CHECKS / "seed_spread.csv", index=False, float_format="%.6g")
-    summ = sp.groupby("table")["rel_std_pct"].agg(
-        cells="size", median="median", max="max",
-        pct_over_0p5=lambda x: 100 * (x > 0.5).mean(), pct_over_1=lambda x: 100 * (x > 1).mean())
-    summ.round(2).to_csv(CHECKS / "seed_spread_summary.csv")
-    return summ.round(2)
-
-
 def build_all(verbose=True, show_std=True, std_rel=None):
-    """Build every table in paper order; returns the seed-spread summary.
+    """Build every table in paper order.
 
     show_std: True/False for every table, or a dict {table name: bool} using the
     output names (e.g. {"T3a_crps_tcool": False, "S16_spectral_tcool": False});
@@ -460,4 +437,3 @@ def build_all(verbose=True, show_std=True, std_rel=None):
     s21_s22_ic_perturbation(f("S21_S22_ic"), t("S21_ic_crps"), t("S22_ic_spectral"))
     t2_s23_s24_profiling()
     s2_cross_scale()
-    return write_seed_spread()

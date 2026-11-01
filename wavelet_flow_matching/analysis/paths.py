@@ -15,7 +15,6 @@ ARTIFACTS = PROJECT_ROOT / "artifacts"
 TABLES_TEX = ARTIFACTS / "tables" / "tex"
 TABLES_CSV = ARTIFACTS / "tables" / "csv"
 FIGURES = ARTIFACTS / "figures"
-CHECKS = ARTIFACTS / "checks"
 
 
 def metrics_dir(pde: str) -> Path:
@@ -23,5 +22,5 @@ def metrics_dir(pde: str) -> Path:
 
 
 def ensure_artifact_dirs() -> None:
-    for d in (TABLES_TEX, TABLES_CSV, FIGURES, CHECKS):
+    for d in (TABLES_TEX, TABLES_CSV, FIGURES):
         d.mkdir(parents=True, exist_ok=True)

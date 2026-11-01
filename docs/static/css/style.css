@@ -96,9 +96,9 @@ sup { font-size: 0.68em; color: var(--accent); }
 .video-figure { margin: 0 auto 26px; }
 .video-frame {
   position: relative; border-radius: var(--radius); overflow: hidden;
-  background: #111; border: 1px solid var(--line);
+  background: #fff; border: 1px solid var(--line);
 }
-.video-frame video { width: 100%; display: block; }
+.video-frame img { width: 100%; display: block; }
 .video-missing {
   display: none; position: absolute; inset: auto 0 0 0;
   padding: 8px 14px; font-size: 0.85rem; color: #fff;
@@ -106,7 +106,6 @@ sup { font-size: 0.68em; color: var(--accent); }
 }
 .video-frame.missing { background: #fff; }
 .video-frame.missing .video-missing { display: block; }
-.video-frame.missing video { pointer-events: none; }
 
 /* ---------- figures ---------- */
 .figure { margin: 22px 0; }

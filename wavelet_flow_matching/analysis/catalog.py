@@ -15,8 +15,8 @@ diagnostics (kinetic energy etc.); the per-field ML metrics (CRPS, VRMSE,
 spectral coherence) are NaN there. ``load()`` keeps them separate.
 
 MODEL is the name used in the paper (WFM_1scale_haar, FM_pixel, FM_fourier,
-WDNO, LatentFM, WNO, FNO, TFNO, ...). Raw inference outputs are converted to
-this scheme by ``scripts/rename_to_paper_names.py``.
+WDNO, LatentFM, WNO, FNO, TFNO, ...); metric files written by the inference
+scripts are renamed to this scheme before analysis.
 """
 from __future__ import annotations
 
@@ -223,9 +223,3 @@ def load(models=None, pdes=PDES, source: str = "auto", verbose: bool = True):
     return fields, glob_
 
 
-def coverage(df: pd.DataFrame) -> pd.DataFrame:
-    """(pde, model) -> sorted seeds and file count, for audits."""
-    return (df.groupby(["pde", "model"])
-              .agg(seeds=("seed", lambda s: sorted(s.unique())),
-                   files=("source", "nunique"), rows=("step", "size"))
-              .reset_index())

@@ -213,21 +213,6 @@ def s9_table(sel_mean, sel_std) -> pd.DataFrame:
 
 
 # ===========================================================================
-# seed-spread audit
-# ===========================================================================
-def spread_report(name, mean, std, n):
-    """Long-format relative std (%) of every cell with >=2 seeds."""
-    m, s = mean.stack(list(range(mean.columns.nlevels)), future_stack=True), \
-           std.stack(list(range(std.columns.nlevels)), future_stack=True)
-    nn = n.stack(list(range(n.columns.nlevels)), future_stack=True)
-    r = pd.DataFrame({"mean": m, "std": s, "n": nn}).dropna(subset=["mean"])
-    r = r[r["n"] >= 2]
-    r["rel_std_pct"] = 100 * r["std"] / r["mean"].abs()
-    r.insert(0, "table", name)
-    return r.reset_index()
-
-
-# ===========================================================================
 # LaTeX
 # ===========================================================================
 # Mean-only mode (STD_IN_LATEX = False): cells whose across-seed std exceeds
