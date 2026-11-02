@@ -17,7 +17,7 @@ cd $PBS_O_WORKDIR
 DATASET_NAME="rayleigh_benard"
 REPO=/glade/work/gaccarino/wavelet_flow_matching
 CONFIG=${REPO}/configs/${DATASET_NAME}/inference_${DATASET_NAME}.yaml
-N_ENSEMBLE=8
+N_ENSEMBLE=8   # M: ensemble members (independent realizations) per initial condition
 NUM_SAMPLING=20
 
 conda activate mlenv

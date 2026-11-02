@@ -740,7 +740,7 @@ def main() -> None:
     ckpt_name         = cfg["ckpt_name"]
     N_STEPS_INPUT     = cfg["n_steps_input"]
     NUM_SAMPLING      = cfg["num_sampling_steps"]
-    N_ENSEMBLE        = cfg["n_ensemble"]
+    N_ENSEMBLE        = cfg["n_ensemble"]   # M: ensemble members (independent realizations) per initial condition
     ODE_METHOD        = cfg.get("ode_method", "euler")
     CLAMP_SIGMA       = cfg.get("clamp_sigma", 5.0)
     N_TRAJ_PER_FILE   = cfg.get("n_traj_per_file", N_TRAJ_PER_FILE_DEFAULT)
@@ -883,7 +883,7 @@ def main() -> None:
                 scalar_conds     = label_exp,
                 rollout_steps    = n_rollout,
                 n_steps_input    = N_STEPS_INPUT,
-                n_ensemble       = 1,
+                n_ensemble       = 1,   # members are already stacked along the batch dim (n_ens_local copies of the seed)
                 normalized_input = False,
                 verbose          = cfg.get("verbose", False),
                 ode_method       = ODE_METHOD,

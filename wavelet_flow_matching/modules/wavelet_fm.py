@@ -362,7 +362,7 @@ class WaveletFlowModule(pl.LightningModule):
         Euler integration of the learned vector field.
         """
         fm    = self.flow_matching_cfg
-        n_ens = n_ensemble or fm.n_ensemble
+        n_ens = n_ensemble or fm.n_ensemble   # M: ensemble members (independent realizations) per input
         dt    = 1.0 / fm.num_sampling_steps
 
         x0, x1, cond, B = self._prepare_batch(batch)
@@ -431,7 +431,7 @@ class WaveletFlowModule(pl.LightningModule):
         scalar_conds    : torch.Tensor,
         rollout_steps   : int,
         n_steps_input   : int | None = None,
-        n_ensemble      : int | None = None,
+        n_ensemble      : int | None = None,   # M realizations per seed (default: config); stacked as dim E of the output
         normalized_input: bool = False,
         verbose         : bool = False,
         ode_method      : str  = "heun",

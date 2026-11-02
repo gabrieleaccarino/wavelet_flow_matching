@@ -381,7 +381,7 @@ class LatentFlowModule(pl.LightningModule):
     def sample(self, batch, batch_idx, n_ensemble: int | None = None,
                ode_method: str = "euler"):
         fm    = self.flow_matching_cfg
-        n_ens = n_ensemble or fm.n_ensemble
+        n_ens = n_ensemble or fm.n_ensemble   # M: ensemble members (independent realizations) per input
 
         x0, x1, cond, B = self._prepare_batch(batch)
         c0 = self._lat_to_curr(x0)
@@ -410,7 +410,7 @@ class LatentFlowModule(pl.LightningModule):
         scalar_conds    : torch.Tensor,
         rollout_steps   : int,
         n_steps_input   : int | None = None,
-        n_ensemble      : int | None = None,
+        n_ensemble      : int | None = None,   # M realizations per seed (default: config); stacked as dim E of the output
         normalized_input: bool = False,
         verbose         : bool = False,
         ode_method      : str  = "heun",

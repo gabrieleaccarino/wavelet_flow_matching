@@ -24,7 +24,7 @@ CONFIG=${REPO}/configs/${DATASET_NAME}/inference_${DATASET_NAME}_seed.yaml
 INFER=${REPO}/wavelet_flow_matching/inference_latent_fm.py
 
 N_GPUS=4
-N_ENSEMBLE=8
+N_ENSEMBLE=8   # M: ensemble members (independent realizations) per initial condition
 NUM_SAMPLING=50
 ODE_METHOD="euler"        # keep in sync with the YAML's ode_method
 CLAMP_SIGMA=5.0

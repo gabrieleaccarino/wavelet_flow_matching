@@ -93,7 +93,7 @@ def main() -> None:
     ckpt_name         = cfg["ckpt_name"]
     N_STEPS_INPUT     = cfg["n_steps_input"]
     NUM_SAMPLING      = cfg["num_sampling_steps"]
-    N_ENSEMBLE        = cfg["n_ensemble"]
+    N_ENSEMBLE        = cfg["n_ensemble"]   # M: ensemble members (independent realizations) per initial condition
 
     ckpt_base_name = re.split(r"_\d{8}_", ckpt_name)[0]
     if ckpt_base_name == ckpt_name:

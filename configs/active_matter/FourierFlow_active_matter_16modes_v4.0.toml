@@ -52,7 +52,7 @@
 
 [flow_matching]
     cls        = 'OT_CFM'
-    n_ensemble = 1
+    n_ensemble = 1   # M realizations for the end-of-epoch monitoring sample only (no effect on the loss); inference M is set in inference_*.yaml
 
 [flow_matching.params]
     sigma = 0.0

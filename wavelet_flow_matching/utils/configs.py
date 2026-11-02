@@ -94,7 +94,7 @@ class VelocityNetConfig:
 
 @dataclass
 class FlowMatchingConfig:
-    n_ensemble         : int   = 1
+    n_ensemble         : int   = 1    # M: ensemble members (independent realizations) per initial condition
     num_sampling_steps : int   = 20
     sigma              : float = 0.0
 

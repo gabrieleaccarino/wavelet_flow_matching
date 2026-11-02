@@ -40,5 +40,5 @@ augment:   []
 # ── Model / inference ─────────────────────────────────────────────────────────
 n_steps_input:      4    # Ti — must match the value used during training
 num_sampling_steps: 20   # ODE integration steps per prediction
-n_ensemble:         8    # total ensemble members (split across GPUs)
+n_ensemble:         8    # M: total ensemble members (independent realizations) per initial condition, split across GPUs
 verbose:            true

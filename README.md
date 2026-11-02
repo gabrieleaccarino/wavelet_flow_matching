@@ -96,8 +96,8 @@ from wavelet_flow_matching.wavelets import WaveletDecomposer2D
 dwt = WaveletDecomposer2D(wavelet="db4", n_scales=3, mode="periodic")
 
 x = torch.randn(2, 4, 1, 128, 384)          # (B, C, T, H, W)
-coeffs = dwt.forward_transform(x)            # {scale: (B, C, T, 4, H_j, W_j)}, fine -> coarse
-x_rec = dwt.inverse_transform(coeffs)        # exact reconstruction
+coeffs = dwt.forward_transform(x)           # {scale: (B, C, T, 4, H_j, W_j)}, fine to coarse
+x_rec = dwt.inverse_transform(coeffs)       # exact reconstruction
 
 print({j: tuple(c.shape) for j, c in coeffs.items()})
 print("max reconstruction error:", (x - x_rec).abs().max().item())
@@ -120,8 +120,8 @@ dataset = get_well_dataset(
     split="test", steps=-1, transform=["log_scalars"], augment=[],
 )
 
-N_STEPS_INPUT, N_ENSEMBLE = 4, 8                       # 4-frame context, 8 trajectories
-x_full, label = get_well_inputs(dataset[0], device=device)   # (T, H, W, C), (num_cond,)
+N_STEPS_INPUT, N_ENSEMBLE = 4, 8                                                # 4-frame context, M = 8 ensemble members
+x_full, label = get_well_inputs(dataset[0], device=device)                      # (T, H, W, C), (num_cond,)
 seed = x_full[:N_STEPS_INPUT].unsqueeze(0).expand(N_ENSEMBLE, -1, -1, -1, -1)
 cond = label.unsqueeze(0).expand(N_ENSEMBLE, -1) if label is not None else None
 
@@ -171,6 +171,11 @@ python wavelet_flow_matching/inference_wavelet_fm.py \
     --override n_ensemble=8 seed=42
 ```
 
+`n_ensemble` is the number of **ensemble members** $M$: independent realizations generated from the same initial
+condition, each starting from its own Gaussian noise draw ($M = 8$ in the paper). At inference the members are split
+across GPUs. In the training configs, `n_ensemble = 1` only controls the end-of-epoch monitoring sample and does not
+affect training. The name is kept for compatibility with the released configs and checkpoints.
+
 This writes `experiments/<pde>/metrics/*_metrics.csv` (one per inference seed) and `*_perf.yaml` (profiling).
 Initial-condition perturbation runs use `inference_wavelet_fm_ic_pert.py` (`scripts/inference_ic_pert.pbs`).
 
@@ -201,7 +206,7 @@ physical-parameter tables average over all lead times. Horizon bins are inclusiv
 | `04_kinetic_energy.ipynb` | kinetic-energy diagnostic |
 | `05_cross_scale_coupling.ipynb` | cross-scale sensitivity (needs GPU + checkpoint) |
 | `06_architecture_figure.ipynb` | Fig. 1 panels |
-| `07_rollout_animations.ipynb` | rollout GIFs → `artifacts/gifs/` (copied to `docs/static/gifs/` for the project page) |
+| `07_rollout_animations.ipynb` | rollout GIFs → `artifacts/gifs/` |
 
 ## Repository layout
 
@@ -221,13 +226,6 @@ artifacts/              tables and figures that go into the paper (tracked in gi
 docs/                   project page (GitHub Pages)
 experiments/<pde>/      (not in git) checkpoints, metrics, profiling
 ```
-
-## Project page
-
-The project page lives in [`docs/`](docs/) and is served with GitHub Pages
-(**Settings → Pages → Deploy from a branch → `main` / `/docs`**). The rollout GIFs it shows live in
-[`docs/static/gifs/`](docs/static/gifs/README.md), copied from `artifacts/gifs/` (written by
-`notebooks/07_rollout_animations.ipynb`).
 
 ## Citation
 
@@ -253,7 +251,6 @@ from the Simons Foundation. This work used NSF NCAR Derecho-GPU through allocati
 We thank the authors of [The Well](https://github.com/PolymathicAI/the_well) for the datasets and baseline
 configurations, [PyWavelets](https://github.com/PyWavelets/pywt) for the wavelet backend, and
 Rozet et al. (*Lost in Latent Space*) for the pre-trained autoencoder used by the latent baseline.
-The project page layout is inspired by [Flowers](https://t-muser.github.io/flowers/).
 
 ## Contact
 

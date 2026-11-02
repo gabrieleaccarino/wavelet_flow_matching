@@ -46,7 +46,7 @@ augment:   []
 
 # ── Rollout / sampling ────────────────────────────────────────────────────────
 n_steps_input: 4
-n_ensemble: 8
+n_ensemble: 8    # M: total ensemble members (independent realizations) per initial condition, split across GPUs
 ode_method: "heun"         # "euler", "heun", or "midpoint"
 
 clamp_sigma: 5.0           # soft clamp on normalized predictions (0 = off)
