@@ -1,0 +1,27 @@
+# Pinned dependencies of wavelet_flow_matching: the environment used for the paper
+# (Python 3.10.15, PyTorch 2.6.0 + CUDA 12.4, NVIDIA A100 40GB).
+# If the default torch wheel does not match your CUDA driver, install PyTorch first:
+#   https://pytorch.org/get-started/locally/
+torch==2.6.0                    # core
+pytorch-lightning==2.6.0        # core: training loops [pytorch_lightning]
+the_well==1.2.0                 # core: datasets
+numpy==2.2.6                    # core
+scipy==1.15.2                   # core
+pandas==2.3.3                   # core: metrics / tables
+PyYAML==6.0.3                   # core: configs [yaml]
+toml==0.10.2                    # core: configs
+munch==4.0.0                    # core: configs
+einops==0.8.1                   # core
+PyWavelets==1.8.0               # core: wavelet filters [pywt]
+POT==0.9.6.post1                # core: Wasserstein metrics [ot]
+h5py==3.15.1                    # core: data
+mlflow==3.8.1                   # training: logging
+neuraloperator==0.3.0           # baselines: FNO / TFNO [neuralop]
+torch_harmonics==0.8.0          # baselines: required by neuraloperator, not declared by it
+wandb==0.23.1                   # baselines: required by neuraloperator, not declared by it
+matplotlib==3.10.8              # figures
+seaborn==0.13.2                 # figures
+pillow==11.3.0                  # figures / GIFs [PIL]
+moviepy==2.2.1                  # videos
+tqdm==4.67.1                    # progress bars
+ipykernel==7.1.0                # notebooks

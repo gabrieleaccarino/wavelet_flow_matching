@@ -1,11 +1,43 @@
 [build-system]
-requires = ["setuptools"]
-build-backend = "setuptools.backends.legacy:build"
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
 
 [project]
 name = "wavelet_flow_matching"
 version = "0.1.0"
+description = "Wavelet Flow Matching for Multi-Scale Physics Emulation (NeurIPS 2026)"
+readme = "README.md"
 requires-python = ">=3.10"
+# Loose requirements; the exact versions used for the paper are pinned in env/requirements.txt.
+dependencies = [
+    "torch",
+    "pytorch-lightning",
+    "the_well",
+    "numpy",
+    "scipy",
+    "pandas",
+    "pyyaml",
+    "toml",
+    "munch",
+    "einops",
+    "PyWavelets",
+    "POT",
+    "h5py",
+    "fsspec",
+    "mlflow",
+    "neuraloperator",
+    "torch_harmonics",
+    "wandb",
+    "matplotlib",
+    "seaborn",
+    "pillow",
+    "moviepy",
+    "tqdm",
+]
+
+[project.optional-dependencies]
+deepspeed = ["deepspeed"]
+notebooks = ["ipykernel"]
 
 [tool.setuptools.packages.find]
 where = ["."]

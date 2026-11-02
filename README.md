@@ -38,22 +38,32 @@ Rayleigh–Bénard convection and Active Matter), WFM achieves the best spectral
 
 ## Installation
 
-> **Note** — a pinned environment file is coming soon. The steps below install the package and its main
-> dependencies.
+The environment used for the paper is pinned in [`env/`](env/): `environment.yml` (conda) and `requirements.txt` (pip).
+All experiments were run with Python 3.10.15 and PyTorch 2.6.0 (CUDA 12.4, cuDNN 9.2, NCCL 2.21) on NCAR Derecho
+GPU nodes (4× NVIDIA A100 40GB per node, SUSE Linux 15).
+
+**Option A — conda (recommended)**
 
 ```bash
 git clone https://github.com/gabrieleaccarino/wavelet_flow_matching.git
 cd wavelet_flow_matching
 
-# create an environment (Python >= 3.10)
-conda create -n wfm python=3.10 -y
+conda env create -f env/environment.yml      # Python + pinned dependencies
 conda activate wfm
+pip install -e .                             # the wavelet_flow_matching package itself
+```
 
-# install PyTorch for your CUDA version first: https://pytorch.org/get-started/locally/
-# then the remaining dependencies and the package itself (editable)
-pip install pytorch-lightning pywavelets einops the_well numpy pandas pyyaml toml munch pot matplotlib tqdm
+**Option B — pip / venv**
+
+```bash
+python -m venv .venv && source .venv/bin/activate   # same Python version as in env/environment.yml
+pip install -r env/requirements.txt
 pip install -e .
 ```
+
+`env/requirements.txt` pins `torch` to the version used in the paper. If the default PyPI wheel does not match your
+CUDA driver, install PyTorch first following <https://pytorch.org/get-started/locally/>, then run the commands above.
+`pip install -e .` alone also works and pulls the latest compatible versions instead of the pinned ones.
 
 The analysis code (`wavelet_flow_matching.analysis`) only needs `numpy`, `pandas` and `pyyaml`, so the paper tables
 can be rebuilt without a GPU or PyTorch.
@@ -205,6 +215,7 @@ wavelet_flow_matching/            package
   analysis/             numpy/pandas only — rebuilds every table of the paper
 configs/<pde>/          training configs (TOML) + inference configs (YAML, *_seed.yaml = 3-seed runs)
 scripts/                PBS job scripts (training, inference, IC-perturbation runs)
+env/                    pinned environment: environment.yml (conda), requirements.txt (pip)
 notebooks/              tables, figures, rollout snapshots and animations, examples, data preparation
 artifacts/              tables and figures that go into the paper (tracked in git)
 docs/                   project page (GitHub Pages)

@@ -1,0 +1,32 @@
+# Conda environment for wavelet_flow_matching: the environment used for the paper.
+#   conda env create -f env/environment.yml && conda activate wfm && pip install -e .
+name: wfm
+channels:
+  - conda-forge
+dependencies:
+  - python=3.10.15
+  - pip
+  - pip:
+      - torch==2.6.0
+      - pytorch-lightning==2.6.0
+      - the_well==1.2.0
+      - numpy==2.2.6
+      - scipy==1.15.2
+      - pandas==2.3.3
+      - PyYAML==6.0.3
+      - toml==0.10.2
+      - munch==4.0.0
+      - einops==0.8.1
+      - PyWavelets==1.8.0
+      - POT==0.9.6.post1
+      - h5py==3.15.1
+      - mlflow==3.8.1
+      - neuraloperator==0.3.0
+      - torch_harmonics==0.8.0
+      - wandb==0.23.1
+      - matplotlib==3.10.8
+      - seaborn==0.13.2
+      - pillow==11.3.0
+      - moviepy==2.2.1
+      - tqdm==4.67.1
+      - ipykernel==7.1.0
