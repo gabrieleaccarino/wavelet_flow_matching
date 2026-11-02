@@ -5,6 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "wavelet_flow_matching"
 version = "0.1.0"
+license = {text = "MIT"}
 description = "Wavelet Flow Matching for Multi-Scale Physics Emulation (NeurIPS 2026)"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -33,6 +34,7 @@ dependencies = [
     "pillow",
     "moviepy",
     "tqdm",
+    "huggingface_hub",
 ]
 
 [project.optional-dependencies]

@@ -4,12 +4,13 @@
 
 **NeurIPS 2026**
 
-Gabriele Accarino · Juan Nathaniel · Carla Roesch · Pierre Gentine · Sara Shamekh · Duncan Watson-Parris · Viviana Acquaviva
+Gabriele Accarino · Juan Nathaniel · Carla Roesch · Pierre Gentine · Sara Shamekh \
+Duncan Watson-Parris · Viviana Acquaviva
 
 [**Project page**](https://gabrieleaccarino.github.io/wavelet_flow_matching/) ·
 [**Paper**](#) <!-- TODO: paper link --> ·
 [**arXiv**](#) <!-- TODO: arXiv link --> ·
-[**Pre-trained weights**](#) <!-- TODO: weights link --> ·
+[**Pre-trained weights**](https://huggingface.co/gabrieleaccarino/wavelet-flow-matching) ·
 [**BibTeX**](#citation)
 
 <img src="docs/static/images/architecture.png" width="95%" alt="Wavelet Flow Matching architecture">
@@ -27,12 +28,14 @@ Rayleigh–Bénard convection and Active Matter), WFM achieves the best spectral
 
 - [Installation](#installation)
 - [Data](#data)
+- [Pre-trained weights](#pre-trained-weights)
 - [Quick start](#quick-start)
 - [Training](#training)
 - [Inference and evaluation](#inference-and-evaluation)
 - [Reproducing the paper tables and figures](#reproducing-the-paper-tables-and-figures)
 - [Repository layout](#repository-layout)
 - [Project page](#project-page)
+- [License](#license)
 - [Citation](#citation)
 - [Acknowledgements](#acknowledgements)
 
@@ -85,6 +88,30 @@ the-well-download --base-path ./data/datasets --dataset active_matter
 | Rayleigh–Bénard | 512×128 | 4 | 1750 | 200 | $Ra$, $Pr$ |
 | Active Matter | 256×256 | 11 | 225 | 81 | $\alpha$, $\zeta$ |
 
+## Pre-trained weights
+
+The checkpoints of every model in the paper are on the Hugging Face Hub:
+[**gabrieleaccarino/wavelet-flow-matching**](https://huggingface.co/gabrieleaccarino/wavelet-flow-matching). That covers WFM with 1 and 3 scales for each mother wavelet (haar, db2, db4,
+db6), plus the FM<sub>pixel</sub>, FM<sub>fourier</sub> (32 and 16 modes), LatentFM, FNO and TFNO baselines, on all
+three systems. The model card lists each checkpoint with its parameters, epoch, validation loss and SHA-256.
+
+```python
+from wavelet_flow_matching.hub import list_models, load_pretrained
+
+list_models("rayleigh_benard")      # ['WFM_1scale_haar', ..., 'FNO', 'TFNO', 'LatentFM']
+model = load_pretrained("rayleigh_benard", "WFM_3scale_db4", map_location="cuda")
+```
+
+Model names match the paper and the metric files in `experiments/<pde>/metrics/`. `load_pretrained` downloads the
+file once (cached) and returns the model in eval mode. `download_checkpoint(pde, model)` only downloads and returns
+the local path. From the command line:
+
+```bash
+hf download gabrieleaccarino/wavelet-flow-matching --include "rayleigh_benard/*" --local-dir ./weights
+```
+
+WNO and WDNO were run with their authors' official code and are not included.
+
 ## Quick start
 
 ### Multi-scale wavelet transform
@@ -108,12 +135,12 @@ print("max reconstruction error:", (x - x_rec).abs().max().item())
 ```python
 import torch
 from wavelet_flow_matching.utils.well_data import get_well_dataset, get_well_inputs
-from wavelet_flow_matching.modules.wavelet_fm import WaveletFlowModule
+from wavelet_flow_matching.hub import load_pretrained
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-model = WaveletFlowModule.from_checkpoint("path/to/WaveletFlow_..._portable.ckpt", map_location=device)
-model.eval().to(device)
+# downloads the checkpoint from the Hugging Face Hub (or: WaveletFlowModule.from_checkpoint("path/to/file.ckpt"))
+model = load_pretrained("turbulent_radiative_layer_2D", "WFM_3scale_haar", map_location=device)
 
 dataset = get_well_dataset(
     path="./data/datasets", physics="turbulent_radiative_layer_2D",
@@ -149,13 +176,14 @@ torchrun --nproc_per_node=4 wavelet_flow_matching/train_wavelet_fm.py \
     -n 1 -d 4
 ```
 
-Baselines use the analogous entry points `train_fourier_fm.py` (FM<sub>pixel</sub> / FM<sub>fourier</sub>),
-`train_latent_fm.py` (LatentFM) and `train_neural_ops.py` (FNO, TFNO, WNO). PBS job scripts used on NCAR Derecho
-are in `scripts/train_<pde>.sh`.
+FM<sub>pixel</sub> uses the same entry point with `use_wavelet = false` (`configs/<pde>/FM_*data_space*.toml`). The
+other baselines use `train_fourier_fm.py` (FM<sub>fourier</sub>), `train_latent_fm.py` (LatentFM) and
+`train_neural_ops.py` (FNO, TFNO). WNO and WDNO were trained with their authors' official code. PBS job scripts used
+on NCAR Derecho are in `scripts/train_<pde>.sh`.
 
 Selected mother wavelets (lowest average spectral coherence RMSE):
 
-| | TRL 2D | Rayleigh–Bénard | Active Matter |
+| | Turbulent Radiative Layer 2D | Rayleigh–Bénard | Active Matter |
 |---|---|---|---|
 | WFM 1-scale | haar | db4 | haar |
 | WFM 3-scale | haar | db4 | db2 |
@@ -177,6 +205,10 @@ across GPUs. In the training configs, `n_ensemble = 1` only controls the end-of-
 affect training. The name is kept for compatibility with the released configs and checkpoints.
 
 This writes `experiments/<pde>/metrics/*_metrics.csv` (one per inference seed) and `*_perf.yaml` (profiling).
+
+The inference configs keep the paths used on NCAR Derecho. Before running them, set `project_root`, `well_base_path`
+and `stats_path` to your own paths. To evaluate a checkpoint downloaded from the Hub, set `ckpt_path:` to the file; it
+takes precedence over `ckpt_name`.
 Initial-condition perturbation runs use `inference_wavelet_fm_ic_pert.py` (`scripts/inference_ic_pert.pbs`).
 
 ## Reproducing the paper tables and figures
@@ -215,6 +247,7 @@ wavelet_flow_matching/            package
   wavelets/             DWT2D: batched multi-scale 2D DWT / IDWT (PyWavelets backend)
   models/               WaveletFlowUNet (velocity network), DC-AE wrapper
   modules/              Lightning modules: wavelet_fm, fourier_fm, latent_fm, neural_ops
+  hub.py                download / load the pre-trained checkpoints from the Hugging Face Hub
   utils/                data loading (The Well), rollout, metrics, physics diagnostics, GIF animations
   train_*.py, inference_*.py, eval_only.py   entry points
   analysis/             numpy/pandas only — rebuilds every table of the paper
@@ -226,6 +259,10 @@ artifacts/              tables and figures that go into the paper (tracked in gi
 docs/                   project page (GitHub Pages)
 experiments/<pde>/      (not in git) checkpoints, metrics, profiling
 ```
+
+## License
+
+Code and pre-trained weights are released under the [MIT License](LICENSE).
 
 ## Citation
 
@@ -250,7 +287,7 @@ from the Simons Foundation. This work used NSF NCAR Derecho-GPU through allocati
 
 We thank the authors of [The Well](https://github.com/PolymathicAI/the_well) for the datasets and baseline
 configurations, [PyWavelets](https://github.com/PyWavelets/pywt) for the wavelet backend, and
-Rozet et al. (*Lost in Latent Space*) for the pre-trained autoencoder used by the latent baseline.
+Rozet et al. (*Lost in Latent Space*) for the pre-trained autoencoder used by the latent baseline for the Rayleigh–Bénard system.
 
 ## Contact
 

@@ -25,3 +25,4 @@ pillow==11.3.0                  # figures / GIFs [PIL]
 moviepy==2.2.1                  # videos
 tqdm==4.67.1                    # progress bars
 ipykernel==7.1.0                # notebooks
+huggingface_hub==2.4.0          # pre-trained weights (wavelet_flow_matching.hub)

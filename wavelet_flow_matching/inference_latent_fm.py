@@ -737,7 +737,8 @@ def main() -> None:
     # ── Experiment identifiers ────────────────────────────────────────────────
     well_base_path    = cfg["well_base_path"]
     well_dataset_name = cfg["well_dataset_name"]
-    ckpt_name         = cfg["ckpt_name"]
+    ckpt_path_cfg     = cfg.get("ckpt_path")   # optional: explicit file, e.g. downloaded from the Hugging Face Hub
+    ckpt_name         = os.path.basename(ckpt_path_cfg) if ckpt_path_cfg else cfg["ckpt_name"]
     N_STEPS_INPUT     = cfg["n_steps_input"]
     NUM_SAMPLING      = cfg["num_sampling_steps"]
     N_ENSEMBLE        = cfg["n_ensemble"]   # M: ensemble members (independent realizations) per initial condition
@@ -749,7 +750,7 @@ def main() -> None:
     if ckpt_base_name == ckpt_name:
         ckpt_base_name = Path(ckpt_name).stem
 
-    ckpt_path = os.path.join(
+    ckpt_path = ckpt_path_cfg or os.path.join(
         project_root, "experiments", well_dataset_name,
         ckpt_base_name, "artifacts/checkpoints", ckpt_name,
     )
