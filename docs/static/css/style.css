@@ -96,6 +96,7 @@ sup { font-size: 0.68em; color: var(--accent); }
   transition: background .15s, transform .15s;
 }
 .btn svg { width: 18px; height: 18px; }
+.btn-emoji { font-size: 17px; line-height: 1; }
 .btn:hover { background: var(--accent); text-decoration: none; transform: translateY(-1px); }
 .btn.disabled { background: #b9b5c9; cursor: default; pointer-events: none; }
 
