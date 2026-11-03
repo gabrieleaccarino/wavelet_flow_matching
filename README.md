@@ -7,11 +7,25 @@
 Gabriele Accarino · Juan Nathaniel · Carla Roesch · Pierre Gentine · Sara Shamekh \
 Duncan Watson-Parris · Viviana Acquaviva
 
+[![arXiv](https://img.shields.io/badge/arXiv-2605.16573-b31b1b.svg?logo=arxiv&logoColor=white)](https://arxiv.org/abs/2605.16573)
+[![NeurIPS 2026](https://img.shields.io/badge/NeurIPS-2026-4b44ce.svg)](https://arxiv.org/abs/2605.16573)
+[![Project page](https://img.shields.io/badge/Project-Page-1f72b8.svg?logo=githubpages&logoColor=white)](https://gabrieleaccarino.github.io/wavelet_flow_matching/)
+[![Hugging Face](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Weights-ffc107.svg)](https://huggingface.co/gabrieleaccarino/wavelet-flow-matching)
+[![Data: The Well](https://img.shields.io/badge/Data-The%20Well-2e8b57.svg)](https://polymathic-ai.org/the_well/)
+<br>
+[![License: MIT](https://img.shields.io/github/license/gabrieleaccarino/wavelet_flow_matching.svg)](LICENSE)
+[![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-3776ab.svg?logo=python&logoColor=white)](env/environment.yml)
+[![PyTorch 2.6](https://img.shields.io/badge/PyTorch-2.6-ee4c2c.svg?logo=pytorch&logoColor=white)](https://pytorch.org/)
+[![Last commit](https://img.shields.io/github/last-commit/gabrieleaccarino/wavelet_flow_matching.svg)](https://github.com/gabrieleaccarino/wavelet_flow_matching/commits/main)
+[![GitHub stars](https://img.shields.io/github/stars/gabrieleaccarino/wavelet_flow_matching.svg?style=social)](https://github.com/gabrieleaccarino/wavelet_flow_matching/stargazers)
+[![GitHub forks](https://img.shields.io/github/forks/gabrieleaccarino/wavelet_flow_matching.svg?style=social)](https://github.com/gabrieleaccarino/wavelet_flow_matching/network/members)
+
 [**Project page**](https://gabrieleaccarino.github.io/wavelet_flow_matching/) ·
-[**Paper**](#) <!-- TODO: paper link --> ·
-[**arXiv**](#) <!-- TODO: arXiv link --> ·
+[**arXiv**](https://arxiv.org/abs/2605.16573) ·
+[**PDF**](https://arxiv.org/pdf/2605.16573) ·
 [**Pre-trained weights**](https://huggingface.co/gabrieleaccarino/wavelet-flow-matching) ·
 [**BibTeX**](#citation)
+<!-- TODO: add the NeurIPS proceedings link once it is published -->
 
 <img src="docs/static/images/architecture.png" width="95%" alt="Wavelet Flow Matching architecture">
 
